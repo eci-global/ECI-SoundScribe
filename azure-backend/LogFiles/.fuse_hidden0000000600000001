@@ -1,0 +1,1625 @@
+2025-07-09T03:03:45.4547531Z Container start method called.
+2025-07-09T03:03:45.4691420Z Establishing network.
+2025-07-09T03:03:45.4696061Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T03:03:45.6728569Z Image appsvc/node:18-lts_20250506.5.tuxprod is pulled from registry 10.1.0.6:13209
+2025-07-09T03:03:45.6797786Z Container is starting.
+2025-07-09T03:03:45.6802490Z Establishing user namespace if not established already.
+2025-07-09T03:03:45.6809362Z Establishing network if not established already.
+2025-07-09T03:03:45.6811744Z Mounting volumes.
+2025-07-09T03:03:45.6839391Z Nested mountpoint site/wwwroot
+2025-07-09T03:03:45.6898213Z Nested mountpoint volatile/logs
+2025-07-09T03:03:45.6919823Z Nested mountpoint 
+2025-07-09T03:03:45.7003639Z Nested mountpoint 
+2025-07-09T03:03:45.7265228Z Nested mountpoint 
+2025-07-09T03:03:45.7288306Z Nested mountpoint 
+2025-07-09T03:03:46.8443419Z Creating container.
+2025-07-09T03:03:46.8449864Z Creating pipes for streaming container io.
+2025-07-09T03:03:46.8456554Z Creating stdout named pipe at /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stdout_270aa14728694b08a16d536eaa0523f5.
+2025-07-09T03:03:46.8461783Z Successfully created stdout named pipe at: /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stdout_270aa14728694b08a16d536eaa0523f5.
+2025-07-09T03:03:46.8469250Z Opening named pipe /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stdout_270aa14728694b08a16d536eaa0523f5 for reading in non-blocking mode.
+2025-07-09T03:03:46.8471160Z Successfully opened named pipe: /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stdout_270aa14728694b08a16d536eaa0523f5.
+2025-07-09T03:03:46.8476650Z Successfully removed non-blocking flag from /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stdout_270aa14728694b08a16d536eaa0523f5.
+2025-07-09T03:03:46.8478360Z Creating stderr named pipe at /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stderr_59f9600fc0284627b7d25a31f42a21af.
+2025-07-09T03:03:46.8483036Z Successfully created stderr named pipe at: /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stderr_59f9600fc0284627b7d25a31f42a21af.
+2025-07-09T03:03:46.8487322Z Opening named pipe /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stderr_59f9600fc0284627b7d25a31f42a21af for reading in non-blocking mode.
+2025-07-09T03:03:46.8494925Z Successfully opened named pipe: /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stderr_59f9600fc0284627b7d25a31f42a21af.
+2025-07-09T03:03:46.8502061Z Successfully removed non-blocking flag from /podr/container/pipe/16a42c2b6b7b_soundscribe-backend/stderr_59f9600fc0284627b7d25a31f42a21af.
+2025-07-09T03:03:46.8512910Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:03:47.4491485Z Starting container: 16a42c2b6b7b_soundscribe-backend.
+2025-07-09T03:03:47.5114101Z Starting watchers and probes.
+2025-07-09T03:03:47.5243805Z Starting metrics collection.
+2025-07-09T03:03:47.5272446Z Container is running.
+2025-07-09T03:03:47.7324742Z Container start method finished after 2275 ms.
+2025-07-09T03:03:50.3408424Z Container has finished running with exit code: 1.
+2025-07-09T03:03:50.3443277Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T03:03:50.3503908Z Stop and delete container. Retry count = 0
+2025-07-09T03:03:50.3515847Z Stopping container: 16a42c2b6b7b_soundscribe-backend.
+2025-07-09T03:03:50.3683778Z Deleting container: 16a42c2b6b7b_soundscribe-backend. Retry count = 0
+2025-07-09T03:03:50.4213381Z Container spec TerminationMessagePolicy  path 
+2025-07-09T03:03:50.4233007Z Container is terminated. Total time elapsed: 77 ms.
+2025-07-09T03:03:50.4245748Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T03:03:50.4264591Z Site startup probe failed after 2.6656167 seconds.
+2025-07-09T03:03:50.4439421Z Failed to start site. Revert by stopping site.
+2025-07-09T03:03:50.4529235Z Site: soundscribe-backend stopped.
+2025-07-09T03:04:21.144Z INFO  - Pulling image: mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:04:21.273Z INFO  - stage3 Pulling from appsvc/middleware
+2025-07-09T03:04:21.290Z INFO  -  Digest: sha256:053794b6902a3f02a4aa1ec413523bad68ca5841b3573fb71e0898176cf06fcf
+2025-07-09T03:04:21.290Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:04:21.318Z INFO  - Pull Image successful, Time taken: 0 Seconds
+2025-07-09T03:04:21.376Z INFO  - Starting container for site
+2025-07-09T03:04:21.376Z INFO  - docker run -d --expose=8181 --name soundscribe-backend_0_7c2f0288_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://localhost:5173,https://preview--eci-sound-scribe.lovable.app,https://eci-sound-scribe.lovable.app,https://preview--echo-ai-scribe-app.lovable.app,https://echo-ai-scribe-app.lovable.app,https://*.lovableproject.com -e WEBSITE_CORS_SUPPORT_CREDENTIALS=False -e PORT=3001 -e WEBSITES_PORT=3001 -e WEBSITES_ENABLE_APP_SERVICE_STORAGE=false -e WEBSITE_SITE_NAME=soundscribe-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=soundscribe-backend.azurewebsites.net -e WEBSITE_INSTANCE_ID=4c11444959efb9529cb60d8cec69115a66a458b1ddc5f5c9c48663dd2f61c942 -e HTTP_LOGGING_ENABLED=1 mcr.microsoft.com/appsvc/middleware:stage3 REDACTED
+fe73e946043 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - e80e7a01aa18 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - dbdb400cee12 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 6cfdccd84944 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 05cbafa84713 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - c63eec82a533 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 1d2026fe3a6c Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - d8490e915e0f Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 7b5561a23a3b Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - ef14a3f6126b Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 4bce287fb788 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - ea800b560a24 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 675715b611cb Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 687284d089f3 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - 1f91d5ab9574 Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - d73d49dbfc6a Pulling fs layer
+2025-07-09T03:03:57.831Z INFO  - a0666340f4df Waiting
+2025-07-09T03:03:57.831Z INFO  - 3fe73e946043 Waiting
+2025-07-09T03:03:57.831Z INFO  - e80e7a01aa18 Waiting
+2025-07-09T03:03:57.831Z INFO  - dbdb400cee12 Waiting
+2025-07-09T03:03:57.831Z INFO  - 6cfdccd84944 Waiting
+2025-07-09T03:03:57.831Z INFO  - 05cbafa84713 Waiting
+2025-07-09T03:03:57.831Z INFO  - c63eec82a533 Waiting
+2025-07-09T03:03:57.831Z INFO  - 1d2026fe3a6c Waiting
+2025-07-09T03:03:57.831Z INFO  - d8490e915e0f Waiting
+2025-07-09T03:03:57.831Z INFO  - 7b5561a23a3b Waiting
+2025-07-09T03:03:57.831Z INFO  - ef14a3f6126b Waiting
+2025-07-09T03:03:57.831Z INFO  - 4bce287fb788 Waiting
+2025-07-09T03:03:57.831Z INFO  - ea800b560a24 Waiting
+2025-07-09T03:03:57.831Z INFO  - 675715b611cb Waiting
+2025-07-09T03:03:57.832Z INFO  - 687284d089f3 Waiting
+2025-07-09T03:03:57.832Z INFO  - d73d49dbfc6a Waiting
+2025-07-09T03:03:57.832Z INFO  - 1f91d5ab9574 Waiting
+2025-07-09T03:03:57.833Z INFO  - ba31af965236 Downloading 3KB / 13KB
+2025-07-09T03:03:57.833Z INFO  - fe38d6c43aed Downloading 39KB / 39KB
+2025-07-09T03:03:57.833Z INFO  - ba31af965236 Downloading 13KB / 13KB
+2025-07-09T03:03:57.833Z INFO  - fe38d6c43aed Verifying Checksum
+2025-07-09T03:03:57.833Z INFO  - fe38d6c43aed Download complete
+2025-07-09T03:03:57.848Z INFO  - ba31af965236 Verifying Checksum
+2025-07-09T03:03:57.848Z INFO  - ba31af965236 Download complete
+2025-07-09T03:03:57.848Z INFO  - d065ebe907aa Downloading 126B / 126B
+2025-07-09T03:03:57.848Z INFO  - d065ebe907aa Verifying Checksum
+2025-07-09T03:03:57.848Z INFO  - d065ebe907aa Download complete
+2025-07-09T03:03:57.848Z INFO  - b1fc213b8591 Downloading 3KB / 10KB
+2025-07-09T03:03:57.848Z INFO  - b1fc213b8591 Downloading 10KB / 10KB
+2025-07-09T03:03:57.848Z INFO  - 4f4fb700ef54 Downloading 32B / 32B
+2025-07-09T03:03:57.848Z INFO  - b1fc213b8591 Verifying Checksum
+2025-07-09T03:03:57.848Z INFO  - b1fc213b8591 Download complete
+2025-07-09T03:03:57.848Z INFO  - 4f4fb700ef54 Verifying Checksum
+2025-07-09T03:03:57.848Z INFO  - 4f4fb700ef54 Download complete
+2025-07-09T03:03:57.848Z INFO  - c2230bed8f53 Downloading 10KB / 10KB
+2025-07-09T03:03:57.848Z INFO  - c2230bed8f53 Verifying Checksum
+2025-07-09T03:03:57.848Z INFO  - c2230bed8f53 Download complete
+2025-07-09T03:03:57.848Z INFO  - 004ce55f87ff Downloading 35KB / 1MB
+2025-07-09T03:03:57.849Z INFO  - 9f2e01286e23 Downloading 3KB / 3KB
+2025-07-09T03:03:57.849Z INFO  - a0666340f4df Downloading 946B / 946B
+2025-07-09T03:03:57.849Z INFO  - 19f1f54854d6 Downloading 520KB / 51MB
+2025-07-09T03:03:57.866Z INFO  - 8766eb796574 Downloading 284KB / 284KB
+2025-07-09T03:03:57.866Z INFO  - 9f2e01286e23 Downloading 3KB / 3KB
+2025-07-09T03:03:57.867Z INFO  - cae2b124a38d Downloading 385B / 385B
+2025-07-09T03:03:57.867Z INFO  - a0666340f4df Verifying Checksum
+2025-07-09T03:03:57.867Z INFO  - a0666340f4df Download complete
+2025-07-09T03:03:57.867Z INFO  - 9f2e01286e23 Verifying Checksum
+2025-07-09T03:03:57.867Z INFO  - 9f2e01286e23 Download complete
+2025-07-09T03:03:57.872Z INFO  - 8766eb796574 Verifying Checksum
+2025-07-09T03:03:57.872Z INFO  - 8766eb796574 Download complete
+2025-07-09T03:03:57.872Z INFO  - cae2b124a38d Verifying Checksum
+2025-07-09T03:03:57.872Z INFO  - cae2b124a38d Download complete
+2025-07-09T03:03:57.889Z INFO  - 3fe73e946043 Downloading 1KB / 1KB
+2025-07-09T03:03:57.889Z INFO  - 05cbafa84713 Downloading 1KB / 1KB
+2025-07-09T03:03:57.890Z INFO  - 6cfdccd84944 Downloading 1KB / 1KB
+2025-07-09T03:03:57.891Z INFO  - 3fe73e946043 Verifying Checksum
+2025-07-09T03:03:57.891Z INFO  - 3fe73e946043 Download complete
+2025-07-09T03:03:57.892Z INFO  - e80e7a01aa18 Downloading 137B / 137B
+2025-07-09T03:03:57.892Z INFO  - e80e7a01aa18 Verifying Checksum
+2025-07-09T03:03:57.893Z INFO  - e80e7a01aa18 Download complete
+2025-07-09T03:03:57.893Z INFO  - 05cbafa84713 Verifying Checksum
+2025-07-09T03:03:57.894Z INFO  - 05cbafa84713 Download complete
+2025-07-09T03:03:57.894Z INFO  - 6cfdccd84944 Verifying Checksum
+2025-07-09T03:03:57.899Z INFO  - 6cfdccd84944 Download complete
+2025-07-09T03:03:57.932Z INFO  - c63eec82a533 Downloading 2KB / 2KB
+2025-07-09T03:03:57.933Z INFO  - c63eec82a533 Verifying Checksum
+2025-07-09T03:03:57.933Z INFO  - c63eec82a533 Download complete
+2025-07-09T03:03:57.939Z INFO  - 26c54f90efe5 Downloading 1MB / 1MB
+2025-07-09T03:03:57.940Z INFO  - 26c54f90efe5 Downloading 1MB / 1MB
+2025-07-09T03:03:57.941Z INFO  - d8490e915e0f Downloading 3KB / 13KB
+2025-07-09T03:03:57.945Z INFO  - 1d2026fe3a6c Downloading 152B / 152B
+2025-07-09T03:03:57.946Z INFO  - d8490e915e0f Downloading 13KB / 13KB
+2025-07-09T03:03:57.974Z INFO  - 2e75f3d69a88 Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - 2e75f3d69a88 Download complete
+2025-07-09T03:03:58.036Z INFO  - 26c54f90efe5 Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - 26c54f90efe5 Download complete
+2025-07-09T03:03:58.036Z INFO  - 1d2026fe3a6c Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - 1d2026fe3a6c Download complete
+2025-07-09T03:03:58.036Z INFO  - d8490e915e0f Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - d8490e915e0f Download complete
+2025-07-09T03:03:58.036Z INFO  - 004ce55f87ff Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - 004ce55f87ff Download complete
+2025-07-09T03:03:58.036Z INFO  - ea800b560a24 Downloading 125B / 125B
+2025-07-09T03:03:58.036Z INFO  - 687284d089f3 Downloading 1KB / 1KB
+2025-07-09T03:03:58.036Z INFO  - 4bce287fb788 Downloading 271B / 271B
+2025-07-09T03:03:58.036Z INFO  - 675715b611cb Downloading 419B / 419B
+2025-07-09T03:03:58.036Z INFO  - ea800b560a24 Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - ea800b560a24 Download complete
+2025-07-09T03:03:58.036Z INFO  - 687284d089f3 Verifying Checksum
+2025-07-09T03:03:58.036Z INFO  - 687284d089f3 Download complete
+2025-07-09T03:03:58.036Z INFO  - 4bce287fb788 Verifying Checksum
+2025-07-09T03:03:58.037Z INFO  - 4bce287fb788 Download complete
+2025-07-09T03:03:58.037Z INFO  - 675715b611cb Verifying Checksum
+2025-07-09T03:03:58.037Z INFO  - 675715b611cb Download complete
+2025-07-09T03:03:58.037Z INFO  - dbdb400cee12 Downloading 516KB / 62MB
+2025-07-09T03:03:58.037Z INFO  - 3bdbced20006 Downloading 4MB / 35MB
+2025-07-09T03:03:58.037Z INFO  - 918f47dbe60d Downloading 4MB / 10MB
+2025-07-09T03:03:58.037Z INFO  - ef14a3f6126b Downloading 271B / 271B
+2025-07-09T03:03:58.037Z INFO  - ef14a3f6126b Verifying Checksum
+2025-07-09T03:03:58.037Z INFO  - ef14a3f6126b Download complete
+2025-07-09T03:03:58.064Z INFO  - d73d49dbfc6a Downloading 132B / 132B
+2025-07-09T03:03:58.064Z INFO  - 7b5561a23a3b Downloading 1KB / 1KB
+2025-07-09T03:03:58.064Z INFO  - d73d49dbfc6a Verifying Checksum
+2025-07-09T03:03:58.064Z INFO  - d73d49dbfc6a Download complete
+2025-07-09T03:03:58.064Z INFO  - 7b5561a23a3b Verifying Checksum
+2025-07-09T03:03:58.064Z INFO  - 7b5561a23a3b Download complete
+2025-07-09T03:03:58.122Z INFO  - 1f91d5ab9574 Downloading 120KB / 1MB
+2025-07-09T03:03:58.136Z INFO  - 19f1f54854d6 Downloading 6MB / 51MB
+2025-07-09T03:03:58.140Z INFO  - 918f47dbe60d Downloading 7MB / 10MB
+2025-07-09T03:03:58.159Z INFO  - dbdb400cee12 Downloading 2MB / 62MB
+2025-07-09T03:03:58.189Z INFO  - dbdb400cee12 Downloading 6MB / 62MB
+2025-07-09T03:03:58.191Z INFO  - 5b8842b15e04 Downloading 5MB / 5MB
+2025-07-09T03:03:58.204Z INFO  - 5b8842b15e04 Verifying Checksum
+2025-07-09T03:03:58.252Z INFO  - 5b8842b15e04 Download complete
+2025-07-09T03:03:58.253Z INFO  - 1f91d5ab9574 Downloading 1MB / 1MB
+2025-07-09T03:03:58.253Z INFO  - 1f91d5ab9574 Downloading 1MB / 1MB
+2025-07-09T03:03:58.253Z INFO  - 19f1f54854d6 Downloading 10MB / 51MB
+2025-07-09T03:03:58.255Z INFO  - 321325091bfd Downloading 10MB / 16MB
+2025-07-09T03:03:58.255Z INFO  - 1f91d5ab9574 Verifying Checksum
+2025-07-09T03:03:58.255Z INFO  - 1f91d5ab9574 Download complete
+2025-07-09T03:03:58.268Z INFO  - 3bdbced20006 Downloading 11MB / 35MB
+2025-07-09T03:03:58.271Z INFO  - 918f47dbe60d Downloading 9MB / 10MB
+2025-07-09T03:03:58.284Z INFO  - d96775b7da67 Downloading 6MB / 42MB
+2025-07-09T03:03:58.291Z INFO  - 918f47dbe60d Verifying Checksum
+2025-07-09T03:03:58.291Z INFO  - 918f47dbe60d Download complete
+2025-07-09T03:03:58.312Z INFO  - 9bfcbf7e4fe7 Downloading 13MB / 43MB
+2025-07-09T03:03:58.340Z INFO  - dbdb400cee12 Downloading 14MB / 62MB
+2025-07-09T03:03:58.356Z INFO  - 19f1f54854d6 Downloading 15MB / 51MB
+2025-07-09T03:03:58.356Z INFO  - 321325091bfd Verifying Checksum
+2025-07-09T03:03:58.356Z INFO  - 321325091bfd Download complete
+2025-07-09T03:03:58.384Z INFO  - d96775b7da67 Downloading 8MB / 42MB
+2025-07-09T03:03:58.420Z INFO  - 9bfcbf7e4fe7 Downloading 20MB / 43MB
+2025-07-09T03:03:58.428Z INFO  - 3bdbced20006 Downloading 17MB / 35MB
+2025-07-09T03:03:58.484Z INFO  - dbdb400cee12 Downloading 19MB / 62MB
+2025-07-09T03:03:58.520Z INFO  - 3bdbced20006 Downloading 24MB / 35MB
+2025-07-09T03:03:58.566Z INFO  - 9bfcbf7e4fe7 Downloading 27MB / 43MB
+2025-07-09T03:03:58.576Z INFO  - 19f1f54854d6 Downloading 26MB / 51MB
+2025-07-09T03:03:58.596Z INFO  - dbdb400cee12 Downloading 23MB / 62MB
+2025-07-09T03:03:58.656Z INFO  - 3bdbced20006 Verifying Checksum
+2025-07-09T03:03:58.656Z INFO  - 3bdbced20006 Download complete
+2025-07-09T03:03:58.677Z INFO  - 19f1f54854d6 Downloading 31MB / 51MB
+2025-07-09T03:03:58.684Z INFO  - dbdb400cee12 Downloading 29MB / 62MB
+2025-07-09T03:03:58.792Z INFO  - dbdb400cee12 Downloading 36MB / 62MB
+2025-07-09T03:03:58.868Z INFO  - 9bfcbf7e4fe7 Verifying Checksum
+2025-07-09T03:03:58.868Z INFO  - 9bfcbf7e4fe7 Download complete
+2025-07-09T03:03:58.879Z INFO  - 19f1f54854d6 Downloading 47MB / 51MB
+2025-07-09T03:03:58.900Z INFO  - d96775b7da67 Downloading 36MB / 42MB
+2025-07-09T03:03:58.904Z INFO  - dbdb400cee12 Downloading 44MB / 62MB
+2025-07-09T03:03:58.914Z INFO  - 19f1f54854d6 Verifying Checksum
+2025-07-09T03:03:58.914Z INFO  - 19f1f54854d6 Download complete
+2025-07-09T03:03:58.952Z INFO  - d96775b7da67 Verifying Checksum
+2025-07-09T03:03:58.952Z INFO  - d96775b7da67 Download complete
+2025-07-09T03:03:59.038Z INFO  - dbdb400cee12 Verifying Checksum
+2025-07-09T03:03:59.038Z INFO  - dbdb400cee12 Download complete
+2025-07-09T03:03:59.093Z INFO  - 19f1f54854d6 Extracting 2MB / 51MB
+2025-07-09T03:03:59.207Z INFO  - 19f1f54854d6 Extracting 4MB / 51MB
+2025-07-09T03:03:59.413Z INFO  - 19f1f54854d6 Extracting 9MB / 51MB
+2025-07-09T03:03:59.868Z INFO  - 19f1f54854d6 Extracting 20MB / 51MB
+2025-07-09T03:03:59.980Z INFO  - 19f1f54854d6 Extracting 23MB / 51MB
+2025-07-09T03:04:00.112Z INFO  - 19f1f54854d6 Extracting 26MB / 51MB
+2025-07-09T03:04:00.253Z INFO  - 19f1f54854d6 Extracting 27MB / 51MB
+2025-07-09T03:04:00.354Z INFO  - 19f1f54854d6 Extracting 32MB / 51MB
+2025-07-09T03:04:00.796Z INFO  - 19f1f54854d6 Extracting 44MB / 51MB
+2025-07-09T03:04:00.912Z INFO  - 19f1f54854d6 Extracting 46MB / 51MB
+2025-07-09T03:04:01.051Z INFO  - 19f1f54854d6 Extracting 48MB / 51MB
+2025-07-09T03:04:01.497Z INFO  - 19f1f54854d6 Extracting 50MB / 51MB
+2025-07-09T03:04:01.642Z INFO  - 19f1f54854d6 Extracting 51MB / 51MB
+2025-07-09T03:04:01.700Z INFO  - 19f1f54854d6 Pull complete
+2025-07-09T03:04:01.852Z INFO  - 3bdbced20006 Extracting 3MB / 35MB
+2025-07-09T03:04:02.085Z INFO  - 3bdbced20006 Extracting 7MB / 35MB
+2025-07-09T03:04:02.329Z INFO  - 3bdbced20006 Extracting 10MB / 35MB
+2025-07-09T03:04:02.437Z INFO  - 3bdbced20006 Extracting 11MB / 35MB
+2025-07-09T03:04:02.809Z INFO  - 3bdbced20006 Extracting 19MB / 35MB
+2025-07-09T03:04:02.916Z INFO  - 3bdbced20006 Extracting 20MB / 35MB
+2025-07-09T03:04:03.146Z INFO  - 3bdbced20006 Extracting 25MB / 35MB
+2025-07-09T03:04:03.464Z INFO  - 3bdbced20006 Extracting 34MB / 35MB
+2025-07-09T03:04:03.581Z INFO  - 3bdbced20006 Extracting 35MB / 35MB
+2025-07-09T03:04:03.910Z INFO  - 3bdbced20006 Pull complete
+2025-07-09T03:04:03.915Z INFO  - 4f4fb700ef54 Extracting 32B / 32B
+2025-07-09T03:04:03.921Z INFO  - 4f4fb700ef54 Extracting 32B / 32B
+2025-07-09T03:04:03.947Z INFO  - 4f4fb700ef54 Pull complete
+2025-07-09T03:04:03.949Z INFO  - cae2b124a38d Extracting 385B / 385B
+2025-07-09T03:04:03.954Z INFO  - cae2b124a38d Extracting 385B / 385B
+2025-07-09T03:04:03.959Z INFO  - cae2b124a38d Pull complete
+2025-07-09T03:04:03.961Z INFO  - 26c54f90efe5 Extracting 32KB / 1MB
+2025-07-09T03:04:03.990Z INFO  - 26c54f90efe5 Extracting 1MB / 1MB
+2025-07-09T03:04:03.991Z INFO  - 26c54f90efe5 Extracting 1MB / 1MB
+2025-07-09T03:04:04.015Z INFO  - 26c54f90efe5 Pull complete
+2025-07-09T03:04:04.039Z INFO  - fe38d6c43aed Extracting 39KB / 39KB
+2025-07-09T03:04:04.046Z INFO  - fe38d6c43aed Extracting 39KB / 39KB
+2025-07-09T03:04:04.069Z INFO  - fe38d6c43aed Pull complete
+2025-07-09T03:04:04.071Z INFO  - b1fc213b8591 Extracting 10KB / 10KB
+2025-07-09T03:04:04.079Z INFO  - b1fc213b8591 Extracting 10KB / 10KB
+2025-07-09T03:04:04.101Z INFO  - b1fc213b8591 Pull complete
+2025-07-09T03:04:04.103Z INFO  - ba31af965236 Extracting 13KB / 13KB
+2025-07-09T03:04:04.112Z INFO  - ba31af965236 Extracting 13KB / 13KB
+2025-07-09T03:04:04.133Z INFO  - ba31af965236 Pull complete
+2025-07-09T03:04:04.152Z INFO  - 8766eb796574 Extracting 284KB / 284KB
+2025-07-09T03:04:04.154Z INFO  - 8766eb796574 Extracting 284KB / 284KB
+2025-07-09T03:04:04.178Z INFO  - 8766eb796574 Pull complete
+2025-07-09T03:04:04.179Z INFO  - c2230bed8f53 Extracting 10KB / 10KB
+2025-07-09T03:04:04.183Z INFO  - c2230bed8f53 Extracting 10KB / 10KB
+2025-07-09T03:04:04.205Z INFO  - c2230bed8f53 Pull complete
+2025-07-09T03:04:04.213Z INFO  - 2e75f3d69a88 Extracting 32KB / 1MB
+2025-07-09T03:04:04.240Z INFO  - 2e75f3d69a88 Extracting 1MB / 1MB
+2025-07-09T03:04:04.245Z INFO  - 2e75f3d69a88 Pull complete
+2025-07-09T03:04:04.248Z INFO  - 004ce55f87ff Extracting 32KB / 1MB
+2025-07-09T03:04:04.332Z INFO  - 004ce55f87ff Extracting 1MB / 1MB
+2025-07-09T03:04:04.355Z INFO  - 004ce55f87ff Pull complete
+2025-07-09T03:04:04.357Z INFO  - 9f2e01286e23 Extracting 3KB / 3KB
+2025-07-09T03:04:04.372Z INFO  - 9f2e01286e23 Extracting 3KB / 3KB
+2025-07-09T03:04:04.396Z INFO  - 9f2e01286e23 Pull complete
+2025-07-09T03:04:04.629Z INFO  - d96775b7da67 Extracting 22MB / 42MB
+2025-07-09T03:04:04.730Z INFO  - d96775b7da67 Extracting 34MB / 42MB
+2025-07-09T03:04:04.825Z INFO  - d96775b7da67 Extracting 42MB / 42MB
+2025-07-09T03:04:04.846Z INFO  - d96775b7da67 Pull complete
+2025-07-09T03:04:05.006Z INFO  - 9bfcbf7e4fe7 Extracting 3MB / 43MB
+2025-07-09T03:04:05.110Z INFO  - 9bfcbf7e4fe7 Extracting 7MB / 43MB
+2025-07-09T03:04:05.346Z INFO  - 9bfcbf7e4fe7 Extracting 14MB / 43MB
+2025-07-09T03:04:05.668Z INFO  - 9bfcbf7e4fe7 Extracting 24MB / 43MB
+2025-07-09T03:04:05.872Z INFO  - 9bfcbf7e4fe7 Extracting 30MB / 43MB
+2025-07-09T03:04:06.129Z INFO  - 9bfcbf7e4fe7 Extracting 34MB / 43MB
+2025-07-09T03:04:06.524Z INFO  - 9bfcbf7e4fe7 Extracting 37MB / 43MB
+2025-07-09T03:04:06.823Z INFO  - 9bfcbf7e4fe7 Extracting 40MB / 43MB
+2025-07-09T03:04:06.961Z INFO  - 9bfcbf7e4fe7 Extracting 41MB / 43MB
+2025-07-09T03:04:07.193Z INFO  - 9bfcbf7e4fe7 Extracting 42MB / 43MB
+2025-07-09T03:04:07.496Z INFO  - 9bfcbf7e4fe7 Extracting 43MB / 43MB
+2025-07-09T03:04:09.690Z INFO  - 9bfcbf7e4fe7 Pull complete
+2025-07-09T03:04:09.826Z INFO  - 918f47dbe60d Extracting 1MB / 10MB
+2025-07-09T03:04:09.928Z INFO  - 918f47dbe60d Extracting 4MB / 10MB
+2025-07-09T03:04:10.035Z INFO  - 918f47dbe60d Extracting 8MB / 10MB
+2025-07-09T03:04:10.159Z INFO  - 918f47dbe60d Extracting 9MB / 10MB
+2025-07-09T03:04:10.278Z INFO  - 918f47dbe60d Extracting 9MB / 10MB
+2025-07-09T03:04:10.530Z INFO  - 918f47dbe60d Extracting 10MB / 10MB
+2025-07-09T03:04:10.629Z INFO  - 918f47dbe60d Extracting 10MB / 10MB
+2025-07-09T03:04:10.660Z INFO  - 918f47dbe60d Pull complete
+2025-07-09T03:04:10.887Z INFO  - 321325091bfd Extracting 5MB / 16MB
+2025-07-09T03:04:11.208Z INFO  - 321325091bfd Extracting 8MB / 16MB
+2025-07-09T03:04:11.432Z INFO  - 321325091bfd Extracting 9MB / 16MB
+2025-07-09T03:04:11.564Z INFO  - 321325091bfd Extracting 10MB / 16MB
+2025-07-09T03:04:12.093Z INFO  - 321325091bfd Extracting 12MB / 16MB
+2025-07-09T03:04:12.216Z INFO  - 321325091bfd Extracting 13MB / 16MB
+2025-07-09T03:04:12.351Z INFO  - 321325091bfd Extracting 14MB / 16MB
+2025-07-09T03:04:12.641Z INFO  - 321325091bfd Extracting 15MB / 16MB
+2025-07-09T03:04:12.932Z INFO  - 321325091bfd Extracting 16MB / 16MB
+2025-07-09T03:04:13.053Z INFO  - 321325091bfd Pull complete
+2025-07-09T03:04:13.055Z INFO  - d065ebe907aa Extracting 126B / 126B
+2025-07-09T03:04:13.059Z INFO  - d065ebe907aa Extracting 126B / 126B
+2025-07-09T03:04:13.094Z INFO  - d065ebe907aa Pull complete
+2025-07-09T03:04:13.226Z INFO  - 5b8842b15e04 Extracting 5MB / 5MB
+2025-07-09T03:04:13.230Z INFO  - 5b8842b15e04 Pull complete
+2025-07-09T03:04:13.232Z INFO  - a0666340f4df Extracting 946B / 946B
+2025-07-09T03:04:13.246Z INFO  - a0666340f4df Extracting 946B / 946B
+2025-07-09T03:04:13.250Z INFO  - a0666340f4df Pull complete
+2025-07-09T03:04:13.252Z INFO  - 3fe73e946043 Extracting 1KB / 1KB
+2025-07-09T03:04:13.256Z INFO  - 3fe73e946043 Extracting 1KB / 1KB
+2025-07-09T03:04:13.260Z INFO  - 3fe73e946043 Pull complete
+2025-07-09T03:04:13.262Z INFO  - e80e7a01aa18 Extracting 137B / 137B
+2025-07-09T03:04:13.265Z INFO  - e80e7a01aa18 Extracting 137B / 137B
+2025-07-09T03:04:13.285Z INFO  - e80e7a01aa18 Pull complete
+2025-07-09T03:04:13.307Z INFO  - dbdb400cee12 Extracting 544KB / 62MB
+2025-07-09T03:04:13.522Z INFO  - dbdb400cee12 Extracting 5MB / 62MB
+2025-07-09T03:04:13.647Z INFO  - dbdb400cee12 Extracting 9MB / 62MB
+2025-07-09T03:04:13.754Z INFO  - dbdb400cee12 Extracting 10MB / 62MB
+2025-07-09T03:04:13.860Z INFO  - dbdb400cee12 Extracting 11MB / 62MB
+2025-07-09T03:04:14.088Z INFO  - dbdb400cee12 Extracting 14MB / 62MB
+2025-07-09T03:04:14.517Z INFO  - dbdb400cee12 Extracting 25MB / 62MB
+2025-07-09T03:04:14.724Z INFO  - dbdb400cee12 Extracting 31MB / 62MB
+2025-07-09T03:04:14.835Z INFO  - dbdb400cee12 Extracting 35MB / 62MB
+2025-07-09T03:04:14.946Z INFO  - dbdb400cee12 Extracting 37MB / 62MB
+2025-07-09T03:04:15.170Z INFO  - dbdb400cee12 Extracting 40MB / 62MB
+2025-07-09T03:04:15.437Z INFO  - dbdb400cee12 Extracting 44MB / 62MB
+2025-07-09T03:04:15.578Z INFO  - dbdb400cee12 Extracting 46MB / 62MB
+2025-07-09T03:04:15.706Z INFO  - dbdb400cee12 Extracting 47MB / 62MB
+2025-07-09T03:04:16.023Z INFO  - dbdb400cee12 Extracting 60MB / 62MB
+2025-07-09T03:04:16.141Z INFO  - dbdb400cee12 Extracting 62MB / 62MB
+2025-07-09T03:04:16.189Z INFO  - dbdb400cee12 Pull complete
+2025-07-09T03:04:16.191Z INFO  - 6cfdccd84944 Extracting 1KB / 1KB
+2025-07-09T03:04:16.194Z INFO  - 6cfdccd84944 Extracting 1KB / 1KB
+2025-07-09T03:04:16.199Z INFO  - 6cfdccd84944 Pull complete
+2025-07-09T03:04:16.201Z INFO  - 05cbafa84713 Extracting 1KB / 1KB
+2025-07-09T03:04:16.205Z INFO  - 05cbafa84713 Extracting 1KB / 1KB
+2025-07-09T03:04:16.240Z INFO  - 05cbafa84713 Pull complete
+2025-07-09T03:04:16.242Z INFO  - c63eec82a533 Extracting 2KB / 2KB
+2025-07-09T03:04:16.246Z INFO  - c63eec82a533 Extracting 2KB / 2KB
+2025-07-09T03:04:16.267Z INFO  - c63eec82a533 Pull complete
+2025-07-09T03:04:16.269Z INFO  - 1d2026fe3a6c Extracting 152B / 152B
+2025-07-09T03:04:16.272Z INFO  - 1d2026fe3a6c Extracting 152B / 152B
+2025-07-09T03:04:16.278Z INFO  - 1d2026fe3a6c Pull complete
+2025-07-09T03:04:16.280Z INFO  - d8490e915e0f Extracting 13KB / 13KB
+2025-07-09T03:04:16.285Z INFO  - d8490e915e0f Extracting 13KB / 13KB
+2025-07-09T03:04:16.289Z INFO  - d8490e915e0f Pull complete
+2025-07-09T03:04:16.292Z INFO  - 7b5561a23a3b Extracting 1KB / 1KB
+2025-07-09T03:04:16.295Z INFO  - 7b5561a23a3b Extracting 1KB / 1KB
+2025-07-09T03:04:16.308Z INFO  - 7b5561a23a3b Pull complete
+2025-07-09T03:04:16.326Z INFO  - ef14a3f6126b Extracting 271B / 271B
+2025-07-09T03:04:16.331Z INFO  - ef14a3f6126b Extracting 271B / 271B
+2025-07-09T03:04:16.358Z INFO  - ef14a3f6126b Pull complete
+2025-07-09T03:04:16.360Z INFO  - 4bce287fb788 Extracting 271B / 271B
+2025-07-09T03:04:16.363Z INFO  - 4bce287fb788 Extracting 271B / 271B
+2025-07-09T03:04:16.383Z INFO  - 4bce287fb788 Pull complete
+2025-07-09T03:04:16.422Z INFO  - ea800b560a24 Extracting 125B / 125B
+2025-07-09T03:04:16.425Z INFO  - ea800b560a24 Extracting 125B / 125B
+2025-07-09T03:04:16.429Z INFO  - ea800b560a24 Pull complete
+2025-07-09T03:04:16.431Z INFO  - 675715b611cb Extracting 419B / 419B
+2025-07-09T03:04:16.435Z INFO  - 675715b611cb Extracting 419B / 419B
+2025-07-09T03:04:16.463Z INFO  - 675715b611cb Pull complete
+2025-07-09T03:04:16.465Z INFO  - 687284d089f3 Extracting 1KB / 1KB
+2025-07-09T03:04:16.469Z INFO  - 687284d089f3 Extracting 1KB / 1KB
+2025-07-09T03:04:16.490Z INFO  - 687284d089f3 Pull complete
+2025-07-09T03:04:16.724Z INFO  - 1f91d5ab9574 Extracting 1MB / 1MB
+2025-07-09T03:04:16.746Z INFO  - 1f91d5ab9574 Extracting 1MB / 1MB
+2025-07-09T03:04:16.772Z INFO  - 1f91d5ab9574 Pull complete
+2025-07-09T03:04:16.773Z INFO  - d73d49dbfc6a Extracting 132B / 132B
+2025-07-09T03:04:16.776Z INFO  - d73d49dbfc6a Extracting 132B / 132B
+2025-07-09T03:04:16.780Z INFO  - d73d49dbfc6a Pull complete
+2025-07-09T03:04:16.805Z INFO  -  Digest: sha256:62acf921d8764b3e62b3a2e954009cb245a4cb782108267be9e86394aa400a44
+2025-07-09T03:04:16.807Z INFO  -  Status: Downloaded newer image for 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:04:16.824Z INFO  - Pull Image successful, Time taken: 19 Seconds
+2025-07-09T03:04:17.367Z INFO  - Starting container for site
+2025-07-09T03:04:17.367Z INFO  - docker run -d --expose=3001 --name soundscribe-backend_0_7c2f0288 -e WEBSITE_USE_DIAGNOSTIC_SERVER=true -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://localhost:5173,https://preview--eci-sound-scribe.lovable.app,https://eci-sound-scribe.lovable.app,https://preview--echo-ai-scribe-app.lovable.app,https://echo-ai-scribe-app.lovable.app,https://*.lovableproject.com -e WEBSITE_CORS_SUPPORT_CREDENTIALS=False -e PORT=3001 -e WEBSITES_PORT=3001 -e WEBSITES_ENABLE_APP_SERVICE_STORAGE=false -e WEBSITE_SITE_NAME=soundscribe-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=soundscribe-backend.azurewebsites.net -e WEBSITE_INSTANCE_ID=4c11444959efb9529cb60d8cec69115a66a458b1ddc5f5c9c48663dd2f61c942 -e HTTP_LOGGING_ENABLED=1 appsvc/node:18-lts_20250506.5.tuxprod REDACTED
+2025-07-09T03:04:21.974Z INFO  - Initiating warmup request to container soundscribe-backend_0_7c2f0288 for site soundscribe-backend
+2025-07-09T03:04:25.044Z ERROR - Container soundscribe-backend_0_7c2f0288 for site soundscribe-backend has exited, failing site start
+2025-07-09T03:04:25.044Z INFO  - Initiating warmup request to container soundscribe-backend_0_7c2f0288_middleware for site soundscribe-backend
+2025-07-09T03:04:25.288Z INFO  - Container soundscribe-backend_0_7c2f0288_middleware for site soundscribe-backend initialized successfully and is ready to serve requests.
+2025-07-09T03:04:25.304Z ERROR - Container soundscribe-backend_0_7c2f0288 didn't respond to HTTP pings on port: 3001. Failing site start. See container logs for debugging.
+2025-07-09T03:04:25.331Z INFO  - Stopping site soundscribe-backend because it failed during startup.
+2025-07-09T03:04:38.933Z INFO  - Pulling image: mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:04:39.079Z INFO  - stage3 Pulling from appsvc/middleware
+2025-07-09T03:04:39.093Z INFO  -  Digest: sha256:053794b6902a3f02a4aa1ec413523bad68ca5841b3573fb71e0898176cf06fcf
+2025-07-09T03:04:39.099Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:04:39.109Z INFO  - Pull Image successful, Time taken: 0 Seconds
+2025-07-09T03:04:39.181Z INFO  - Starting container for site
+2025-07-09T03:04:39.182Z INFO  - docker run -d --expose=8181 --name soundscribe-backend_0_9fb190de_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://localhost:5173,https://preview--eci-sound-scribe.lovable.app,https://eci-sound-scribe.lovable.app,https://preview--echo-ai-scribe-app.lovable.app,https://echo-ai-scribe-app.lovable.app,https://*.lovableproject.com -e WEBSITE_CORS_SUPPORT_CREDENTIALS=False -e PORT=3001 -e WEBSITES_PORT=3001 -e WEBSITES_ENABLE_APP_SERVICE_STORAGE=false -e WEBSITE_SITE_NAME=soundscribe-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=soundscribe-backend.azurewebsites.net -e WEBSITE_INSTANCE_ID=4c11444959efb9529cb60d8cec69115a66a458b1ddc5f5c9c48663dd2f61c942 -e HTTP_LOGGING_ENABLED=1 mcr.micro2025-07-09T03:04:39.734Z INFO  - Initiating warmup request to container soundscribe-backend_0_9fb190de for site soundscribe-backend
+2025-07-09T03:04:42.785Z ERROR - Container soundscribe-backend_0_9fb190de for site soundscribe-backend has exited, failing site start
+2025-07-09T03:04:42.786Z INFO  - Initiating warmup request to container soundscribe-backend_0_9fb190de_middleware for site soundscribe-backend
+2025-07-09T03:04:43.003Z INFO  - Container soundscribe-backend_0_9fb190de_middleware for site soundscribe-backend initialized successfully and is ready to serve requests.
+2025-07-09T03:04:43.013Z ERROR - Container soundscribe-backend_0_9fb190de didn't respond to HTTP pings on port: 3001. Failing site start. See container logs for debugging.
+2025-07-09T03:04:43.020Z INFO  - Stopping site soundscribe-backend because it failed during startup.
+2025-07-09T03:04:56.128Z INFO  - Pulling image: mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:04:56.305Z INFO  - stage3 Pulling from appsvc/middleware
+2025-07-09T03:04:56.321Z INFO  -  Digest: sha256:053794b6902a3f02a4aa1ec413523bad68ca5841b3573fb71e0898176cf06fcf
+2025-07-09T03:04:56.323Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:04:56.341Z INFO  - Pull Image successful, Time taken: 0 Seconds
+2025-07-09T03:04:56.387Z INFO  - Starting container for site
+2025-07-09T03:04:56.390Z INFO  - docker run -d --expose=8181 --name soundscribe-backend_0_70a3a0dd_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://localhost:5173,https://preview--eci-sound-scribe.lovable.app,https://eci-sound-scribe.lovable.app,https://preview--echo-ai-scribe-app.lovable.app,https://echo-ai-scribe-app.lovable.app,https://*.lovableproject.com -e WEBSITE_CORS_SUPPORT_CREDENTIALS=False -e PORT=3001 -e WEBSITES_PORT=3001 -e WEBSITES_ENABLE_APP_SERVICE_STORAGE=false -e WEBSITE_SITE_NAME=soundscribe-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=soundscribe-backend.azurewebsites.net -e WEBSITE_INSTANCE_ID=4c11444959efb9529cb60d8cec69115a66a458b1ddc5f5c9c48663dd2f61c942 -e HTTP_LOGGING_ENABLED=1 mcr.mi2025-07-09T03:05:01.591Z INFO  - Initiating warmup request to container soundscribe-backend_0_70a3a0dd for site soundscribe-backend
+2025-07-09T03:05:01.597Z ERROR - Container soundscribe-backend_0_70a3a0dd for site soundscribe-backend has exited, failing site start
+2025-07-09T03:05:01.597Z INFO  - Initiating warmup request to container soundscribe-backend_0_70a3a0dd_middleware for site soundscribe-backend
+2025-07-09T03:05:02.835Z INFO  - Container soundscribe-backend_0_70a3a0dd_middleware for site soundscribe-backend initialized successfully and is ready to serve requests.
+2025-07-09T03:05:02.851Z ERROR - Container soundscribe-backend_0_70a3a0dd didn't respond to HTTP pings on port: 3001. Failing site start. See container logs for debugging.
+2025-07-09T03:05:02.858Z INFO  - Stopping site soundscribe-backend because it failed during startup.
+2025-07-09T03:05:17.614Z INFO  - Pulling image: mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:05:17.788Z INFO  - stage3 Pulling from appsvc/middleware
+2025-07-09T03:05:17.799Z INFO  -  Digest: sha256:053794b6902a3f02a4aa1ec413523bad68ca5841b3573fb71e0898176cf06fcf
+2025-07-09T03:05:17.801Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:05:17.842Z INFO  - Pull Image successful, Time taken: 0 Seconds
+2025-07-09T03:05:17.898Z INFO  - Starting container for site
+2025-07-09T03:05:17.900Z INFO  - docker run -d --expose=8181 --name soundscribe-backend_0_8a6edbfa_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://localhost:5173,https://preview--eci-sound-scribe.lovable.app,https://eci-sound-scribe.lovable.app,https://preview--echo-ai-scribe-app.lovable.app,https://echo-ai-scribe-app.lovable.app,https://*.lovableproject.com -e WEBSITE_CORS_SUPPORT_CREDENTIALS=False -e PORT=3001 -e WEBSITES_PORT=3001 -e WEBSITES_ENABLE_APP_SERVICE_STORAGE=false -e WEBSITE_SITE_NAME=soundscribe-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=soundscribe-backend.azurewebsites.net -e WEBSITE_INSTANCE_ID=4c11444959efb9529cb60d8cec69115a66a458b1ddc5f5c9c48663dd2f61c942 -e HTTP_LOGGING_ENABLED=1 mcr.mi2025-07-09T03:05:18.865Z INFO  - Initiating warmup request to container soundscribe-backend_0_8a6edbfa for site soundscribe-backend
+2025-07-09T03:05:20.934Z ERROR - Container soundscribe-backend_0_8a6edbfa for site soundscribe-backend has exited, failing site start
+2025-07-09T03:05:20.936Z INFO  - Initiating warmup request to container soundscribe-backend_0_8a6edbfa_middleware for site soundscribe-backend
+2025-07-09T03:05:22.159Z INFO  - Container soundscribe-backend_0_8a6edbfa_middleware for site soundscribe-backend initialized successfully and is ready to serve requests.
+2025-07-09T03:05:22.178Z ERROR - Container soundscribe-backend_0_8a6edbfa didn't respond to HTTP pings on port: 3001. Failing site start. See container logs for debugging.
+2025-07-09T03:05:22.187Z INFO  - Stopping site soundscribe-backend because it failed during startup.
+2025-07-09T03:07:47.120Z INFO  - Pulling image: mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:07:47.282Z INFO  - stage3 Pulling from appsvc/middleware
+2025-07-09T03:07:47.295Z INFO  -  Digest: sha256:053794b6902a3f02a4aa1ec413523bad68ca5841b3573fb71e0898176cf06fcf
+2025-07-09T03:07:47.297Z INFO  -  Status: Image is up to date for mcr.microsoft.com/appsvc/middleware:stage3
+2025-07-09T03:07:47.315Z INFO  - Pull Image successful, Time taken: 0 Seconds
+2025-07-09T03:07:47.380Z INFO  - Starting container for site
+2025-07-09T03:07:47.381Z INFO  - docker run -d --expose=8181 --name soundscribe-backend_0_93665d4d_middleware -e WEBSITE_CORS_ALLOWED_ORIGINS=http://localhost:8080,http://localhost:3000,http://localhost:5173,https://preview--eci-sound-scribe.lovable.app,https://eci-sound-scribe.lovable.app,https://preview--echo-ai-scribe-app.lovable.app,https://echo-ai-scribe-app.lovable.app,https://*.lovableproject.com -e WEBSITE_CORS_SUPPORT_CREDENTIALS=False -e PORT=3001 -e WEBSITES_PORT=3001 -e WEBSITES_ENABLE_APP_SERVICE_STORAGE=false -e WEBSITE_SITE_NAME=soundscribe-backend -e WEBSITE_AUTH_ENABLED=False -e WEBSITE_ROLE_INSTANCE_ID=0 -e WEBSITE_HOSTNAME=soundscribe-backend.azurewebsites.net -e WEBSITE_INSTANCE_ID=4c11444959efb9529cb60d8cec69115a66a458b1ddc5f5c9c48663dd2f61c942 -e HTTP_LOGGING_ENABLED=1 mcr.mi2025-07-09T03:07:47.939Z INFO  - Initiating warmup request to container soundscribe-backend_0_93665d4d for site soundscribe-backend
+2025-07-09T03:07:51.000Z ERROR - Container soundscribe-backend_0_93665d4d for site soundscribe-backend has exited, failing site start
+2025-07-09T03:07:51.000Z INFO  - Initiating warmup request to container soundscribe-backend_0_93665d4d_middleware for site soundscribe-backend
+2025-07-09T03:07:51.227Z INFO  - Container soundscribe-backend_0_93665d4d_middleware for site soundscribe-backend initialized successfully and is ready to serve requests.
+2025-07-09T03:07:51.237Z ERROR - Container soundscribe-backend_0_93665d4d didn't respond to HTTP pings on port: 3001. Failing site start. See container logs for debugging.
+2025-07-09T03:07:51.246Z INFO  - Stopping site soundscribe-backend because it failed during startup.
+2025-07-09T03:10:11.9632004Z Container start method called.
+2025-07-09T03:10:11.9638798Z Establishing network.
+2025-07-09T03:10:11.9647825Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T03:10:12.1634201Z Container is starting.
+2025-07-09T03:10:12.1637998Z Establishing user namespace if not established already.
+2025-07-09T03:10:12.1641908Z Establishing network if not established already.
+2025-07-09T03:10:12.1645851Z Mounting volumes.
+2025-07-09T03:10:12.1651435Z Nested mountpoint site/wwwroot
+2025-07-09T03:10:12.1679017Z Nested mountpoint volatile/logs
+2025-07-09T03:10:12.1728427Z Nested mountpoint 
+2025-07-09T03:10:12.1753133Z Nested mountpoint 
+2025-07-09T03:10:12.1854733Z Nested mountpoint 
+2025-07-09T03:10:12.1877320Z Nested mountpoint 
+2025-07-09T03:10:12.8547511Z Creating container.
+2025-07-09T03:10:12.8553233Z Creating pipes for streaming container io.
+2025-07-09T03:10:12.8557201Z Creating stdout named pipe at /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stdout_a861259b63e947bda2cb2f13278f4404.
+2025-07-09T03:10:12.8561671Z Successfully created stdout named pipe at: /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stdout_a861259b63e947bda2cb2f13278f4404.
+2025-07-09T03:10:12.8565913Z Opening named pipe /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stdout_a861259b63e947bda2cb2f13278f4404 for reading in non-blocking mode.
+2025-07-09T03:10:12.8569080Z Successfully opened named pipe: /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stdout_a861259b63e947bda2cb2f13278f4404.
+2025-07-09T03:10:12.8571940Z Successfully removed non-blocking flag from /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stdout_a861259b63e947bda2cb2f13278f4404.
+2025-07-09T03:10:12.8575402Z Creating stderr named pipe at /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stderr_16dd795b3f2a4d1981c421ace3279a28.
+2025-07-09T03:10:12.8580048Z Successfully created stderr named pipe at: /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stderr_16dd795b3f2a4d1981c421ace3279a28.
+2025-07-09T03:10:12.8584955Z Opening named pipe /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stderr_16dd795b3f2a4d1981c421ace3279a28 for reading in non-blocking mode.
+2025-07-09T03:10:12.8596721Z Successfully opened named pipe: /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stderr_16dd795b3f2a4d1981c421ace3279a28.
+2025-07-09T03:10:12.8605688Z Successfully removed non-blocking flag from /podr/container/pipe/a5c3dc851dfc_soundscribe-backend/stderr_16dd795b3f2a4d1981c421ace3279a28.
+2025-07-09T03:10:12.8612477Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:10:13.6450984Z Starting container: a5c3dc851dfc_soundscribe-backend.
+2025-07-09T03:10:14.9483485Z Starting watchers and probes.
+2025-07-09T03:10:14.9487358Z Starting metrics collection.
+2025-07-09T03:10:14.9489565Z Container is running.
+2025-07-09T03:10:15.7330724Z Container start method finished after 3769 ms.
+2025-07-09T03:10:16.4741912Z Container has finished running with exit code: 1.
+2025-07-09T03:10:16.4743885Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T03:10:16.4747111Z Stop and delete container. Retry count = 0
+2025-07-09T03:10:16.4748530Z Stopping container: a5c3dc851dfc_soundscribe-backend.
+2025-07-09T03:10:16.4884986Z Deleting container: a5c3dc851dfc_soundscribe-backend. Retry count = 0
+2025-07-09T03:10:16.5453421Z Container spec TerminationMessagePolicy  path 
+2025-07-09T03:10:16.5462855Z Container is terminated. Total time elapsed: 71 ms.
+2025-07-09T03:10:16.5468758Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T03:10:16.5476472Z Site startup probe failed after 0.7980175 seconds.
+2025-07-09T03:10:16.5527004Z Failed to start site. Revert by stopping site.
+2025-07-09T03:10:16.5535804Z Site: soundscribe-backend stopped.
+2025-07-09T03:10:22.1807834Z Container start method called.
+2025-07-09T03:10:22.1809620Z Establishing network.
+2025-07-09T03:10:22.1811271Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T03:10:22.3004550Z Container is starting.
+2025-07-09T03:10:22.3006167Z Establishing user namespace if not established already.
+2025-07-09T03:10:22.3007712Z Establishing network if not established already.
+2025-07-09T03:10:22.3009196Z Mounting volumes.
+2025-07-09T03:10:22.3011549Z Nested mountpoint site/wwwroot
+2025-07-09T03:10:22.3013448Z Nested mountpoint volatile/logs
+2025-07-09T03:10:22.3068418Z Nested mountpoint 
+2025-07-09T03:10:22.3093479Z Nested mountpoint 
+2025-07-09T03:10:22.3387478Z Nested mountpoint 
+2025-07-09T03:10:22.3397610Z Nested mountpoint 
+2025-07-09T03:10:22.5146923Z Creating container.
+2025-07-09T03:10:22.5155587Z Creating pipes for streaming container io.
+2025-07-09T03:10:22.5160658Z Creating stdout named pipe at /podr/container/pipe/70de4219d47c_soundscribe-backend/stdout_7293b406cff14f3498e8cc18f0106127.
+2025-07-09T03:10:22.5165245Z Successfully created stdout named pipe at: /podr/container/pipe/70de4219d47c_soundscribe-backend/stdout_7293b406cff14f3498e8cc18f0106127.
+2025-07-09T03:10:22.5168510Z Opening named pipe /podr/container/pipe/70de4219d47c_soundscribe-backend/stdout_7293b406cff14f3498e8cc18f0106127 for reading in non-blocking mode.
+2025-07-09T03:10:22.5171713Z Successfully opened named pipe: /podr/container/pipe/70de4219d47c_soundscribe-backend/stdout_7293b406cff14f3498e8cc18f0106127.
+2025-07-09T03:10:22.5174359Z Successfully removed non-blocking flag from /podr/container/pipe/70de4219d47c_soundscribe-backend/stdout_7293b406cff14f3498e8cc18f0106127.
+2025-07-09T03:10:22.5177279Z Creating stderr named pipe at /podr/container/pipe/70de4219d47c_soundscribe-backend/stderr_263aa3163b92419e8011d5d5a0afa024.
+2025-07-09T03:10:22.5181529Z Successfully created stderr named pipe at: /podr/container/pipe/70de4219d47c_soundscribe-backend/stderr_263aa3163b92419e8011d5d5a0afa024.
+2025-07-09T03:10:22.5184093Z Opening named pipe /podr/container/pipe/70de4219d47c_soundscribe-backend/stderr_263aa3163b92419e8011d5d5a0afa024 for reading in non-blocking mode.
+2025-07-09T03:10:22.5187579Z Successfully opened named pipe: /podr/container/pipe/70de4219d47c_soundscribe-backend/stderr_263aa3163b92419e8011d5d5a0afa024.
+2025-07-09T03:10:22.5190611Z Successfully removed non-blocking flag from /podr/container/pipe/70de4219d47c_soundscribe-backend/stderr_263aa3163b92419e8011d5d5a0afa024.
+2025-07-09T03:10:22.5194412Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:10:23.0660877Z Starting container: 70de4219d47c_soundscribe-backend.
+2025-07-09T03:10:23.0948613Z Starting watchers and probes.
+2025-07-09T03:10:23.0952226Z Starting metrics collection.
+2025-07-09T03:10:23.0954261Z Container is running.
+2025-07-09T03:10:23.1459900Z Container start method finished after 958 ms.
+2025-07-09T03:10:25.1322305Z Container has finished running with exit code: 1.
+2025-07-09T03:10:25.1323976Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T03:10:25.1327334Z Stop and delete container. Retry count = 0
+2025-07-09T03:10:25.1328560Z Stopping container: 70de4219d47c_soundscribe-backend.
+2025-07-09T03:10:25.1507189Z Deleting container: 70de4219d47c_soundscribe-backend. Retry count = 0
+2025-07-09T03:10:26.6723929Z Container spec TerminationMessagePolicy  path 
+2025-07-09T03:10:26.6806366Z Container is terminated. Total time elapsed: 1540 ms.
+2025-07-09T03:10:26.6815043Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T03:10:26.6824248Z Site startup probe failed after 3.5330683 seconds.
+2025-07-09T03:10:26.6931529Z Failed to start site. Revert by stopping site.
+2025-07-09T03:10:26.6959899Z Site: soundscribe-backend stopped.
+2025-07-09T03:10:27.2638438Z Site: soundscribe-backend will be blocked for 1 minutes till 07/09/2025 03:11:27
+2025-07-09T03:10:32.3167635Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:10:37.3463737Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:10:42.3673150Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:10:47.3960401Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:10:52.4196100Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:10:57.4510284Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:03.0530671Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:08.0874735Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:13.5629952Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:18.5876150Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:23.6166997Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:27.2624865Z Site: soundscribe-backend is unblocked.
+2025-07-09T03:11:29.0007086Z Container start method called.
+2025-07-09T03:11:29.0010896Z Establishing network.
+2025-07-09T03:11:29.0020001Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T03:11:29.1150933Z Container is starting.
+2025-07-09T03:11:29.1157039Z Establishing user namespace if not established already.
+2025-07-09T03:11:29.1162111Z Establishing network if not established already.
+2025-07-09T03:11:29.1174135Z Mounting volumes.
+2025-07-09T03:11:29.1183026Z Nested mountpoint site/wwwroot
+2025-07-09T03:11:29.1226881Z Nested mountpoint volatile/logs
+2025-07-09T03:11:29.1253485Z Nested mountpoint 
+2025-07-09T03:11:29.1361949Z Nested mountpoint 
+2025-07-09T03:11:29.1427799Z Nested mountpoint 
+2025-07-09T03:11:29.1458977Z Nested mountpoint 
+2025-07-09T03:11:29.3116566Z Creating container.
+2025-07-09T03:11:29.3119971Z Creating pipes for streaming container io.
+2025-07-09T03:11:29.3122353Z Creating stdout named pipe at /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stdout_20d7a70e95154f61aa59a3171a002896.
+2025-07-09T03:11:29.3125593Z Successfully created stdout named pipe at: /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stdout_20d7a70e95154f61aa59a3171a002896.
+2025-07-09T03:11:29.3127645Z Opening named pipe /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stdout_20d7a70e95154f61aa59a3171a002896 for reading in non-blocking mode.
+2025-07-09T03:11:29.3129345Z Successfully opened named pipe: /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stdout_20d7a70e95154f61aa59a3171a002896.
+2025-07-09T03:11:29.3130598Z Successfully removed non-blocking flag from /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stdout_20d7a70e95154f61aa59a3171a002896.
+2025-07-09T03:11:29.3131927Z Creating stderr named pipe at /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stderr_57d3718d229e4164be6644b509738358.
+2025-07-09T03:11:29.3133691Z Successfully created stderr named pipe at: /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stderr_57d3718d229e4164be6644b509738358.
+2025-07-09T03:11:29.3135026Z Opening named pipe /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stderr_57d3718d229e4164be6644b509738358 for reading in non-blocking mode.
+2025-07-09T03:11:29.3137421Z Successfully opened named pipe: /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stderr_57d3718d229e4164be6644b509738358.
+2025-07-09T03:11:29.3139396Z Successfully removed non-blocking flag from /podr/container/pipe/8a5ca2ac5775_soundscribe-backend/stderr_57d3718d229e4164be6644b509738358.
+2025-07-09T03:11:29.3141564Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:11:29.4326828Z Starting container: 8a5ca2ac5775_soundscribe-backend.
+2025-07-09T03:11:29.4510242Z Starting watchers and probes.
+2025-07-09T03:11:29.4513405Z Starting metrics collection.
+2025-07-09T03:11:29.4516389Z Container is running.
+2025-07-09T03:11:29.4835767Z Container start method finished after 482 ms.
+2025-07-09T03:11:31.9616749Z Container has finished running with exit code: 1.
+2025-07-09T03:11:31.9626745Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T03:11:31.9637734Z Stop and delete container. Retry count = 0
+2025-07-09T03:11:31.9648410Z Stopping container: 8a5ca2ac5775_soundscribe-backend.
+2025-07-09T03:11:31.9764072Z Deleting container: 8a5ca2ac5775_soundscribe-backend. Retry count = 0
+2025-07-09T03:11:33.1298743Z Container spec TerminationMessagePolicy  path 
+2025-07-09T03:11:33.1302919Z Container is terminated. Total time elapsed: 1167 ms.
+2025-07-09T03:11:33.1308887Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T03:11:33.1313672Z Site startup probe failed after 3.6434301 seconds.
+2025-07-09T03:11:33.1367587Z Failed to start site. Revert by stopping site.
+2025-07-09T03:11:33.1369553Z Site: soundscribe-backend stopped.
+2025-07-09T03:11:33.7635753Z Site: soundscribe-backend will be blocked for 1 minutes till 07/09/2025 03:12:33
+2025-07-09T03:11:38.8482697Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:43.8999997Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:48.9304397Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:54.0614292Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:11:59.0675193Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:04.0911094Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:09.1247822Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:14.3252713Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:19.3515039Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:24.4721457Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:29.5220268Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:33.7618222Z Site: soundscribe-backend is unblocked.
+2025-07-09T03:12:36.0873968Z Container start method called.
+2025-07-09T03:12:36.0875472Z Establishing network.
+2025-07-09T03:12:36.0877022Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T03:12:36.1994263Z Container is starting.
+2025-07-09T03:12:36.1995842Z Establishing user namespace if not established already.
+2025-07-09T03:12:36.1997378Z Establishing network if not established already.
+2025-07-09T03:12:36.1999121Z Mounting volumes.
+2025-07-09T03:12:36.2001542Z Nested mountpoint site/wwwroot
+2025-07-09T03:12:36.2052573Z Nested mountpoint volatile/logs
+2025-07-09T03:12:36.2081921Z Nested mountpoint 
+2025-07-09T03:12:36.2114311Z Nested mountpoint 
+2025-07-09T03:12:36.2147419Z Nested mountpoint 
+2025-07-09T03:12:36.2165232Z Nested mountpoint 
+2025-07-09T03:12:36.4314584Z Creating container.
+2025-07-09T03:12:36.4315914Z Creating pipes for streaming container io.
+2025-07-09T03:12:36.4317134Z Creating stdout named pipe at /podr/container/pipe/49d757850518_soundscribe-backend/stdout_435506d48fd5490b84cd8a6dc90ab312.
+2025-07-09T03:12:36.4324542Z Successfully created stdout named pipe at: /podr/container/pipe/49d757850518_soundscribe-backend/stdout_435506d48fd5490b84cd8a6dc90ab312.
+2025-07-09T03:12:36.4326009Z Opening named pipe /podr/container/pipe/49d757850518_soundscribe-backend/stdout_435506d48fd5490b84cd8a6dc90ab312 for reading in non-blocking mode.
+2025-07-09T03:12:36.4327886Z Successfully opened named pipe: /podr/container/pipe/49d757850518_soundscribe-backend/stdout_435506d48fd5490b84cd8a6dc90ab312.
+2025-07-09T03:12:36.4329077Z Successfully removed non-blocking flag from /podr/container/pipe/49d757850518_soundscribe-backend/stdout_435506d48fd5490b84cd8a6dc90ab312.
+2025-07-09T03:12:36.4330353Z Creating stderr named pipe at /podr/container/pipe/49d757850518_soundscribe-backend/stderr_e8f12af63991425784b281f8f101f449.
+2025-07-09T03:12:36.4332118Z Successfully created stderr named pipe at: /podr/container/pipe/49d757850518_soundscribe-backend/stderr_e8f12af63991425784b281f8f101f449.
+2025-07-09T03:12:36.4333289Z Opening named pipe /podr/container/pipe/49d757850518_soundscribe-backend/stderr_e8f12af63991425784b281f8f101f449 for reading in non-blocking mode.
+2025-07-09T03:12:36.4334658Z Successfully opened named pipe: /podr/container/pipe/49d757850518_soundscribe-backend/stderr_e8f12af63991425784b281f8f101f449.
+2025-07-09T03:12:36.4335812Z Successfully removed non-blocking flag from /podr/container/pipe/49d757850518_soundscribe-backend/stderr_e8f12af63991425784b281f8f101f449.
+2025-07-09T03:12:36.4337157Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:12:36.5561920Z Starting container: 49d757850518_soundscribe-backend.
+2025-07-09T03:12:36.5745614Z Starting watchers and probes.
+2025-07-09T03:12:36.5750775Z Starting metrics collection.
+2025-07-09T03:12:36.5754219Z Container is running.
+2025-07-09T03:12:36.6192410Z Container start method finished after 531 ms.
+2025-07-09T03:12:39.1898195Z Container has finished running with exit code: 1.
+2025-07-09T03:12:39.1900020Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T03:12:39.1903592Z Stop and delete container. Retry count = 0
+2025-07-09T03:12:39.1905253Z Stopping container: 49d757850518_soundscribe-backend.
+2025-07-09T03:12:39.2078364Z Deleting container: 49d757850518_soundscribe-backend. Retry count = 0
+2025-07-09T03:12:39.2493992Z Container spec TerminationMessagePolicy  path 
+2025-07-09T03:12:39.2500883Z Container is terminated. Total time elapsed: 59 ms.
+2025-07-09T03:12:39.2504177Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T03:12:39.2508505Z Site startup probe failed after 2.6290552 seconds.
+2025-07-09T03:12:39.2568789Z Failed to start site. Revert by stopping site.
+2025-07-09T03:12:39.2574949Z Site: soundscribe-backend stopped.
+2025-07-09T03:12:39.5254941Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 03:14:39
+2025-07-09T03:12:44.5833227Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:49.5962894Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:12:54.6441563Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:00.0801984Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:05.1091349Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:10.1322660Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:15.1399584Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:20.1583027Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:25.1779982Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:30.2161087Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:35.2361476Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:13:40.2434104Z Start site prohibitted because the site is being blocked.
+2025-07-09T03:14:39.5248462Z Site: soundscribe-backend is unblocked.
+2025-07-09T03:44:06.1841562Z Container start method called.
+2025-07-09T03:44:06.1847210Z Establishing network.
+2025-07-09T03:44:06.1849054Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T03:44:06.2868568Z Container is starting.
+2025-07-09T03:44:06.2872141Z Establishing user namespace if not established already.
+2025-07-09T03:44:06.2875741Z Establishing network if not established already.
+2025-07-09T03:44:06.2879561Z Mounting volumes.
+2025-07-09T03:44:06.2885198Z Nested mountpoint site/wwwroot
+2025-07-09T03:44:06.2904557Z Nested mountpoint volatile/logs
+2025-07-09T03:44:06.2935424Z Nested mountpoint 
+2025-07-09T03:44:06.2951461Z Nested mountpoint 
+2025-07-09T03:44:06.3005528Z Nested mountpoint 
+2025-07-09T03:44:06.3026892Z Nested mountpoint 
+2025-07-09T03:44:06.5191574Z Creating container.
+2025-07-09T03:44:06.5195576Z Creating pipes for streaming container io.
+2025-07-09T03:44:06.5200160Z Creating stdout named pipe at /podr/container/pipe/92e729f3ca36_soundscribe-backend/stdout_bab3cef647a34acf8a9e96d626faa1ba.
+2025-07-09T03:44:06.5207459Z Successfully created stdout named pipe at: /podr/container/pipe/92e729f3ca36_soundscribe-backend/stdout_bab3cef647a34acf8a9e96d626faa1ba.
+2025-07-09T03:44:06.5211615Z Opening named pipe /podr/container/pipe/92e729f3ca36_soundscribe-backend/stdout_bab3cef647a34acf8a9e96d626faa1ba for reading in non-blocking mode.
+2025-07-09T03:44:06.5217257Z Successfully opened named pipe: /podr/container/pipe/92e729f3ca36_soundscribe-backend/stdout_bab3cef647a34acf8a9e96d626faa1ba.
+2025-07-09T03:44:06.5221336Z Successfully removed non-blocking flag from /podr/container/pipe/92e729f3ca36_soundscribe-backend/stdout_bab3cef647a34acf8a9e96d626faa1ba.
+2025-07-09T03:44:06.5225805Z Creating stderr named pipe at /podr/container/pipe/92e729f3ca36_soundscribe-backend/stderr_20b85783790144b9860476397045ecf6.
+2025-07-09T03:44:06.5229834Z Successfully created stderr named pipe at: /podr/container/pipe/92e729f3ca36_soundscribe-backend/stderr_20b85783790144b9860476397045ecf6.
+2025-07-09T03:44:06.5233199Z Opening named pipe /podr/container/pipe/92e729f3ca36_soundscribe-backend/stderr_20b85783790144b9860476397045ecf6 for reading in non-blocking mode.
+2025-07-09T03:44:06.5236894Z Successfully opened named pipe: /podr/container/pipe/92e729f3ca36_soundscribe-backend/stderr_20b85783790144b9860476397045ecf6.
+2025-07-09T03:44:06.5240706Z Successfully removed non-blocking flag from /podr/container/pipe/92e729f3ca36_soundscribe-backend/stderr_20b85783790144b9860476397045ecf6.
+2025-07-09T03:44:06.5246949Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T03:44:06.6445119Z Starting container: 92e729f3ca36_soundscribe-backend.
+2025-07-09T03:44:06.6703696Z Starting watchers and probes.
+2025-07-09T03:44:06.6765982Z Starting metrics collection.
+2025-07-09T03:44:06.6907673Z Container is running.
+2025-07-09T03:44:08.6472987Z Container start method finished after 2462 ms.
+2025-07-09T03:44:09.3533176Z Container has finished running with exit code: 1.
+2025-07-09T03:44:09.3534753Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T03:44:09.3538212Z Stop and delete container. Retry count = 0
+2025-07-09T03:44:09.3539474Z Stopping container: 92e729f3ca36_soundscribe-backend.
+2025-07-09T03:44:09.3647673Z Deleting container: 92e729f3ca36_soundscribe-backend. Retry count = 0
+2025-07-09T03:44:09.4077951Z Container spec TerminationMessagePolicy  path 
+2025-07-09T03:44:09.4086332Z Container is terminated. Total time elapsed: 54 ms.
+2025-07-09T03:44:09.4091247Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T03:44:09.4094009Z Site startup probe failed after 0.7605593 seconds.
+2025-07-09T03:44:09.4110757Z Failed to start site. Revert by stopping site.
+2025-07-09T03:44:09.4112621Z Site: soundscribe-backend stopped.
+2025-07-09T03:44:09.6886269Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 03:46:09
+2025-07-09T03:46:09.6892582Z Site: soundscribe-backend is unblocked.
+2025-07-09T04:19:07.8222738Z Container start method called.
+2025-07-09T04:19:07.8226169Z Establishing network.
+2025-07-09T04:19:07.8231004Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T04:19:07.9201345Z Container is starting.
+2025-07-09T04:19:07.9202998Z Establishing user namespace if not established already.
+2025-07-09T04:19:07.9206422Z Establishing network if not established already.
+2025-07-09T04:19:07.9210924Z Mounting volumes.
+2025-07-09T04:19:07.9214396Z Nested mountpoint site/wwwroot
+2025-07-09T04:19:07.9260721Z Nested mountpoint volatile/logs
+2025-07-09T04:19:07.9286438Z Nested mountpoint 
+2025-07-09T04:19:07.9455288Z Nested mountpoint 
+2025-07-09T04:19:07.9539081Z Nested mountpoint 
+2025-07-09T04:19:07.9547104Z Nested mountpoint 
+2025-07-09T04:19:08.1433255Z Creating container.
+2025-07-09T04:19:08.1441231Z Creating pipes for streaming container io.
+2025-07-09T04:19:08.1445781Z Creating stdout named pipe at /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stdout_bfa077098bc84677b20f9384ec398ddc.
+2025-07-09T04:19:08.1449161Z Successfully created stdout named pipe at: /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stdout_bfa077098bc84677b20f9384ec398ddc.
+2025-07-09T04:19:08.1450697Z Opening named pipe /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stdout_bfa077098bc84677b20f9384ec398ddc for reading in non-blocking mode.
+2025-07-09T04:19:08.1452362Z Successfully opened named pipe: /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stdout_bfa077098bc84677b20f9384ec398ddc.
+2025-07-09T04:19:08.1454259Z Successfully removed non-blocking flag from /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stdout_bfa077098bc84677b20f9384ec398ddc.
+2025-07-09T04:19:08.1455917Z Creating stderr named pipe at /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stderr_91407d72dec4469e9f3f06cc8a7cb2f0.
+2025-07-09T04:19:08.1457904Z Successfully created stderr named pipe at: /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stderr_91407d72dec4469e9f3f06cc8a7cb2f0.
+2025-07-09T04:19:08.1459843Z Opening named pipe /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stderr_91407d72dec4469e9f3f06cc8a7cb2f0 for reading in non-blocking mode.
+2025-07-09T04:19:08.1461534Z Successfully opened named pipe: /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stderr_91407d72dec4469e9f3f06cc8a7cb2f0.
+2025-07-09T04:19:08.1462945Z Successfully removed non-blocking flag from /podr/container/pipe/ef4b8cf28a6a_soundscribe-backend/stderr_91407d72dec4469e9f3f06cc8a7cb2f0.
+2025-07-09T04:19:08.1464550Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T04:19:08.2699981Z Starting container: ef4b8cf28a6a_soundscribe-backend.
+2025-07-09T04:19:08.2886628Z Starting watchers and probes.
+2025-07-09T04:19:08.2891114Z Starting metrics collection.
+2025-07-09T04:19:08.2894644Z Container is running.
+2025-07-09T04:19:08.3325351Z Container start method finished after 509 ms.
+2025-07-09T04:19:11.1554689Z Container has finished running with exit code: 1.
+2025-07-09T04:19:11.1557352Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T04:19:11.2045029Z Stop and delete container. Retry count = 0
+2025-07-09T04:19:11.2047319Z Stopping container: ef4b8cf28a6a_soundscribe-backend.
+2025-07-09T04:19:11.2185686Z Deleting container: ef4b8cf28a6a_soundscribe-backend. Retry count = 0
+2025-07-09T04:19:11.8426004Z Container spec TerminationMessagePolicy  path 
+2025-07-09T04:19:11.8432403Z Container is terminated. Total time elapsed: 686 ms.
+2025-07-09T04:19:11.8436093Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T04:19:11.8440847Z Site startup probe failed after 3.5096001 seconds.
+2025-07-09T04:19:11.8500078Z Failed to start site. Revert by stopping site.
+2025-07-09T04:19:11.8505714Z Site: soundscribe-backend stopped.
+2025-07-09T04:19:12.0718434Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 04:21:12
+2025-07-09T04:21:12.0695186Z Site: soundscribe-backend is unblocked.
+2025-07-09T04:54:11.1176446Z Container start method called.
+2025-07-09T04:54:11.1181382Z Establishing network.
+2025-07-09T04:54:11.1186771Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T04:54:11.2409186Z Container is starting.
+2025-07-09T04:54:11.2413048Z Establishing user namespace if not established already.
+2025-07-09T04:54:11.2416551Z Establishing network if not established already.
+2025-07-09T04:54:11.2420087Z Mounting volumes.
+2025-07-09T04:54:11.2422447Z Nested mountpoint site/wwwroot
+2025-07-09T04:54:11.2482194Z Nested mountpoint volatile/logs
+2025-07-09T04:54:11.2510593Z Nested mountpoint 
+2025-07-09T04:54:11.2548542Z Nested mountpoint 
+2025-07-09T04:54:11.2588258Z Nested mountpoint 
+2025-07-09T04:54:11.2613129Z Nested mountpoint 
+2025-07-09T04:54:11.4215707Z Creating container.
+2025-07-09T04:54:11.4219126Z Creating pipes for streaming container io.
+2025-07-09T04:54:11.4223938Z Creating stdout named pipe at /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stdout_599ad41b6ef74c6c81f9c02b7a73f719.
+2025-07-09T04:54:11.4228990Z Successfully created stdout named pipe at: /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stdout_599ad41b6ef74c6c81f9c02b7a73f719.
+2025-07-09T04:54:11.4233313Z Opening named pipe /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stdout_599ad41b6ef74c6c81f9c02b7a73f719 for reading in non-blocking mode.
+2025-07-09T04:54:11.4237116Z Successfully opened named pipe: /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stdout_599ad41b6ef74c6c81f9c02b7a73f719.
+2025-07-09T04:54:11.4241256Z Successfully removed non-blocking flag from /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stdout_599ad41b6ef74c6c81f9c02b7a73f719.
+2025-07-09T04:54:11.4246884Z Creating stderr named pipe at /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stderr_62073a716afd4f0cb2db3067695ea2e3.
+2025-07-09T04:54:11.4251468Z Successfully created stderr named pipe at: /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stderr_62073a716afd4f0cb2db3067695ea2e3.
+2025-07-09T04:54:11.4254873Z Opening named pipe /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stderr_62073a716afd4f0cb2db3067695ea2e3 for reading in non-blocking mode.
+2025-07-09T04:54:11.4257923Z Successfully opened named pipe: /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stderr_62073a716afd4f0cb2db3067695ea2e3.
+2025-07-09T04:54:11.4262241Z Successfully removed non-blocking flag from /podr/container/pipe/d1c55912bb4b_soundscribe-backend/stderr_62073a716afd4f0cb2db3067695ea2e3.
+2025-07-09T04:54:11.4266464Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T04:54:11.5569340Z Starting container: d1c55912bb4b_soundscribe-backend.
+2025-07-09T04:54:11.5803507Z Starting watchers and probes.
+2025-07-09T04:54:11.5814254Z Starting metrics collection.
+2025-07-09T04:54:11.5825923Z Container is running.
+2025-07-09T04:54:11.6407819Z Container start method finished after 522 ms.
+2025-07-09T04:54:14.0729633Z Container has finished running with exit code: 1.
+2025-07-09T04:54:14.0733212Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T04:54:14.0742761Z Stop and delete container. Retry count = 0
+2025-07-09T04:54:14.0745899Z Stopping container: d1c55912bb4b_soundscribe-backend.
+2025-07-09T04:54:14.0888769Z Deleting container: d1c55912bb4b_soundscribe-backend. Retry count = 0
+2025-07-09T04:54:14.1268810Z Container spec TerminationMessagePolicy  path 
+2025-07-09T04:54:14.1273143Z Container is terminated. Total time elapsed: 53 ms.
+2025-07-09T04:54:14.1276574Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T04:54:14.1280532Z Site startup probe failed after 2.4849108 seconds.
+2025-07-09T04:54:14.1301421Z Failed to start site. Revert by stopping site.
+2025-07-09T04:54:14.1304504Z Site: soundscribe-backend stopped.
+2025-07-09T04:54:14.3756979Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 04:56:14
+2025-07-09T04:56:14.3769901Z Site: soundscribe-backend is unblocked.
+2025-07-09T05:29:12.1654171Z Container start method called.
+2025-07-09T05:29:12.1657231Z Establishing network.
+2025-07-09T05:29:12.1660343Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T05:29:12.2881148Z Container is starting.
+2025-07-09T05:29:12.2883873Z Establishing user namespace if not established already.
+2025-07-09T05:29:12.2886511Z Establishing network if not established already.
+2025-07-09T05:29:12.2889321Z Mounting volumes.
+2025-07-09T05:29:12.2892719Z Nested mountpoint site/wwwroot
+2025-07-09T05:29:12.2907229Z Nested mountpoint volatile/logs
+2025-07-09T05:29:12.2926495Z Nested mountpoint 
+2025-07-09T05:29:12.2938543Z Nested mountpoint 
+2025-07-09T05:29:12.3050151Z Nested mountpoint 
+2025-07-09T05:29:12.3082955Z Nested mountpoint 
+2025-07-09T05:29:12.5397385Z Creating container.
+2025-07-09T05:29:12.5406701Z Creating pipes for streaming container io.
+2025-07-09T05:29:12.5410605Z Creating stdout named pipe at /podr/container/pipe/e1a0664bf787_soundscribe-backend/stdout_6e12ce7d751c44999565d52893985091.
+2025-07-09T05:29:12.5415005Z Successfully created stdout named pipe at: /podr/container/pipe/e1a0664bf787_soundscribe-backend/stdout_6e12ce7d751c44999565d52893985091.
+2025-07-09T05:29:12.5418649Z Opening named pipe /podr/container/pipe/e1a0664bf787_soundscribe-backend/stdout_6e12ce7d751c44999565d52893985091 for reading in non-blocking mode.
+2025-07-09T05:29:12.5423777Z Successfully opened named pipe: /podr/container/pipe/e1a0664bf787_soundscribe-backend/stdout_6e12ce7d751c44999565d52893985091.
+2025-07-09T05:29:12.5427256Z Successfully removed non-blocking flag from /podr/container/pipe/e1a0664bf787_soundscribe-backend/stdout_6e12ce7d751c44999565d52893985091.
+2025-07-09T05:29:12.5430883Z Creating stderr named pipe at /podr/container/pipe/e1a0664bf787_soundscribe-backend/stderr_707d7864c0a148288f61b18464802d86.
+2025-07-09T05:29:12.5434698Z Successfully created stderr named pipe at: /podr/container/pipe/e1a0664bf787_soundscribe-backend/stderr_707d7864c0a148288f61b18464802d86.
+2025-07-09T05:29:12.5439068Z Opening named pipe /podr/container/pipe/e1a0664bf787_soundscribe-backend/stderr_707d7864c0a148288f61b18464802d86 for reading in non-blocking mode.
+2025-07-09T05:29:12.5443010Z Successfully opened named pipe: /podr/container/pipe/e1a0664bf787_soundscribe-backend/stderr_707d7864c0a148288f61b18464802d86.
+2025-07-09T05:29:12.5446446Z Successfully removed non-blocking flag from /podr/container/pipe/e1a0664bf787_soundscribe-backend/stderr_707d7864c0a148288f61b18464802d86.
+2025-07-09T05:29:12.5450138Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T05:29:12.6876524Z Starting container: e1a0664bf787_soundscribe-backend.
+2025-07-09T05:29:12.7170515Z Starting watchers and probes.
+2025-07-09T05:29:12.7175359Z Starting metrics collection.
+2025-07-09T05:29:12.7230802Z Container is running.
+2025-07-09T05:29:14.6152641Z Container start method finished after 2448 ms.
+2025-07-09T05:29:14.6285584Z Container has finished running with exit code: 1.
+2025-07-09T05:29:14.6287647Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T05:29:14.6292495Z Stop and delete container. Retry count = 0
+2025-07-09T05:29:14.6294624Z Stopping container: e1a0664bf787_soundscribe-backend.
+2025-07-09T05:29:14.6343891Z Container get mounts received unexpected exception.
+2025-07-09T05:29:14.6502729Z Container get mounts received unexpected exception.
+2025-07-09T05:29:14.6710712Z Deleting container: e1a0664bf787_soundscribe-backend. Retry count = 0
+2025-07-09T05:29:14.7391315Z Container spec TerminationMessagePolicy  path 
+2025-07-09T05:29:14.7408043Z Container is terminated. Total time elapsed: 110 ms.
+2025-07-09T05:29:14.7420358Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T05:29:14.7427887Z Site startup probe failed after 0.1247289 seconds.
+2025-07-09T05:29:14.7452299Z Failed to start site. Revert by stopping site.
+2025-07-09T05:29:14.7462943Z Site: soundscribe-backend stopped.
+2025-07-09T05:29:14.9595728Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 05:31:14
+2025-07-09T05:31:00.7677911Z Start site prohibitted because the site is being blocked.
+2025-07-09T05:31:14.9569359Z Site: soundscribe-backend is unblocked.
+2025-07-09T06:04:13.9545549Z Container start method called.
+2025-07-09T06:04:13.9547173Z Establishing network.
+2025-07-09T06:04:13.9548555Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T06:04:14.0725476Z Container is starting.
+2025-07-09T06:04:14.0731858Z Establishing user namespace if not established already.
+2025-07-09T06:04:14.0736283Z Establishing network if not established already.
+2025-07-09T06:04:14.0742430Z Mounting volumes.
+2025-07-09T06:04:14.0748002Z Nested mountpoint site/wwwroot
+2025-07-09T06:04:14.0770299Z Nested mountpoint volatile/logs
+2025-07-09T06:04:14.0797294Z Nested mountpoint 
+2025-07-09T06:04:14.0813721Z Nested mountpoint 
+2025-07-09T06:04:14.0876900Z Nested mountpoint 
+2025-07-09T06:04:14.0903575Z Nested mountpoint 
+2025-07-09T06:04:14.2607219Z Creating container.
+2025-07-09T06:04:14.2609148Z Creating pipes for streaming container io.
+2025-07-09T06:04:14.2611085Z Creating stdout named pipe at /podr/container/pipe/fa656556806a_soundscribe-backend/stdout_a92cba5d536f4e5d951b984c702cb053.
+2025-07-09T06:04:14.2613910Z Successfully created stdout named pipe at: /podr/container/pipe/fa656556806a_soundscribe-backend/stdout_a92cba5d536f4e5d951b984c702cb053.
+2025-07-09T06:04:14.2620863Z Opening named pipe /podr/container/pipe/fa656556806a_soundscribe-backend/stdout_a92cba5d536f4e5d951b984c702cb053 for reading in non-blocking mode.
+2025-07-09T06:04:14.2623642Z Successfully opened named pipe: /podr/container/pipe/fa656556806a_soundscribe-backend/stdout_a92cba5d536f4e5d951b984c702cb053.
+2025-07-09T06:04:14.2626758Z Successfully removed non-blocking flag from /podr/container/pipe/fa656556806a_soundscribe-backend/stdout_a92cba5d536f4e5d951b984c702cb053.
+2025-07-09T06:04:14.2629972Z Creating stderr named pipe at /podr/container/pipe/fa656556806a_soundscribe-backend/stderr_ab25a812de40400f8ce9100a8c8b43e2.
+2025-07-09T06:04:14.2633469Z Successfully created stderr named pipe at: /podr/container/pipe/fa656556806a_soundscribe-backend/stderr_ab25a812de40400f8ce9100a8c8b43e2.
+2025-07-09T06:04:14.2635952Z Opening named pipe /podr/container/pipe/fa656556806a_soundscribe-backend/stderr_ab25a812de40400f8ce9100a8c8b43e2 for reading in non-blocking mode.
+2025-07-09T06:04:14.2639349Z Successfully opened named pipe: /podr/container/pipe/fa656556806a_soundscribe-backend/stderr_ab25a812de40400f8ce9100a8c8b43e2.
+2025-07-09T06:04:14.2642863Z Successfully removed non-blocking flag from /podr/container/pipe/fa656556806a_soundscribe-backend/stderr_ab25a812de40400f8ce9100a8c8b43e2.
+2025-07-09T06:04:14.2646469Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T06:04:14.4141349Z Starting container: fa656556806a_soundscribe-backend.
+2025-07-09T06:04:14.4342577Z Starting watchers and probes.
+2025-07-09T06:04:14.4348000Z Starting metrics collection.
+2025-07-09T06:04:14.4352299Z Container is running.
+2025-07-09T06:04:14.4652785Z Container start method finished after 510 ms.
+2025-07-09T06:04:17.1248962Z Container has finished running with exit code: 1.
+2025-07-09T06:04:17.1250517Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T06:04:17.1253570Z Stop and delete container. Retry count = 0
+2025-07-09T06:04:17.1254924Z Stopping container: fa656556806a_soundscribe-backend.
+2025-07-09T06:04:17.1442842Z Deleting container: fa656556806a_soundscribe-backend. Retry count = 0
+2025-07-09T06:04:17.2635109Z Container spec TerminationMessagePolicy  path 
+2025-07-09T06:04:17.2637314Z Container is terminated. Total time elapsed: 138 ms.
+2025-07-09T06:04:17.2644001Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T06:04:17.2648505Z Site startup probe failed after 2.7978094 seconds.
+2025-07-09T06:04:17.2712877Z Failed to start site. Revert by stopping site.
+2025-07-09T06:04:17.2733850Z Site: soundscribe-backend stopped.
+2025-07-09T06:04:17.4391576Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 06:06:17
+2025-07-09T06:06:17.4416858Z Site: soundscribe-backend is unblocked.
+2025-07-09T06:37:55.2457519Z Container start method called.
+2025-07-09T06:37:55.2459091Z Establishing network.
+2025-07-09T06:37:55.2460385Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T06:37:55.3588577Z Container is starting.
+2025-07-09T06:37:55.3592177Z Establishing user namespace if not established already.
+2025-07-09T06:37:55.3595636Z Establishing network if not established already.
+2025-07-09T06:37:55.3599385Z Mounting volumes.
+2025-07-09T06:37:55.3603910Z Nested mountpoint site/wwwroot
+2025-07-09T06:37:55.3624670Z Nested mountpoint volatile/logs
+2025-07-09T06:37:55.3648130Z Nested mountpoint 
+2025-07-09T06:37:55.3656111Z Nested mountpoint 
+2025-07-09T06:37:55.3700272Z Nested mountpoint 
+2025-07-09T06:37:55.3723978Z Nested mountpoint 
+2025-07-09T06:37:55.5832337Z Creating container.
+2025-07-09T06:37:55.5836213Z Creating pipes for streaming container io.
+2025-07-09T06:37:55.5840125Z Creating stdout named pipe at /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stdout_d3038052002d48d2b4d9a7782ccdc956.
+2025-07-09T06:37:55.5844525Z Successfully created stdout named pipe at: /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stdout_d3038052002d48d2b4d9a7782ccdc956.
+2025-07-09T06:37:55.5848222Z Opening named pipe /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stdout_d3038052002d48d2b4d9a7782ccdc956 for reading in non-blocking mode.
+2025-07-09T06:37:55.5852051Z Successfully opened named pipe: /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stdout_d3038052002d48d2b4d9a7782ccdc956.
+2025-07-09T06:37:55.5856260Z Successfully removed non-blocking flag from /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stdout_d3038052002d48d2b4d9a7782ccdc956.
+2025-07-09T06:37:55.5860190Z Creating stderr named pipe at /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stderr_a8705b23bbfc43c6b2ad6d471d6652db.
+2025-07-09T06:37:55.5864352Z Successfully created stderr named pipe at: /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stderr_a8705b23bbfc43c6b2ad6d471d6652db.
+2025-07-09T06:37:55.5868083Z Opening named pipe /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stderr_a8705b23bbfc43c6b2ad6d471d6652db for reading in non-blocking mode.
+2025-07-09T06:37:55.5871799Z Successfully opened named pipe: /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stderr_a8705b23bbfc43c6b2ad6d471d6652db.
+2025-07-09T06:37:55.5875564Z Successfully removed non-blocking flag from /podr/container/pipe/c8ba65ed75df_soundscribe-backend/stderr_a8705b23bbfc43c6b2ad6d471d6652db.
+2025-07-09T06:37:55.5879417Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T06:37:55.7337670Z Starting container: c8ba65ed75df_soundscribe-backend.
+2025-07-09T06:37:55.7557988Z Starting watchers and probes.
+2025-07-09T06:37:55.7595117Z Starting metrics collection.
+2025-07-09T06:37:55.7671311Z Container is running.
+2025-07-09T06:37:55.8006599Z Container start method finished after 554 ms.
+2025-07-09T06:37:58.4704529Z Container has finished running with exit code: 1.
+2025-07-09T06:37:58.4708516Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T06:37:58.4718248Z Stop and delete container. Retry count = 0
+2025-07-09T06:37:58.4722725Z Stopping container: c8ba65ed75df_soundscribe-backend.
+2025-07-09T06:37:58.4843009Z Deleting container: c8ba65ed75df_soundscribe-backend. Retry count = 0
+2025-07-09T06:37:58.5299187Z Container spec TerminationMessagePolicy  path 
+2025-07-09T06:37:58.5305241Z Container is terminated. Total time elapsed: 59 ms.
+2025-07-09T06:37:58.5309173Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T06:37:58.5315260Z Site startup probe failed after 2.7289772 seconds.
+2025-07-09T06:37:58.5366554Z Failed to start site. Revert by stopping site.
+2025-07-09T06:37:58.5377181Z Site: soundscribe-backend stopped.
+2025-07-09T06:37:58.7017792Z Site: soundscribe-backend will be blocked for 4 minutes till 07/09/2025 06:41:58
+2025-07-09T06:41:58.7035715Z Site: soundscribe-backend is unblocked.
+2025-07-09T07:12:51.0390760Z Container start method called.
+2025-07-09T07:12:51.0395612Z Establishing network.
+2025-07-09T07:12:51.0400812Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T07:12:51.1524536Z Container is starting.
+2025-07-09T07:12:51.1527606Z Establishing user namespace if not established already.
+2025-07-09T07:12:51.1530462Z Establishing network if not established already.
+2025-07-09T07:12:51.1533225Z Mounting volumes.
+2025-07-09T07:12:51.1536485Z Nested mountpoint site/wwwroot
+2025-07-09T07:12:51.1550998Z Nested mountpoint volatile/logs
+2025-07-09T07:12:51.1622049Z Nested mountpoint 
+2025-07-09T07:12:51.1774052Z Nested mountpoint 
+2025-07-09T07:12:51.1850886Z Nested mountpoint 
+2025-07-09T07:12:51.1916434Z Nested mountpoint 
+2025-07-09T07:12:51.3617074Z Creating container.
+2025-07-09T07:12:51.3620876Z Creating pipes for streaming container io.
+2025-07-09T07:12:51.3624253Z Creating stdout named pipe at /podr/container/pipe/a8b7400e1944_soundscribe-backend/stdout_cd5ef3483e1e4ba687d28a4efee63d29.
+2025-07-09T07:12:51.3628421Z Successfully created stdout named pipe at: /podr/container/pipe/a8b7400e1944_soundscribe-backend/stdout_cd5ef3483e1e4ba687d28a4efee63d29.
+2025-07-09T07:12:51.3631767Z Opening named pipe /podr/container/pipe/a8b7400e1944_soundscribe-backend/stdout_cd5ef3483e1e4ba687d28a4efee63d29 for reading in non-blocking mode.
+2025-07-09T07:12:51.3635559Z Successfully opened named pipe: /podr/container/pipe/a8b7400e1944_soundscribe-backend/stdout_cd5ef3483e1e4ba687d28a4efee63d29.
+2025-07-09T07:12:51.3639345Z Successfully removed non-blocking flag from /podr/container/pipe/a8b7400e1944_soundscribe-backend/stdout_cd5ef3483e1e4ba687d28a4efee63d29.
+2025-07-09T07:12:51.3643005Z Creating stderr named pipe at /podr/container/pipe/a8b7400e1944_soundscribe-backend/stderr_af37ec414a384ad594a8ddab9ebcf760.
+2025-07-09T07:12:51.3646890Z Successfully created stderr named pipe at: /podr/container/pipe/a8b7400e1944_soundscribe-backend/stderr_af37ec414a384ad594a8ddab9ebcf760.
+2025-07-09T07:12:51.3650277Z Opening named pipe /podr/container/pipe/a8b7400e1944_soundscribe-backend/stderr_af37ec414a384ad594a8ddab9ebcf760 for reading in non-blocking mode.
+2025-07-09T07:12:51.3654131Z Successfully opened named pipe: /podr/container/pipe/a8b7400e1944_soundscribe-backend/stderr_af37ec414a384ad594a8ddab9ebcf760.
+2025-07-09T07:12:51.3657425Z Successfully removed non-blocking flag from /podr/container/pipe/a8b7400e1944_soundscribe-backend/stderr_af37ec414a384ad594a8ddab9ebcf760.
+2025-07-09T07:12:51.3660967Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T07:12:51.5106340Z Starting container: a8b7400e1944_soundscribe-backend.
+2025-07-09T07:12:51.5307885Z Starting watchers and probes.
+2025-07-09T07:12:51.5311456Z Starting metrics collection.
+2025-07-09T07:12:51.5320737Z Container is running.
+2025-07-09T07:12:52.3384570Z Container start method finished after 1299 ms.
+2025-07-09T07:12:53.8335879Z Container has finished running with exit code: 1.
+2025-07-09T07:12:53.8337594Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T07:12:53.8351086Z Stop and delete container. Retry count = 0
+2025-07-09T07:12:53.8352734Z Stopping container: a8b7400e1944_soundscribe-backend.
+2025-07-09T07:12:53.8488924Z Deleting container: a8b7400e1944_soundscribe-backend. Retry count = 0
+2025-07-09T07:12:53.9101130Z Container spec TerminationMessagePolicy  path 
+2025-07-09T07:12:53.9104961Z Container is terminated. Total time elapsed: 76 ms.
+2025-07-09T07:12:53.9121944Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T07:12:53.9127413Z Site startup probe failed after 1.5702604 seconds.
+2025-07-09T07:12:53.9148941Z Failed to start site. Revert by stopping site.
+2025-07-09T07:12:53.9154752Z Site: soundscribe-backend stopped.
+2025-07-09T07:12:54.0568625Z Site: soundscribe-backend will be blocked for 4 minutes till 07/09/2025 07:16:54
+2025-07-09T07:16:54.0570475Z Site: soundscribe-backend is unblocked.
+2025-07-09T07:43:18.1074585Z Container start method called.
+2025-07-09T07:43:18.1082200Z Establishing network.
+2025-07-09T07:43:18.1089388Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T07:43:18.2244090Z Container is starting.
+2025-07-09T07:43:18.2247384Z Establishing user namespace if not established already.
+2025-07-09T07:43:18.2250637Z Establishing network if not established already.
+2025-07-09T07:43:18.2253774Z Mounting volumes.
+2025-07-09T07:43:18.2257363Z Nested mountpoint site/wwwroot
+2025-07-09T07:43:18.2273765Z Nested mountpoint volatile/logs
+2025-07-09T07:43:18.2294205Z Nested mountpoint 
+2025-07-09T07:43:18.2319754Z Nested mountpoint 
+2025-07-09T07:43:18.2374362Z Nested mountpoint 
+2025-07-09T07:43:18.2393488Z Nested mountpoint 
+2025-07-09T07:43:18.3927941Z Creating container.
+2025-07-09T07:43:18.3934248Z Creating pipes for streaming container io.
+2025-07-09T07:43:18.3939878Z Creating stdout named pipe at /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stdout_8226c9bfb81a4312a8f9c3f1b71fd30d.
+2025-07-09T07:43:18.3945073Z Successfully created stdout named pipe at: /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stdout_8226c9bfb81a4312a8f9c3f1b71fd30d.
+2025-07-09T07:43:18.3949381Z Opening named pipe /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stdout_8226c9bfb81a4312a8f9c3f1b71fd30d for reading in non-blocking mode.
+2025-07-09T07:43:18.3953860Z Successfully opened named pipe: /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stdout_8226c9bfb81a4312a8f9c3f1b71fd30d.
+2025-07-09T07:43:18.3958219Z Successfully removed non-blocking flag from /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stdout_8226c9bfb81a4312a8f9c3f1b71fd30d.
+2025-07-09T07:43:18.3964017Z Creating stderr named pipe at /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stderr_af6c32633bad4acd85cd56db35de356b.
+2025-07-09T07:43:18.3969577Z Successfully created stderr named pipe at: /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stderr_af6c32633bad4acd85cd56db35de356b.
+2025-07-09T07:43:18.3974728Z Opening named pipe /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stderr_af6c32633bad4acd85cd56db35de356b for reading in non-blocking mode.
+2025-07-09T07:43:18.3982248Z Successfully opened named pipe: /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stderr_af6c32633bad4acd85cd56db35de356b.
+2025-07-09T07:43:18.3987414Z Successfully removed non-blocking flag from /podr/container/pipe/9c9fa113bfb9_soundscribe-backend/stderr_af6c32633bad4acd85cd56db35de356b.
+2025-07-09T07:43:18.3994062Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T07:43:18.5450665Z Starting container: 9c9fa113bfb9_soundscribe-backend.
+2025-07-09T07:43:18.5627070Z Starting watchers and probes.
+2025-07-09T07:43:18.5631980Z Starting metrics collection.
+2025-07-09T07:43:18.5635640Z Container is running.
+2025-07-09T07:43:20.5473243Z Container start method finished after 2434 ms.
+2025-07-09T07:43:20.5703424Z Container has finished running with exit code: 1.
+2025-07-09T07:43:20.5710065Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T07:43:20.5717485Z Stop and delete container. Retry count = 0
+2025-07-09T07:43:20.5723549Z Stopping container: 9c9fa113bfb9_soundscribe-backend.
+2025-07-09T07:43:20.5869615Z Deleting container: 9c9fa113bfb9_soundscribe-backend. Retry count = 0
+2025-07-09T07:43:20.6344350Z Container spec TerminationMessagePolicy  path 
+2025-07-09T07:43:20.6373918Z Container is terminated. Total time elapsed: 65 ms.
+2025-07-09T07:43:20.6388623Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T07:43:20.6410493Z Site startup probe failed after 0.0902941 seconds.
+2025-07-09T07:43:20.6491300Z Failed to start site. Revert by stopping site.
+2025-07-09T07:43:20.6514910Z Site: soundscribe-backend stopped.
+2025-07-09T08:17:25.4217091Z Container start method called.
+2025-07-09T08:17:25.4221011Z Establishing network.
+2025-07-09T08:17:25.4224837Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:17:25.6056882Z Container is starting.
+2025-07-09T08:17:25.6060744Z Establishing user namespace if not established already.
+2025-07-09T08:17:25.6064814Z Establishing network if not established already.
+2025-07-09T08:17:25.6068937Z Mounting volumes.
+2025-07-09T08:17:25.6073150Z Nested mountpoint site/wwwroot
+2025-07-09T08:17:25.6092362Z Nested mountpoint volatile/logs
+2025-07-09T08:17:25.6117719Z Nested mountpoint 
+2025-07-09T08:17:25.6157467Z Nested mountpoint 
+2025-07-09T08:17:25.6195211Z Nested mountpoint 
+2025-07-09T08:17:25.6217793Z Nested mountpoint 
+2025-07-09T08:17:27.6113495Z Creating container.
+2025-07-09T08:17:27.6117455Z Creating pipes for streaming container io.
+2025-07-09T08:17:27.6119763Z Creating stdout named pipe at /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stdout_98a43675ac80442595259900c43f5186.
+2025-07-09T08:17:27.6122879Z Successfully created stdout named pipe at: /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stdout_98a43675ac80442595259900c43f5186.
+2025-07-09T08:17:27.6124327Z Opening named pipe /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stdout_98a43675ac80442595259900c43f5186 for reading in non-blocking mode.
+2025-07-09T08:17:27.6126212Z Successfully opened named pipe: /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stdout_98a43675ac80442595259900c43f5186.
+2025-07-09T08:17:27.6127666Z Successfully removed non-blocking flag from /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stdout_98a43675ac80442595259900c43f5186.
+2025-07-09T08:17:27.6129997Z Creating stderr named pipe at /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stderr_2e21deec6baf46cd82d4c9663a776beb.
+2025-07-09T08:17:27.6132037Z Successfully created stderr named pipe at: /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stderr_2e21deec6baf46cd82d4c9663a776beb.
+2025-07-09T08:17:27.6133553Z Opening named pipe /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stderr_2e21deec6baf46cd82d4c9663a776beb for reading in non-blocking mode.
+2025-07-09T08:17:27.6135102Z Successfully opened named pipe: /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stderr_2e21deec6baf46cd82d4c9663a776beb.
+2025-07-09T08:17:27.6136315Z Successfully removed non-blocking flag from /podr/container/pipe/d5ba3a3d2cba_soundscribe-backend/stderr_2e21deec6baf46cd82d4c9663a776beb.
+2025-07-09T08:17:27.6137681Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:17:28.0544207Z Starting container: d5ba3a3d2cba_soundscribe-backend.
+2025-07-09T08:17:28.0815911Z Starting watchers and probes.
+2025-07-09T08:17:28.0821768Z Starting metrics collection.
+2025-07-09T08:17:28.0830811Z Container is running.
+2025-07-09T08:17:28.1164287Z Container start method finished after 2693 ms.
+2025-07-09T08:17:30.1661918Z Container has finished running with exit code: 1.
+2025-07-09T08:17:30.1664853Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:17:30.1669586Z Stop and delete container. Retry count = 0
+2025-07-09T08:17:30.1675243Z Stopping container: d5ba3a3d2cba_soundscribe-backend.
+2025-07-09T08:17:30.1860725Z Deleting container: d5ba3a3d2cba_soundscribe-backend. Retry count = 0
+2025-07-09T08:17:30.2307684Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:17:30.2333800Z Container is terminated. Total time elapsed: 66 ms.
+2025-07-09T08:17:30.2341431Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:17:30.2347238Z Site startup probe failed after 2.1094921 seconds.
+2025-07-09T08:17:30.2367596Z Failed to start site. Revert by stopping site.
+2025-07-09T08:17:30.2371182Z Site: soundscribe-backend stopped.
+2025-07-09T08:18:05.9567439Z Container start method called.
+2025-07-09T08:18:05.9568786Z Establishing network.
+2025-07-09T08:18:05.9570132Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:18:06.0971687Z Container is starting.
+2025-07-09T08:18:06.0975209Z Establishing user namespace if not established already.
+2025-07-09T08:18:06.0978610Z Establishing network if not established already.
+2025-07-09T08:18:06.0981749Z Mounting volumes.
+2025-07-09T08:18:06.0985535Z Nested mountpoint site/wwwroot
+2025-07-09T08:18:06.1021087Z Nested mountpoint volatile/logs
+2025-07-09T08:18:06.1041498Z Nested mountpoint 
+2025-07-09T08:18:06.1074942Z Nested mountpoint 
+2025-07-09T08:18:06.1155890Z Nested mountpoint 
+2025-07-09T08:18:06.1172515Z Nested mountpoint 
+2025-07-09T08:18:06.2952339Z Creating container.
+2025-07-09T08:18:06.2955684Z Creating pipes for streaming container io.
+2025-07-09T08:18:06.2959341Z Creating stdout named pipe at /podr/container/pipe/8c63b73376ea_soundscribe-backend/stdout_439cc96f3c1345688074ed7a5a5bdfb1.
+2025-07-09T08:18:06.2961807Z Successfully created stdout named pipe at: /podr/container/pipe/8c63b73376ea_soundscribe-backend/stdout_439cc96f3c1345688074ed7a5a5bdfb1.
+2025-07-09T08:18:06.2965647Z Opening named pipe /podr/container/pipe/8c63b73376ea_soundscribe-backend/stdout_439cc96f3c1345688074ed7a5a5bdfb1 for reading in non-blocking mode.
+2025-07-09T08:18:06.2968869Z Successfully opened named pipe: /podr/container/pipe/8c63b73376ea_soundscribe-backend/stdout_439cc96f3c1345688074ed7a5a5bdfb1.
+2025-07-09T08:18:06.2983293Z Successfully removed non-blocking flag from /podr/container/pipe/8c63b73376ea_soundscribe-backend/stdout_439cc96f3c1345688074ed7a5a5bdfb1.
+2025-07-09T08:18:06.2986398Z Creating stderr named pipe at /podr/container/pipe/8c63b73376ea_soundscribe-backend/stderr_df1ce4c1b0014ca59c2eb4e6f1e9f0ba.
+2025-07-09T08:18:06.2990067Z Successfully created stderr named pipe at: /podr/container/pipe/8c63b73376ea_soundscribe-backend/stderr_df1ce4c1b0014ca59c2eb4e6f1e9f0ba.
+2025-07-09T08:18:06.2993241Z Opening named pipe /podr/container/pipe/8c63b73376ea_soundscribe-backend/stderr_df1ce4c1b0014ca59c2eb4e6f1e9f0ba for reading in non-blocking mode.
+2025-07-09T08:18:06.2996712Z Successfully opened named pipe: /podr/container/pipe/8c63b73376ea_soundscribe-backend/stderr_df1ce4c1b0014ca59c2eb4e6f1e9f0ba.
+2025-07-09T08:18:06.3000494Z Successfully removed non-blocking flag from /podr/container/pipe/8c63b73376ea_soundscribe-backend/stderr_df1ce4c1b0014ca59c2eb4e6f1e9f0ba.
+2025-07-09T08:18:06.3003934Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:18:06.4309953Z Starting container: 8c63b73376ea_soundscribe-backend.
+2025-07-09T08:18:06.4513283Z Starting watchers and probes.
+2025-07-09T08:18:06.4516559Z Starting metrics collection.
+2025-07-09T08:18:06.4533238Z Container is running.
+2025-07-09T08:18:07.0295119Z Container start method finished after 1070 ms.
+2025-07-09T08:18:08.6662376Z Container has finished running with exit code: 1.
+2025-07-09T08:18:08.6664100Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:18:08.6667269Z Stop and delete container. Retry count = 0
+2025-07-09T08:18:08.6668331Z Stopping container: 8c63b73376ea_soundscribe-backend.
+2025-07-09T08:18:08.6843650Z Deleting container: 8c63b73376ea_soundscribe-backend. Retry count = 0
+2025-07-09T08:18:08.7364133Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:18:08.7376719Z Container is terminated. Total time elapsed: 70 ms.
+2025-07-09T08:18:08.7383517Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:18:08.7392390Z Site startup probe failed after 1.6995225 seconds.
+2025-07-09T08:18:08.7482469Z Failed to start site. Revert by stopping site.
+2025-07-09T08:18:08.7496182Z Site: soundscribe-backend stopped.
+2025-07-09T08:18:08.9054287Z Site: soundscribe-backend will be blocked for 1 minutes till 07/09/2025 08:19:08
+2025-07-09T08:19:08.9106266Z Site: soundscribe-backend is unblocked.
+2025-07-09T08:48:22.2277959Z Container start method called.
+2025-07-09T08:48:22.2279912Z Establishing network.
+2025-07-09T08:48:22.2281257Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:48:22.3487559Z Container is starting.
+2025-07-09T08:48:22.3490001Z Establishing user namespace if not established already.
+2025-07-09T08:48:22.3492195Z Establishing network if not established already.
+2025-07-09T08:48:22.3494520Z Mounting volumes.
+2025-07-09T08:48:22.3496675Z Nested mountpoint site/wwwroot
+2025-07-09T08:48:22.3513699Z Nested mountpoint volatile/logs
+2025-07-09T08:48:22.3597265Z Nested mountpoint 
+2025-07-09T08:48:22.3676947Z Nested mountpoint 
+2025-07-09T08:48:22.3783982Z Nested mountpoint 
+2025-07-09T08:48:22.3802497Z Nested mountpoint 
+2025-07-09T08:48:22.5161956Z Creating container.
+2025-07-09T08:48:22.5164016Z Creating pipes for streaming container io.
+2025-07-09T08:48:22.5165465Z Creating stdout named pipe at /podr/container/pipe/116741294f89_soundscribe-backend/stdout_6b997c58126340fd8924d58888e86fbc.
+2025-07-09T08:48:22.5170142Z Successfully created stdout named pipe at: /podr/container/pipe/116741294f89_soundscribe-backend/stdout_6b997c58126340fd8924d58888e86fbc.
+2025-07-09T08:48:22.5172861Z Opening named pipe /podr/container/pipe/116741294f89_soundscribe-backend/stdout_6b997c58126340fd8924d58888e86fbc for reading in non-blocking mode.
+2025-07-09T08:48:22.5175795Z Successfully opened named pipe: /podr/container/pipe/116741294f89_soundscribe-backend/stdout_6b997c58126340fd8924d58888e86fbc.
+2025-07-09T08:48:22.5177455Z Successfully removed non-blocking flag from /podr/container/pipe/116741294f89_soundscribe-backend/stdout_6b997c58126340fd8924d58888e86fbc.
+2025-07-09T08:48:22.5180211Z Creating stderr named pipe at /podr/container/pipe/116741294f89_soundscribe-backend/stderr_0dbafa4d6b4f4663aa5c2795e148b560.
+2025-07-09T08:48:22.5183475Z Successfully created stderr named pipe at: /podr/container/pipe/116741294f89_soundscribe-backend/stderr_0dbafa4d6b4f4663aa5c2795e148b560.
+2025-07-09T08:48:22.5185002Z Opening named pipe /podr/container/pipe/116741294f89_soundscribe-backend/stderr_0dbafa4d6b4f4663aa5c2795e148b560 for reading in non-blocking mode.
+2025-07-09T08:48:22.5187787Z Successfully opened named pipe: /podr/container/pipe/116741294f89_soundscribe-backend/stderr_0dbafa4d6b4f4663aa5c2795e148b560.
+2025-07-09T08:48:22.5190182Z Successfully removed non-blocking flag from /podr/container/pipe/116741294f89_soundscribe-backend/stderr_0dbafa4d6b4f4663aa5c2795e148b560.
+2025-07-09T08:48:22.5194095Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:48:22.6403935Z Starting container: 116741294f89_soundscribe-backend.
+2025-07-09T08:48:22.6604596Z Starting watchers and probes.
+2025-07-09T08:48:22.6607710Z Starting metrics collection.
+2025-07-09T08:48:22.6609645Z Container is running.
+2025-07-09T08:48:23.5695853Z Container start method finished after 1341 ms.
+2025-07-09T08:48:25.6378596Z Container has finished running with exit code: 1.
+2025-07-09T08:48:25.6380237Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:48:25.6383815Z Stop and delete container. Retry count = 0
+2025-07-09T08:48:25.6385285Z Stopping container: 116741294f89_soundscribe-backend.
+2025-07-09T08:48:25.6540854Z Deleting container: 116741294f89_soundscribe-backend. Retry count = 0
+2025-07-09T08:48:25.7021775Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:48:25.7033816Z Container is terminated. Total time elapsed: 64 ms.
+2025-07-09T08:48:25.7041097Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:48:25.7047891Z Site startup probe failed after 2.1315143 seconds.
+2025-07-09T08:48:25.7076567Z Failed to start site. Revert by stopping site.
+2025-07-09T08:48:25.7126466Z Site: soundscribe-backend stopped.
+2025-07-09T08:48:25.8531724Z Site: soundscribe-backend will be blocked for 1 minutes till 07/09/2025 08:49:25
+2025-07-09T08:49:25.8546450Z Site: soundscribe-backend is unblocked.
+2025-07-09T08:50:37.8846914Z Container start method called.
+2025-07-09T08:50:37.8868271Z Establishing network.
+2025-07-09T08:50:37.8871298Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:50:38.0028696Z Container is starting.
+2025-07-09T08:50:38.0032173Z Establishing user namespace if not established already.
+2025-07-09T08:50:38.0035461Z Establishing network if not established already.
+2025-07-09T08:50:38.0039423Z Mounting volumes.
+2025-07-09T08:50:38.0043639Z Nested mountpoint site/wwwroot
+2025-07-09T08:50:38.0061847Z Nested mountpoint volatile/logs
+2025-07-09T08:50:38.0087164Z Nested mountpoint 
+2025-07-09T08:50:38.0106143Z Nested mountpoint 
+2025-07-09T08:50:38.0169189Z Nested mountpoint 
+2025-07-09T08:50:38.0192368Z Nested mountpoint 
+2025-07-09T08:50:38.1776257Z Creating container.
+2025-07-09T08:50:38.1779689Z Creating pipes for streaming container io.
+2025-07-09T08:50:38.1783036Z Creating stdout named pipe at /podr/container/pipe/be95f9598d93_soundscribe-backend/stdout_590c58e5d19345b5b00e5e7435d827de.
+2025-07-09T08:50:38.1786989Z Successfully created stdout named pipe at: /podr/container/pipe/be95f9598d93_soundscribe-backend/stdout_590c58e5d19345b5b00e5e7435d827de.
+2025-07-09T08:50:38.1790328Z Opening named pipe /podr/container/pipe/be95f9598d93_soundscribe-backend/stdout_590c58e5d19345b5b00e5e7435d827de for reading in non-blocking mode.
+2025-07-09T08:50:38.1794065Z Successfully opened named pipe: /podr/container/pipe/be95f9598d93_soundscribe-backend/stdout_590c58e5d19345b5b00e5e7435d827de.
+2025-07-09T08:50:38.1797804Z Successfully removed non-blocking flag from /podr/container/pipe/be95f9598d93_soundscribe-backend/stdout_590c58e5d19345b5b00e5e7435d827de.
+2025-07-09T08:50:38.1801396Z Creating stderr named pipe at /podr/container/pipe/be95f9598d93_soundscribe-backend/stderr_292d53a7abf4461bbf02795a6eb9d298.
+2025-07-09T08:50:38.1814663Z Successfully created stderr named pipe at: /podr/container/pipe/be95f9598d93_soundscribe-backend/stderr_292d53a7abf4461bbf02795a6eb9d298.
+2025-07-09T08:50:38.1820915Z Opening named pipe /podr/container/pipe/be95f9598d93_soundscribe-backend/stderr_292d53a7abf4461bbf02795a6eb9d298 for reading in non-blocking mode.
+2025-07-09T08:50:38.1826592Z Successfully opened named pipe: /podr/container/pipe/be95f9598d93_soundscribe-backend/stderr_292d53a7abf4461bbf02795a6eb9d298.
+2025-07-09T08:50:38.1832275Z Successfully removed non-blocking flag from /podr/container/pipe/be95f9598d93_soundscribe-backend/stderr_292d53a7abf4461bbf02795a6eb9d298.
+2025-07-09T08:50:38.1840182Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:50:38.3097021Z Starting container: be95f9598d93_soundscribe-backend.
+2025-07-09T08:50:38.3263171Z Starting watchers and probes.
+2025-07-09T08:50:38.3266309Z Starting metrics collection.
+2025-07-09T08:50:38.3268494Z Container is running.
+2025-07-09T08:50:39.0853300Z Container start method finished after 1200 ms.
+2025-07-09T08:50:40.9272519Z Container has finished running with exit code: 1.
+2025-07-09T08:50:40.9276009Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:50:40.9281106Z Stop and delete container. Retry count = 0
+2025-07-09T08:50:40.9282692Z Stopping container: be95f9598d93_soundscribe-backend.
+2025-07-09T08:50:40.9404027Z Deleting container: be95f9598d93_soundscribe-backend. Retry count = 0
+2025-07-09T08:50:40.9905825Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:50:40.9912868Z Container is terminated. Total time elapsed: 62 ms.
+2025-07-09T08:50:40.9916649Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:50:40.9922154Z Site startup probe failed after 1.9056807 seconds.
+2025-07-09T08:50:40.9982629Z Failed to start site. Revert by stopping site.
+2025-07-09T08:50:40.9994552Z Site: soundscribe-backend stopped.
+2025-07-09T08:50:41.1489169Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 08:52:41
+2025-07-09T08:52:41.1523180Z Site: soundscribe-backend is unblocked.
+2025-07-09T08:53:55.9266557Z Container start method called.
+2025-07-09T08:53:55.9268170Z Establishing network.
+2025-07-09T08:53:55.9269711Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:53:56.0307249Z Container is starting.
+2025-07-09T08:53:56.0312425Z Establishing user namespace if not established already.
+2025-07-09T08:53:56.0317099Z Establishing network if not established already.
+2025-07-09T08:53:56.0321397Z Mounting volumes.
+2025-07-09T08:53:56.0325983Z Nested mountpoint site/wwwroot
+2025-07-09T08:53:56.0345214Z Nested mountpoint volatile/logs
+2025-07-09T08:53:56.0380917Z Nested mountpoint 
+2025-07-09T08:53:56.0397482Z Nested mountpoint 
+2025-07-09T08:53:56.0512353Z Nested mountpoint 
+2025-07-09T08:53:56.0530806Z Nested mountpoint 
+2025-07-09T08:53:56.2359037Z Creating container.
+2025-07-09T08:53:56.2363429Z Creating pipes for streaming container io.
+2025-07-09T08:53:56.2367719Z Creating stdout named pipe at /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stdout_83d2ef9717cf4e278f03f60964f037c6.
+2025-07-09T08:53:56.2372481Z Successfully created stdout named pipe at: /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stdout_83d2ef9717cf4e278f03f60964f037c6.
+2025-07-09T08:53:56.2386381Z Opening named pipe /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stdout_83d2ef9717cf4e278f03f60964f037c6 for reading in non-blocking mode.
+2025-07-09T08:53:56.2391916Z Successfully opened named pipe: /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stdout_83d2ef9717cf4e278f03f60964f037c6.
+2025-07-09T08:53:56.2397748Z Successfully removed non-blocking flag from /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stdout_83d2ef9717cf4e278f03f60964f037c6.
+2025-07-09T08:53:56.2404438Z Creating stderr named pipe at /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stderr_56827a4a23fa41b5baa3ffe80c8f01a0.
+2025-07-09T08:53:56.2409541Z Successfully created stderr named pipe at: /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stderr_56827a4a23fa41b5baa3ffe80c8f01a0.
+2025-07-09T08:53:56.2414850Z Opening named pipe /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stderr_56827a4a23fa41b5baa3ffe80c8f01a0 for reading in non-blocking mode.
+2025-07-09T08:53:56.2419909Z Successfully opened named pipe: /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stderr_56827a4a23fa41b5baa3ffe80c8f01a0.
+2025-07-09T08:53:56.2425338Z Successfully removed non-blocking flag from /podr/container/pipe/e6eafc1f408e_soundscribe-backend/stderr_56827a4a23fa41b5baa3ffe80c8f01a0.
+2025-07-09T08:53:56.2430175Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:53:56.6025961Z Starting container: e6eafc1f408e_soundscribe-backend.
+2025-07-09T08:53:56.6316906Z Starting watchers and probes.
+2025-07-09T08:53:56.6324132Z Starting metrics collection.
+2025-07-09T08:53:56.6326942Z Container is running.
+2025-07-09T08:53:57.6582614Z Container start method finished after 1731 ms.
+2025-07-09T08:53:58.7291230Z Container has finished running with exit code: 1.
+2025-07-09T08:53:58.7292613Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:53:58.7301781Z Stop and delete container. Retry count = 0
+2025-07-09T08:53:58.7306502Z Stopping container: e6eafc1f408e_soundscribe-backend.
+2025-07-09T08:53:58.7420608Z Deleting container: e6eafc1f408e_soundscribe-backend. Retry count = 0
+2025-07-09T08:53:58.7884459Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:53:58.7889942Z Container is terminated. Total time elapsed: 59 ms.
+2025-07-09T08:53:58.7893494Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:53:58.7897645Z Site startup probe failed after 1.1300601 seconds.
+2025-07-09T08:53:58.7970088Z Failed to start site. Revert by stopping site.
+2025-07-09T08:53:58.7972842Z Site: soundscribe-backend stopped.
+2025-07-09T08:56:14.9554703Z Container start method called.
+2025-07-09T08:56:14.9556024Z Establishing network.
+2025-07-09T08:56:14.9561600Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:56:15.1044190Z Container is starting.
+2025-07-09T08:56:15.1048253Z Establishing user namespace if not established already.
+2025-07-09T08:56:15.1051490Z Establishing network if not established already.
+2025-07-09T08:56:15.1054450Z Mounting volumes.
+2025-07-09T08:56:15.1057756Z Nested mountpoint site/wwwroot
+2025-07-09T08:56:15.1081181Z Nested mountpoint volatile/logs
+2025-07-09T08:56:15.1122890Z Nested mountpoint 
+2025-07-09T08:56:15.1139482Z Nested mountpoint 
+2025-07-09T08:56:15.1233728Z Nested mountpoint 
+2025-07-09T08:56:15.1403729Z Nested mountpoint 
+2025-07-09T08:56:15.2777419Z Creating container.
+2025-07-09T08:56:15.2781170Z Creating pipes for streaming container io.
+2025-07-09T08:56:15.2784734Z Creating stdout named pipe at /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stdout_cc0fbfea88054bdd92470cb9d39acda8.
+2025-07-09T08:56:15.2788953Z Successfully created stdout named pipe at: /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stdout_cc0fbfea88054bdd92470cb9d39acda8.
+2025-07-09T08:56:15.2796354Z Opening named pipe /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stdout_cc0fbfea88054bdd92470cb9d39acda8 for reading in non-blocking mode.
+2025-07-09T08:56:15.2807472Z Successfully opened named pipe: /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stdout_cc0fbfea88054bdd92470cb9d39acda8.
+2025-07-09T08:56:15.2810416Z Successfully removed non-blocking flag from /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stdout_cc0fbfea88054bdd92470cb9d39acda8.
+2025-07-09T08:56:15.2815810Z Creating stderr named pipe at /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stderr_da502f838da540f7a2ac34783990508b.
+2025-07-09T08:56:15.2822592Z Successfully created stderr named pipe at: /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stderr_da502f838da540f7a2ac34783990508b.
+2025-07-09T08:56:15.2827690Z Opening named pipe /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stderr_da502f838da540f7a2ac34783990508b for reading in non-blocking mode.
+2025-07-09T08:56:15.2832577Z Successfully opened named pipe: /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stderr_da502f838da540f7a2ac34783990508b.
+2025-07-09T08:56:15.2834168Z Successfully removed non-blocking flag from /podr/container/pipe/ad3571b4c6d2_soundscribe-backend/stderr_da502f838da540f7a2ac34783990508b.
+2025-07-09T08:56:15.2840502Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:56:15.4977160Z Starting container: ad3571b4c6d2_soundscribe-backend.
+2025-07-09T08:56:15.5191682Z Starting watchers and probes.
+2025-07-09T08:56:15.5195096Z Starting metrics collection.
+2025-07-09T08:56:15.5197029Z Container is running.
+2025-07-09T08:56:15.5700766Z Container start method finished after 614 ms.
+2025-07-09T08:56:17.7412710Z Container has finished running with exit code: 1.
+2025-07-09T08:56:17.7414160Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:56:17.7429391Z Stop and delete container. Retry count = 0
+2025-07-09T08:56:17.7430937Z Stopping container: ad3571b4c6d2_soundscribe-backend.
+2025-07-09T08:56:17.7537842Z Deleting container: ad3571b4c6d2_soundscribe-backend. Retry count = 0
+2025-07-09T08:56:17.7984886Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:56:17.7992589Z Container is terminated. Total time elapsed: 57 ms.
+2025-07-09T08:56:17.7998908Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:56:17.8004575Z Site startup probe failed after 2.2216668 seconds.
+2025-07-09T08:56:17.8029905Z Failed to start site. Revert by stopping site.
+2025-07-09T08:56:17.8033880Z Site: soundscribe-backend stopped.
+2025-07-09T08:58:10.2538498Z Container start method called.
+2025-07-09T08:58:10.2540213Z Establishing network.
+2025-07-09T08:58:10.2541720Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T08:58:10.4045660Z Container is starting.
+2025-07-09T08:58:10.4047397Z Establishing user namespace if not established already.
+2025-07-09T08:58:10.4051868Z Establishing network if not established already.
+2025-07-09T08:58:10.4053754Z Mounting volumes.
+2025-07-09T08:58:10.4058554Z Nested mountpoint site/wwwroot
+2025-07-09T08:58:10.4074211Z Nested mountpoint volatile/logs
+2025-07-09T08:58:10.4091514Z Nested mountpoint 
+2025-07-09T08:58:10.4099425Z Nested mountpoint 
+2025-07-09T08:58:10.4178456Z Nested mountpoint 
+2025-07-09T08:58:10.4195645Z Nested mountpoint 
+2025-07-09T08:58:10.5932230Z Creating container.
+2025-07-09T08:58:10.5934717Z Creating pipes for streaming container io.
+2025-07-09T08:58:10.5937187Z Creating stdout named pipe at /podr/container/pipe/efdf65e457fa_soundscribe-backend/stdout_b7e3dd3f1f2a47a0acaec3f2fe8bbbd9.
+2025-07-09T08:58:10.5940450Z Successfully created stdout named pipe at: /podr/container/pipe/efdf65e457fa_soundscribe-backend/stdout_b7e3dd3f1f2a47a0acaec3f2fe8bbbd9.
+2025-07-09T08:58:10.5942899Z Opening named pipe /podr/container/pipe/efdf65e457fa_soundscribe-backend/stdout_b7e3dd3f1f2a47a0acaec3f2fe8bbbd9 for reading in non-blocking mode.
+2025-07-09T08:58:10.5945568Z Successfully opened named pipe: /podr/container/pipe/efdf65e457fa_soundscribe-backend/stdout_b7e3dd3f1f2a47a0acaec3f2fe8bbbd9.
+2025-07-09T08:58:10.5958403Z Successfully removed non-blocking flag from /podr/container/pipe/efdf65e457fa_soundscribe-backend/stdout_b7e3dd3f1f2a47a0acaec3f2fe8bbbd9.
+2025-07-09T08:58:10.5961569Z Creating stderr named pipe at /podr/container/pipe/efdf65e457fa_soundscribe-backend/stderr_18e75f6bd92743919e5ea302de8957cc.
+2025-07-09T08:58:10.5964557Z Successfully created stderr named pipe at: /podr/container/pipe/efdf65e457fa_soundscribe-backend/stderr_18e75f6bd92743919e5ea302de8957cc.
+2025-07-09T08:58:10.5966945Z Opening named pipe /podr/container/pipe/efdf65e457fa_soundscribe-backend/stderr_18e75f6bd92743919e5ea302de8957cc for reading in non-blocking mode.
+2025-07-09T08:58:10.5972186Z Successfully opened named pipe: /podr/container/pipe/efdf65e457fa_soundscribe-backend/stderr_18e75f6bd92743919e5ea302de8957cc.
+2025-07-09T08:58:10.5974904Z Successfully removed non-blocking flag from /podr/container/pipe/efdf65e457fa_soundscribe-backend/stderr_18e75f6bd92743919e5ea302de8957cc.
+2025-07-09T08:58:10.5979389Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T08:58:10.7280455Z Starting container: efdf65e457fa_soundscribe-backend.
+2025-07-09T08:58:10.7462054Z Starting watchers and probes.
+2025-07-09T08:58:10.7466499Z Starting metrics collection.
+2025-07-09T08:58:10.7469569Z Container is running.
+2025-07-09T08:58:10.7970045Z Container start method finished after 542 ms.
+2025-07-09T08:58:12.8815332Z Container has finished running with exit code: 1.
+2025-07-09T08:58:12.8818527Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T08:58:12.8823193Z Stop and delete container. Retry count = 0
+2025-07-09T08:58:12.8826300Z Stopping container: efdf65e457fa_soundscribe-backend.
+2025-07-09T08:58:12.9004266Z Deleting container: efdf65e457fa_soundscribe-backend. Retry count = 0
+2025-07-09T08:58:12.9452568Z Container spec TerminationMessagePolicy  path 
+2025-07-09T08:58:12.9455087Z Container is terminated. Total time elapsed: 63 ms.
+2025-07-09T08:58:12.9457084Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T08:58:12.9462876Z Site startup probe failed after 2.14222 seconds.
+2025-07-09T08:58:12.9485775Z Failed to start site. Revert by stopping site.
+2025-07-09T08:58:12.9488734Z Site: soundscribe-backend stopped.
+2025-07-09T09:01:30.6141104Z Container start method called.
+2025-07-09T09:01:30.6142703Z Establishing network.
+2025-07-09T09:01:30.6144105Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:01:30.8268450Z Container is starting.
+2025-07-09T09:01:30.8271919Z Establishing user namespace if not established already.
+2025-07-09T09:01:30.8275324Z Establishing network if not established already.
+2025-07-09T09:01:30.8279085Z Mounting volumes.
+2025-07-09T09:01:30.8283028Z Nested mountpoint 
+2025-07-09T09:01:30.8300109Z Nested mountpoint volatile/logs
+2025-07-09T09:01:30.8326080Z Nested mountpoint 
+2025-07-09T09:01:30.8349688Z Nested mountpoint 
+2025-07-09T09:01:30.8365402Z Nested mountpoint 
+2025-07-09T09:01:30.9726331Z Creating container.
+2025-07-09T09:01:30.9734303Z Creating pipes for streaming container io.
+2025-07-09T09:01:30.9737134Z Creating stdout named pipe at /podr/container/pipe/14d9db971915_soundscribe-backend/stdout_1d42b79ae11147ec8f2e09bdf0392bca.
+2025-07-09T09:01:30.9741152Z Successfully created stdout named pipe at: /podr/container/pipe/14d9db971915_soundscribe-backend/stdout_1d42b79ae11147ec8f2e09bdf0392bca.
+2025-07-09T09:01:30.9743549Z Opening named pipe /podr/container/pipe/14d9db971915_soundscribe-backend/stdout_1d42b79ae11147ec8f2e09bdf0392bca for reading in non-blocking mode.
+2025-07-09T09:01:30.9745606Z Successfully opened named pipe: /podr/container/pipe/14d9db971915_soundscribe-backend/stdout_1d42b79ae11147ec8f2e09bdf0392bca.
+2025-07-09T09:01:30.9747916Z Successfully removed non-blocking flag from /podr/container/pipe/14d9db971915_soundscribe-backend/stdout_1d42b79ae11147ec8f2e09bdf0392bca.
+2025-07-09T09:01:30.9750192Z Creating stderr named pipe at /podr/container/pipe/14d9db971915_soundscribe-backend/stderr_c47c15a8f46b49b9b30e07bec04511ce.
+2025-07-09T09:01:30.9752962Z Successfully created stderr named pipe at: /podr/container/pipe/14d9db971915_soundscribe-backend/stderr_c47c15a8f46b49b9b30e07bec04511ce.
+2025-07-09T09:01:30.9755223Z Opening named pipe /podr/container/pipe/14d9db971915_soundscribe-backend/stderr_c47c15a8f46b49b9b30e07bec04511ce for reading in non-blocking mode.
+2025-07-09T09:01:30.9757677Z Successfully opened named pipe: /podr/container/pipe/14d9db971915_soundscribe-backend/stderr_c47c15a8f46b49b9b30e07bec04511ce.
+2025-07-09T09:01:30.9759341Z Successfully removed non-blocking flag from /podr/container/pipe/14d9db971915_soundscribe-backend/stderr_c47c15a8f46b49b9b30e07bec04511ce.
+2025-07-09T09:01:30.9761561Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:01:31.1231041Z Starting container: 14d9db971915_soundscribe-backend.
+2025-07-09T09:01:31.1467873Z Starting watchers and probes.
+2025-07-09T09:01:31.1474121Z Starting metrics collection.
+2025-07-09T09:01:31.1479096Z Container is running.
+2025-07-09T09:01:31.1705555Z Container start method finished after 555 ms.
+2025-07-09T09:01:33.6129197Z Container has finished running with exit code: 1.
+2025-07-09T09:01:33.6132410Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T09:01:33.6136725Z Stop and delete container. Retry count = 0
+2025-07-09T09:01:33.6140267Z Stopping container: 14d9db971915_soundscribe-backend.
+2025-07-09T09:01:33.6244363Z Deleting container: 14d9db971915_soundscribe-backend. Retry count = 0
+2025-07-09T09:01:33.6663807Z Container spec TerminationMessagePolicy  path 
+2025-07-09T09:01:33.6666247Z Container is terminated. Total time elapsed: 53 ms.
+2025-07-09T09:01:33.6668320Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T09:01:33.6670827Z Site startup probe failed after 2.4951655 seconds.
+2025-07-09T09:01:33.6738536Z Failed to start site. Revert by stopping site.
+2025-07-09T09:01:33.6749405Z Site: soundscribe-backend stopped.
+2025-07-09T09:09:51.5275042Z Container start method called.
+2025-07-09T09:09:51.5278400Z Establishing network.
+2025-07-09T09:09:51.5291729Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:09:51.6845347Z Container is starting.
+2025-07-09T09:09:51.6846974Z Establishing user namespace if not established already.
+2025-07-09T09:09:51.6848352Z Establishing network if not established already.
+2025-07-09T09:09:51.6850480Z Mounting volumes.
+2025-07-09T09:09:51.6853884Z Nested mountpoint 
+2025-07-09T09:09:51.6868257Z Nested mountpoint volatile/logs
+2025-07-09T09:09:51.6908991Z Nested mountpoint 
+2025-07-09T09:09:51.6954436Z Nested mountpoint 
+2025-07-09T09:09:51.7008983Z Nested mountpoint 
+2025-07-09T09:09:51.8058873Z Creating container.
+2025-07-09T09:09:51.8062225Z Creating pipes for streaming container io.
+2025-07-09T09:09:51.8065555Z Creating stdout named pipe at /podr/container/pipe/fe03491e1b27_soundscribe-backend/stdout_b0cac088c5a64303a2f8d5f7343d140f.
+2025-07-09T09:09:51.8069355Z Successfully created stdout named pipe at: /podr/container/pipe/fe03491e1b27_soundscribe-backend/stdout_b0cac088c5a64303a2f8d5f7343d140f.
+2025-07-09T09:09:51.8072446Z Opening named pipe /podr/container/pipe/fe03491e1b27_soundscribe-backend/stdout_b0cac088c5a64303a2f8d5f7343d140f for reading in non-blocking mode.
+2025-07-09T09:09:51.8075735Z Successfully opened named pipe: /podr/container/pipe/fe03491e1b27_soundscribe-backend/stdout_b0cac088c5a64303a2f8d5f7343d140f.
+2025-07-09T09:09:51.8082726Z Successfully removed non-blocking flag from /podr/container/pipe/fe03491e1b27_soundscribe-backend/stdout_b0cac088c5a64303a2f8d5f7343d140f.
+2025-07-09T09:09:51.8087284Z Creating stderr named pipe at /podr/container/pipe/fe03491e1b27_soundscribe-backend/stderr_0897ec49a8244666bf107683c9678c98.
+2025-07-09T09:09:51.8091544Z Successfully created stderr named pipe at: /podr/container/pipe/fe03491e1b27_soundscribe-backend/stderr_0897ec49a8244666bf107683c9678c98.
+2025-07-09T09:09:51.8095626Z Opening named pipe /podr/container/pipe/fe03491e1b27_soundscribe-backend/stderr_0897ec49a8244666bf107683c9678c98 for reading in non-blocking mode.
+2025-07-09T09:09:51.8099890Z Successfully opened named pipe: /podr/container/pipe/fe03491e1b27_soundscribe-backend/stderr_0897ec49a8244666bf107683c9678c98.
+2025-07-09T09:09:51.8106569Z Successfully removed non-blocking flag from /podr/container/pipe/fe03491e1b27_soundscribe-backend/stderr_0897ec49a8244666bf107683c9678c98.
+2025-07-09T09:09:51.8110197Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:09:51.9580432Z Starting container: fe03491e1b27_soundscribe-backend.
+2025-07-09T09:09:51.9815006Z Starting watchers and probes.
+2025-07-09T09:09:51.9818188Z Starting metrics collection.
+2025-07-09T09:09:51.9819927Z Container is running.
+2025-07-09T09:09:52.9645732Z Container start method finished after 1436 ms.
+2025-07-09T09:09:54.7872774Z Container has finished running with exit code: 1.
+2025-07-09T09:09:54.7889814Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T09:09:54.7906423Z Stop and delete container. Retry count = 0
+2025-07-09T09:09:54.7925962Z Stopping container: fe03491e1b27_soundscribe-backend.
+2025-07-09T09:09:54.8114703Z Deleting container: fe03491e1b27_soundscribe-backend. Retry count = 0
+2025-07-09T09:09:54.8565401Z Container spec TerminationMessagePolicy  path 
+2025-07-09T09:09:54.8567519Z Container is terminated. Total time elapsed: 67 ms.
+2025-07-09T09:09:54.8568952Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T09:09:54.8571213Z Site startup probe failed after 1.8780555 seconds.
+2025-07-09T09:09:54.8589680Z Failed to start site. Revert by stopping site.
+2025-07-09T09:09:54.8593245Z Site: soundscribe-backend stopped.
+2025-07-09T09:09:55.0353277Z Site: soundscribe-backend will be blocked for 1 minutes till 07/09/2025 09:10:55
+2025-07-09T09:10:55.0352170Z Site: soundscribe-backend is unblocked.
+2025-07-09T09:29:40.7588391Z Container start method called.
+2025-07-09T09:29:40.7593743Z Establishing network.
+2025-07-09T09:29:40.7599301Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:29:40.8707410Z Container is starting.
+2025-07-09T09:29:40.8709424Z Establishing user namespace if not established already.
+2025-07-09T09:29:40.8712339Z Establishing network if not established already.
+2025-07-09T09:29:40.8714674Z Mounting volumes.
+2025-07-09T09:29:40.8718142Z Nested mountpoint 
+2025-07-09T09:29:40.8732412Z Nested mountpoint volatile/logs
+2025-07-09T09:29:40.8749790Z Nested mountpoint 
+2025-07-09T09:29:40.8763866Z Nested mountpoint 
+2025-07-09T09:29:40.8771381Z Nested mountpoint 
+2025-07-09T09:29:40.9751741Z Creating container.
+2025-07-09T09:29:40.9754442Z Creating pipes for streaming container io.
+2025-07-09T09:29:40.9757324Z Creating stdout named pipe at /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stdout_a3621ec1367f4afba429360b0bab901f.
+2025-07-09T09:29:40.9761316Z Successfully created stdout named pipe at: /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stdout_a3621ec1367f4afba429360b0bab901f.
+2025-07-09T09:29:40.9762916Z Opening named pipe /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stdout_a3621ec1367f4afba429360b0bab901f for reading in non-blocking mode.
+2025-07-09T09:29:40.9766964Z Successfully opened named pipe: /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stdout_a3621ec1367f4afba429360b0bab901f.
+2025-07-09T09:29:40.9769704Z Successfully removed non-blocking flag from /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stdout_a3621ec1367f4afba429360b0bab901f.
+2025-07-09T09:29:40.9771379Z Creating stderr named pipe at /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stderr_35271f827edc47658ca3ada5e3f21642.
+2025-07-09T09:29:40.9775578Z Successfully created stderr named pipe at: /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stderr_35271f827edc47658ca3ada5e3f21642.
+2025-07-09T09:29:40.9777926Z Opening named pipe /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stderr_35271f827edc47658ca3ada5e3f21642 for reading in non-blocking mode.
+2025-07-09T09:29:40.9781376Z Successfully opened named pipe: /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stderr_35271f827edc47658ca3ada5e3f21642.
+2025-07-09T09:29:40.9782868Z Successfully removed non-blocking flag from /podr/container/pipe/b907a80a8aa9_soundscribe-backend/stderr_35271f827edc47658ca3ada5e3f21642.
+2025-07-09T09:29:40.9786004Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:29:41.0950036Z Starting container: b907a80a8aa9_soundscribe-backend.
+2025-07-09T09:29:41.1132236Z Starting watchers and probes.
+2025-07-09T09:29:41.1135770Z Starting metrics collection.
+2025-07-09T09:29:41.1138072Z Container is running.
+2025-07-09T09:29:41.7904790Z Container start method finished after 1031 ms.
+2025-07-09T09:29:43.7190571Z Container has finished running with exit code: 1.
+2025-07-09T09:29:43.7192136Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T09:29:43.7195104Z Stop and delete container. Retry count = 0
+2025-07-09T09:29:43.7196605Z Stopping container: b907a80a8aa9_soundscribe-backend.
+2025-07-09T09:29:43.7309927Z Deleting container: b907a80a8aa9_soundscribe-backend. Retry count = 0
+2025-07-09T09:29:43.7945234Z Container spec TerminationMessagePolicy  path 
+2025-07-09T09:29:43.7948330Z Container is terminated. Total time elapsed: 75 ms.
+2025-07-09T09:29:43.7950101Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T09:29:43.7953829Z Site startup probe failed after 2.003136 seconds.
+2025-07-09T09:29:43.7981015Z Failed to start site. Revert by stopping site.
+2025-07-09T09:29:43.7982991Z Site: soundscribe-backend stopped.
+2025-07-09T09:29:43.9533897Z Site: soundscribe-backend will be blocked for 1 minutes till 07/09/2025 09:30:43
+2025-07-09T09:30:43.9526471Z Site: soundscribe-backend is unblocked.
+2025-07-09T09:33:08.5218032Z Container start method called.
+2025-07-09T09:33:08.5222108Z Establishing network.
+2025-07-09T09:33:08.5226338Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:33:08.6314012Z Container is starting.
+2025-07-09T09:33:08.6316864Z Establishing user namespace if not established already.
+2025-07-09T09:33:08.6319709Z Establishing network if not established already.
+2025-07-09T09:33:08.6322305Z Mounting volumes.
+2025-07-09T09:33:08.6325389Z Nested mountpoint 
+2025-07-09T09:33:08.6340561Z Nested mountpoint volatile/logs
+2025-07-09T09:33:08.6400016Z Nested mountpoint 
+2025-07-09T09:33:08.6421974Z Nested mountpoint 
+2025-07-09T09:33:08.6495572Z Nested mountpoint 
+2025-07-09T09:33:08.7587509Z Creating container.
+2025-07-09T09:33:08.7591405Z Creating pipes for streaming container io.
+2025-07-09T09:33:08.7595277Z Creating stdout named pipe at /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stdout_f44b36cd898b4ccc8a0140ff785e9527.
+2025-07-09T09:33:08.7599879Z Successfully created stdout named pipe at: /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stdout_f44b36cd898b4ccc8a0140ff785e9527.
+2025-07-09T09:33:08.7603412Z Opening named pipe /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stdout_f44b36cd898b4ccc8a0140ff785e9527 for reading in non-blocking mode.
+2025-07-09T09:33:08.7607005Z Successfully opened named pipe: /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stdout_f44b36cd898b4ccc8a0140ff785e9527.
+2025-07-09T09:33:08.7610492Z Successfully removed non-blocking flag from /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stdout_f44b36cd898b4ccc8a0140ff785e9527.
+2025-07-09T09:33:08.7613942Z Creating stderr named pipe at /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stderr_84f1b6c875734d019404976af0733b38.
+2025-07-09T09:33:08.7618022Z Successfully created stderr named pipe at: /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stderr_84f1b6c875734d019404976af0733b38.
+2025-07-09T09:33:08.7622171Z Opening named pipe /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stderr_84f1b6c875734d019404976af0733b38 for reading in non-blocking mode.
+2025-07-09T09:33:08.7625731Z Successfully opened named pipe: /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stderr_84f1b6c875734d019404976af0733b38.
+2025-07-09T09:33:08.7629138Z Successfully removed non-blocking flag from /podr/container/pipe/9a8baca4c1f4_soundscribe-backend/stderr_84f1b6c875734d019404976af0733b38.
+2025-07-09T09:33:08.7633302Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:33:08.8938205Z Starting container: 9a8baca4c1f4_soundscribe-backend.
+2025-07-09T09:33:08.9161127Z Starting watchers and probes.
+2025-07-09T09:33:08.9164525Z Starting metrics collection.
+2025-07-09T09:33:08.9166412Z Container is running.
+2025-07-09T09:33:08.9399391Z Container start method finished after 417 ms.
+2025-07-09T09:33:11.1694565Z Container has finished running with exit code: 1.
+2025-07-09T09:33:11.1696969Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T09:33:11.1709893Z Stop and delete container. Retry count = 0
+2025-07-09T09:33:11.1711774Z Stopping container: 9a8baca4c1f4_soundscribe-backend.
+2025-07-09T09:33:11.1824249Z Deleting container: 9a8baca4c1f4_soundscribe-backend. Retry count = 0
+2025-07-09T09:33:11.2481974Z Container spec TerminationMessagePolicy  path 
+2025-07-09T09:33:11.2488048Z Container is terminated. Total time elapsed: 78 ms.
+2025-07-09T09:33:11.2493345Z Site container: soundscribe-backend terminated during site startup.
+2025-07-09T09:33:11.2498834Z Site startup probe failed after 2.308382 seconds.
+2025-07-09T09:33:11.2518447Z Failed to start site. Revert by stopping site.
+2025-07-09T09:33:11.2527566Z Site: soundscribe-backend stopped.
+2025-07-09T09:33:11.4809432Z Site: soundscribe-backend will be blocked for 2 minutes till 07/09/2025 09:35:11
+2025-07-09T09:35:11.4810428Z Site: soundscribe-backend is unblocked.
+2025-07-09T09:41:17.3289689Z Container start method called.
+2025-07-09T09:41:17.3291254Z Establishing network.
+2025-07-09T09:41:17.3292623Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:41:17.4337618Z Container is starting.
+2025-07-09T09:41:17.4340142Z Establishing user namespace if not established already.
+2025-07-09T09:41:17.4342593Z Establishing network if not established already.
+2025-07-09T09:41:17.4344906Z Mounting volumes.
+2025-07-09T09:41:17.4348395Z Nested mountpoint 
+2025-07-09T09:41:17.4364537Z Nested mountpoint volatile/logs
+2025-07-09T09:41:17.4381266Z Nested mountpoint 
+2025-07-09T09:41:17.4387964Z Nested mountpoint 
+2025-07-09T09:41:17.4396584Z Nested mountpoint 
+2025-07-09T09:41:17.5584547Z Creating container.
+2025-07-09T09:41:17.5591063Z Creating pipes for streaming container io.
+2025-07-09T09:41:17.5599228Z Creating stdout named pipe at /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stdout_079fad65caf44567b70e187f92a25d30.
+2025-07-09T09:41:17.5608436Z Successfully created stdout named pipe at: /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stdout_079fad65caf44567b70e187f92a25d30.
+2025-07-09T09:41:17.5616384Z Opening named pipe /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stdout_079fad65caf44567b70e187f92a25d30 for reading in non-blocking mode.
+2025-07-09T09:41:17.5624338Z Successfully opened named pipe: /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stdout_079fad65caf44567b70e187f92a25d30.
+2025-07-09T09:41:17.5632224Z Successfully removed non-blocking flag from /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stdout_079fad65caf44567b70e187f92a25d30.
+2025-07-09T09:41:17.5640107Z Creating stderr named pipe at /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stderr_3c32cbacc2cb40bd89dad19647655803.
+2025-07-09T09:41:17.5648918Z Successfully created stderr named pipe at: /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stderr_3c32cbacc2cb40bd89dad19647655803.
+2025-07-09T09:41:17.5656493Z Opening named pipe /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stderr_3c32cbacc2cb40bd89dad19647655803 for reading in non-blocking mode.
+2025-07-09T09:41:17.5663998Z Successfully opened named pipe: /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stderr_3c32cbacc2cb40bd89dad19647655803.
+2025-07-09T09:41:17.5671166Z Successfully removed non-blocking flag from /podr/container/pipe/8d6e85efda0e_soundscribe-backend/stderr_3c32cbacc2cb40bd89dad19647655803.
+2025-07-09T09:41:17.5679278Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:41:17.6940326Z Starting container: 8d6e85efda0e_soundscribe-backend.
+2025-07-09T09:41:17.7154838Z Starting watchers and probes.
+2025-07-09T09:41:17.7158258Z Starting metrics collection.
+2025-07-09T09:41:17.7174473Z Container is running.
+2025-07-09T09:41:21.0544034Z Container start method finished after 3725 ms.
+2025-07-09T09:41:21.0944563Z Site startup probe succeeded after 0.0364988 seconds.
+2025-07-09T09:41:23.5426492Z Site started.
+2025-07-09T09:41:23.5564182Z Site is running with deployment version: 63ce7147-4685-4214-be5b-d7a33fc10da4
+2025-07-09T09:49:37.7384466Z Container start method called.
+2025-07-09T09:49:37.7403852Z Establishing network.
+2025-07-09T09:49:37.7406799Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:49:37.8733353Z Container is starting.
+2025-07-09T09:49:37.8734682Z Establishing user namespace if not established already.
+2025-07-09T09:49:37.8735991Z Establishing network if not established already.
+2025-07-09T09:49:37.8737363Z Mounting volumes.
+2025-07-09T09:49:37.8738953Z Nested mountpoint 
+2025-07-09T09:49:37.8753401Z Nested mountpoint volatile/logs
+2025-07-09T09:49:37.8823315Z Nested mountpoint 
+2025-07-09T09:49:37.8833699Z Nested mountpoint 
+2025-07-09T09:49:37.8842797Z Nested mountpoint 
+2025-07-09T09:49:38.0060139Z Creating container.
+2025-07-09T09:49:38.0061198Z Creating pipes for streaming container io.
+2025-07-09T09:49:38.0062109Z Creating stdout named pipe at /podr/container/pipe/c817034da2cc_soundscribe-backend/stdout_575335a4822f4923a5db25bb4df9027a.
+2025-07-09T09:49:38.0063762Z Successfully created stdout named pipe at: /podr/container/pipe/c817034da2cc_soundscribe-backend/stdout_575335a4822f4923a5db25bb4df9027a.
+2025-07-09T09:49:38.0064683Z Opening named pipe /podr/container/pipe/c817034da2cc_soundscribe-backend/stdout_575335a4822f4923a5db25bb4df9027a for reading in non-blocking mode.
+2025-07-09T09:49:38.0065753Z Successfully opened named pipe: /podr/container/pipe/c817034da2cc_soundscribe-backend/stdout_575335a4822f4923a5db25bb4df9027a.
+2025-07-09T09:49:38.0066625Z Successfully removed non-blocking flag from /podr/container/pipe/c817034da2cc_soundscribe-backend/stdout_575335a4822f4923a5db25bb4df9027a.
+2025-07-09T09:49:38.0067510Z Creating stderr named pipe at /podr/container/pipe/c817034da2cc_soundscribe-backend/stderr_2a6136e0f5cf4a968b8807d1faf024d9.
+2025-07-09T09:49:38.0068743Z Successfully created stderr named pipe at: /podr/container/pipe/c817034da2cc_soundscribe-backend/stderr_2a6136e0f5cf4a968b8807d1faf024d9.
+2025-07-09T09:49:38.0069629Z Opening named pipe /podr/container/pipe/c817034da2cc_soundscribe-backend/stderr_2a6136e0f5cf4a968b8807d1faf024d9 for reading in non-blocking mode.
+2025-07-09T09:49:38.0070603Z Successfully opened named pipe: /podr/container/pipe/c817034da2cc_soundscribe-backend/stderr_2a6136e0f5cf4a968b8807d1faf024d9.
+2025-07-09T09:49:38.0071471Z Successfully removed non-blocking flag from /podr/container/pipe/c817034da2cc_soundscribe-backend/stderr_2a6136e0f5cf4a968b8807d1faf024d9.
+2025-07-09T09:49:38.0072364Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.6:13209 and fully qualified image name: 10.1.0.6:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:49:38.5713487Z Starting container: c817034da2cc_soundscribe-backend.
+2025-07-09T09:49:38.6011663Z Starting watchers and probes.
+2025-07-09T09:49:38.6018671Z Starting metrics collection.
+2025-07-09T09:49:38.6023605Z Container is running.
+2025-07-09T09:49:38.6518728Z Container start method finished after 912 ms.
+2025-07-09T09:49:43.6843885Z Site startup probe succeeded after 5.0291772 seconds.
+2025-07-09T09:49:45.1912508Z Site started.
+2025-07-09T09:49:45.2017730Z Site is running with deployment version: d4fce368-ca77-4c2c-af9a-405beed51ac4
+2025-07-09T09:50:05.2188867Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T09:50:05.2212859Z Stop and delete container. Retry count = 0
+2025-07-09T09:50:05.2215096Z Stopping container: 8d6e85efda0e_soundscribe-backend.
+2025-07-09T09:50:05.2639737Z Deleting container: 8d6e85efda0e_soundscribe-backend. Retry count = 0
+2025-07-09T09:50:06.3430179Z Container spec TerminationMessagePolicy  path 
+2025-07-09T09:50:06.3436415Z Container is terminated. Total time elapsed: 1124 ms.
+2025-07-09T09:50:06.3436886Z Site: soundscribe-backend stopped.
+2025-07-09T09:59:48.1103003Z Container start method called.
+2025-07-09T09:59:48.1107871Z Establishing network.
+2025-07-09T09:59:48.1125185Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T09:59:48.2622200Z Container is starting.
+2025-07-09T09:59:48.2625217Z Establishing user namespace if not established already.
+2025-07-09T09:59:48.2629082Z Establishing network if not established already.
+2025-07-09T09:59:48.2632924Z Mounting volumes.
+2025-07-09T09:59:48.2638925Z Nested mountpoint 
+2025-07-09T09:59:48.2657006Z Nested mountpoint volatile/logs
+2025-07-09T09:59:48.2680882Z Nested mountpoint 
+2025-07-09T09:59:48.2698433Z Nested mountpoint 
+2025-07-09T09:59:48.2716133Z Nested mountpoint 
+2025-07-09T09:59:48.4123533Z Creating container.
+2025-07-09T09:59:48.4131333Z Creating pipes for streaming container io.
+2025-07-09T09:59:48.4135235Z Creating stdout named pipe at /podr/container/pipe/903afe79d173_soundscribe-backend/stdout_621802a9214b4574bd36143df0bcd9fb.
+2025-07-09T09:59:48.4139796Z Successfully created stdout named pipe at: /podr/container/pipe/903afe79d173_soundscribe-backend/stdout_621802a9214b4574bd36143df0bcd9fb.
+2025-07-09T09:59:48.4146597Z Opening named pipe /podr/container/pipe/903afe79d173_soundscribe-backend/stdout_621802a9214b4574bd36143df0bcd9fb for reading in non-blocking mode.
+2025-07-09T09:59:48.4152363Z Successfully opened named pipe: /podr/container/pipe/903afe79d173_soundscribe-backend/stdout_621802a9214b4574bd36143df0bcd9fb.
+2025-07-09T09:59:48.4168785Z Successfully removed non-blocking flag from /podr/container/pipe/903afe79d173_soundscribe-backend/stdout_621802a9214b4574bd36143df0bcd9fb.
+2025-07-09T09:59:48.4173107Z Creating stderr named pipe at /podr/container/pipe/903afe79d173_soundscribe-backend/stderr_330a8b372c9d46efb7ba3217af517d77.
+2025-07-09T09:59:48.4177997Z Successfully created stderr named pipe at: /podr/container/pipe/903afe79d173_soundscribe-backend/stderr_330a8b372c9d46efb7ba3217af517d77.
+2025-07-09T09:59:48.4200942Z Opening named pipe /podr/container/pipe/903afe79d173_soundscribe-backend/stderr_330a8b372c9d46efb7ba3217af517d77 for reading in non-blocking mode.
+2025-07-09T09:59:48.4205627Z Successfully opened named pipe: /podr/container/pipe/903afe79d173_soundscribe-backend/stderr_330a8b372c9d46efb7ba3217af517d77.
+2025-07-09T09:59:48.4210683Z Successfully removed non-blocking flag from /podr/container/pipe/903afe79d173_soundscribe-backend/stderr_330a8b372c9d46efb7ba3217af517d77.
+2025-07-09T09:59:48.4217657Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T09:59:48.5811314Z Starting container: 903afe79d173_soundscribe-backend.
+2025-07-09T09:59:48.6060883Z Starting watchers and probes.
+2025-07-09T09:59:48.6064256Z Starting metrics collection.
+2025-07-09T09:59:48.6071982Z Container is running.
+2025-07-09T09:59:49.3619073Z Container start method finished after 1251 ms.
+2025-07-09T09:59:53.3660400Z Site startup probe succeeded after 4.0033117 seconds.
+2025-07-09T09:59:55.3285973Z Site started.
+2025-07-09T09:59:55.3375799Z Site is running with deployment version: 3c2aeccf-13a1-46ed-ac63-66c54fd5c07f
+2025-07-09T10:00:16.3585055Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T10:00:16.3600814Z Stop and delete container. Retry count = 0
+2025-07-09T10:00:16.3602374Z Stopping container: c817034da2cc_soundscribe-backend.
+2025-07-09T10:00:16.5453467Z Deleting container: c817034da2cc_soundscribe-backend. Retry count = 0
+2025-07-09T10:00:16.9039311Z Container spec TerminationMessagePolicy  path 
+2025-07-09T10:00:16.9122581Z Container is terminated. Total time elapsed: 553 ms.
+2025-07-09T10:00:16.9128071Z Site: soundscribe-backend stopped.
+2025-07-09T10:09:59.0365516Z Container start method called.
+2025-07-09T10:09:59.0369533Z Establishing network.
+2025-07-09T10:09:59.0372994Z Pulling image: appsvc/node:18-lts_20250506.5.tuxprod.
+2025-07-09T10:09:59.1761934Z Container is starting.
+2025-07-09T10:09:59.1764364Z Establishing user namespace if not established already.
+2025-07-09T10:09:59.1766980Z Establishing network if not established already.
+2025-07-09T10:09:59.1769697Z Mounting volumes.
+2025-07-09T10:09:59.1772617Z Nested mountpoint 
+2025-07-09T10:09:59.1791209Z Nested mountpoint volatile/logs
+2025-07-09T10:09:59.1807684Z Nested mountpoint 
+2025-07-09T10:09:59.1818762Z Nested mountpoint 
+2025-07-09T10:09:59.1834034Z Nested mountpoint 
+2025-07-09T10:09:59.3169316Z Creating container.
+2025-07-09T10:09:59.3172211Z Creating pipes for streaming container io.
+2025-07-09T10:09:59.3175146Z Creating stdout named pipe at /podr/container/pipe/03177ad663e7_soundscribe-backend/stdout_2bf7afaedb2741c3af9571d3fcd9d24f.
+2025-07-09T10:09:59.3178991Z Successfully created stdout named pipe at: /podr/container/pipe/03177ad663e7_soundscribe-backend/stdout_2bf7afaedb2741c3af9571d3fcd9d24f.
+2025-07-09T10:09:59.3181798Z Opening named pipe /podr/container/pipe/03177ad663e7_soundscribe-backend/stdout_2bf7afaedb2741c3af9571d3fcd9d24f for reading in non-blocking mode.
+2025-07-09T10:09:59.3184717Z Successfully opened named pipe: /podr/container/pipe/03177ad663e7_soundscribe-backend/stdout_2bf7afaedb2741c3af9571d3fcd9d24f.
+2025-07-09T10:09:59.3187637Z Successfully removed non-blocking flag from /podr/container/pipe/03177ad663e7_soundscribe-backend/stdout_2bf7afaedb2741c3af9571d3fcd9d24f.
+2025-07-09T10:09:59.3190497Z Creating stderr named pipe at /podr/container/pipe/03177ad663e7_soundscribe-backend/stderr_f895cae332654adaa0958b0b6388edca.
+2025-07-09T10:09:59.3193810Z Successfully created stderr named pipe at: /podr/container/pipe/03177ad663e7_soundscribe-backend/stderr_f895cae332654adaa0958b0b6388edca.
+2025-07-09T10:09:59.3196713Z Opening named pipe /podr/container/pipe/03177ad663e7_soundscribe-backend/stderr_f895cae332654adaa0958b0b6388edca for reading in non-blocking mode.
+2025-07-09T10:09:59.3204440Z Successfully opened named pipe: /podr/container/pipe/03177ad663e7_soundscribe-backend/stderr_f895cae332654adaa0958b0b6388edca.
+2025-07-09T10:09:59.3214635Z Successfully removed non-blocking flag from /podr/container/pipe/03177ad663e7_soundscribe-backend/stderr_f895cae332654adaa0958b0b6388edca.
+2025-07-09T10:09:59.3217597Z Creating container with image: appsvc/node:18-lts_20250506.5.tuxprod from registry: 10.1.0.5:13209 and fully qualified image name: 10.1.0.5:13209/appsvc/node:18-lts_20250506.5.tuxprod
+2025-07-09T10:09:59.4988839Z Starting container: 03177ad663e7_soundscribe-backend.
+2025-07-09T10:09:59.5194820Z Starting watchers and probes.
+2025-07-09T10:09:59.5201884Z Starting metrics collection.
+2025-07-09T10:09:59.5205040Z Container is running.
+2025-07-09T10:09:59.5515213Z Container start method finished after 511 ms.
+2025-07-09T10:10:04.5943668Z Site startup probe succeeded after 5.029614 seconds.
+2025-07-09T10:10:06.0744610Z Site started.
+2025-07-09T10:10:06.0849715Z Site is running with deployment version: e21af076-138b-4e76-abaa-9d0220c7a96e
+2025-07-09T10:10:26.0875907Z Container is terminating. Grace period: 5 seconds.
+2025-07-09T10:10:26.0903645Z Stop and delete container. Retry count = 0
+2025-07-09T10:10:26.0911481Z Stopping container: 903afe79d173_soundscribe-backend.
+2025-07-09T10:10:26.1301606Z Deleting container: 903afe79d173_soundscribe-backend. Retry count = 0
+2025-07-09T10:10:26.2497793Z Container spec TerminationMessagePolicy  path 
+2025-07-09T10:10:26.2505026Z Container is terminated. Total time elapsed: 162 ms.
+2025-07-09T10:10:26.2505515Z Site: soundscribe-backend stopped.

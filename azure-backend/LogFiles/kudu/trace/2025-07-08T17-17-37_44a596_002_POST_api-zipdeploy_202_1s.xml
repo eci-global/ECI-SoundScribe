@@ -1,0 +1,17 @@
+<step title="Incoming Request" date="2025-07-08T17:17:37.267" instance="44a596" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="768,1,7" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="3710" x-ms-client-request-id="6c371b8f-5c1f-11f0-9cd7-8c1759c91239" x-ms-artifact-checksum="f56a113b2196568e47f57736706c5e72ed07472655357146c9afa10bf3811cf7" X-ARR-LOG-ID="6c371b8f-5c1f-11f0-9cd7-8c1759c91239" CLIENT-IP="115.87.153.87:61034" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="115.87.153.87" X-Client-Port="61034" >
+  <step title="ZipPushDeploy" date="2025-07-08T17:17:37.465" >
+    <step title="ZipDeploy. Run from package. Ignore remote build." date="2025-07-08T17:17:37.474" /><!-- duration: 3ms -->
+    <step title="None repository commit" date="2025-07-08T17:17:37.485" >
+      <step title="Commit id: deb0a5b1-b296-43e3-876c-2c0410332a43" date="2025-07-08T17:17:37.489" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 4ms -->
+    </step><!-- duration: 12ms -->
+    <step title="Starting PushDeployAsync" date="2025-07-08T17:17:37.502" /><!-- duration: 4ms -->
+    <step title="WEBSITE_RUN_FROM_PACKAGE is set to 1. Writing zip to SitePackagesPath" date="2025-07-08T17:17:37.512" /><!-- duration: 3ms -->
+    <step title="Copying zip to SitePackages /home/data/SitePackages/20250708171737.zip from request body" date="2025-07-08T17:17:37.525" /><!-- duration: 3ms -->
+    <step title="Writing multipart request body to /home/data/SitePackages/20250708171737.zip" date="2025-07-08T17:17:37.533" /><!-- duration: 4ms -->
+    <step title="Start deployment in the background" date="2025-07-08T17:17:37.596" >
+      <step title="Acquiring Deployment Lock" date="2025-07-08T17:17:37.613" /><!-- duration: 3ms -->
+      <step title="Acquired Deployment Lock" date="2025-07-08T17:17:37.709" /><!-- duration: 4ms -->
+    </step><!-- duration: 205ms -->
+  </step><!-- duration: 344ms -->
+  <step title="Outgoing response" date="2025-07-08T17:17:37.819" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 4ms -->
+</step><!-- duration: 562ms -->

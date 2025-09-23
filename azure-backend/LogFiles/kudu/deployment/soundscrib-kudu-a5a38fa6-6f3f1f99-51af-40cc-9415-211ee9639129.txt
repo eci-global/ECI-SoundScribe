@@ -1,0 +1,85 @@
+2025-06-25T23:42:27  Fetching changes.
+2025-06-25T23:42:27    Starting  LocalZipHandler
+2025-06-25T23:42:27    Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/d31c583a-a378-4cb4-80da-359a6dc8b9de.zip (0.00 MB) to /tmp/zipdeploy/extracted
+2025-06-25T23:42:31  Updating submodules.
+2025-06-25T23:42:31  Preparing deployment for commit id 'a9fd9bc4-2'.
+2025-06-25T23:42:31  PreDeployment: context.CleanOutputPath False
+2025-06-25T23:42:31  PreDeployment: context.OutputPath /home/site/wwwroot
+2025-06-25T23:42:31  Repository path is /tmp/zipdeploy/extracted
+2025-06-25T23:42:32  Running oryx build...
+2025-06-25T23:42:32    Command: oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb441f3e6066a -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log
+2025-06-25T23:42:36    Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2025-06-25T23:42:37    You can report issues at https://github.com/Microsoft/Oryx/issues
+2025-06-25T23:42:37    
+2025-06-25T23:42:37    Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493, Commit: 0649de32f1279969c9023dd41b389cce4bb94493, ReleaseTagName: 20250611.1
+2025-06-25T23:42:37    
+2025-06-25T23:42:37    Build Operation ID: 6f8b2b94bf7f2331
+2025-06-25T23:42:37    Repository Commit : a9fd9bc4-26c5-476d-afe5-b746906f1a13
+2025-06-25T23:42:37    OS Type           : bullseye
+2025-06-25T23:42:37    Image Type        : githubactions
+2025-06-25T23:42:37    
+2025-06-25T23:42:37    Primary SDK Storage URL: https://oryxsdks-cdn.azureedge.net
+2025-06-25T23:42:37    Backup SDK Storage URL: https://oryx-cdn.microsoft.io
+2025-06-25T23:42:37    Detecting platforms...
+2025-06-25T23:42:37    External SDK provider is enabled.
+2025-06-25T23:42:37    Requesting metadata for platform nodejs from external SDK provider
+2025-06-25T23:42:38    Requesting metadata for platform nodejs from external SDK provider
+2025-06-25T23:42:38    Detected following platforms:
+2025-06-25T23:42:38      nodejs: 18.20.8
+2025-06-25T23:42:38    Detected the following frameworks: Express
+2025-06-25T23:42:39    
+2025-06-25T23:42:39    Using intermediate directory '/tmp/8ddb441f3e6066a'.
+2025-06-25T23:42:39    
+2025-06-25T23:42:39    Copying files to the intermediate directory...
+2025-06-25T23:42:39    Done in 0 sec(s).
+2025-06-25T23:42:39    
+2025-06-25T23:42:39    Source directory     : /tmp/8ddb441f3e6066a
+2025-06-25T23:42:39    Destination directory: /home/site/wwwroot
+2025-06-25T23:42:39    
+2025-06-25T23:42:39    Removing existing manifest file
+2025-06-25T23:42:39    Creating directory for command manifest file if it does not exist
+2025-06-25T23:42:39    Creating a manifest file...
+2025-06-25T23:42:39    Node Build Command Manifest file created.
+2025-06-25T23:42:39    
+2025-06-25T23:42:39    Using Node version:
+2025-06-25T23:42:39    v18.20.8
+2025-06-25T23:42:39    
+2025-06-25T23:42:39    Using Npm version:
+2025-06-25T23:42:40    10.8.2
+2025-06-25T23:42:40    
+2025-06-25T23:42:40    Running 'npm install'...
+2025-06-25T23:42:40    
+2025-06-25T23:42:59    
+2025-06-25T23:42:59    added 72 packages, and audited 73 packages in 19s
+2025-06-25T23:43:00    
+2025-06-25T23:43:00    15 packages are looking for funding
+2025-06-25T23:43:00      run `npm fund` for details
+2025-06-25T23:43:00    
+2025-06-25T23:43:00    found 0 vulnerabilities
+2025-06-25T23:43:00    
+2025-06-25T23:43:00    Zipping existing node_modules folder...
+2025-06-25T23:43:00    Done in 1 sec(s).
+2025-06-25T23:43:00    Preparing output...
+2025-06-25T23:43:00    
+2025-06-25T23:43:00    Copying files to destination directory '/home/site/wwwroot'...
+2025-06-25T23:43:00    Done in 0 sec(s).
+2025-06-25T23:43:00    
+2025-06-25T23:43:00    Removing existing manifest file
+2025-06-25T23:43:00    Creating a manifest file...
+2025-06-25T23:43:00    Manifest file created.
+2025-06-25T23:43:01    Copying .ostype to manifest output directory.
+2025-06-25T23:43:01    
+2025-06-25T23:43:01    Done in 21 sec(s).
+2025-06-25T23:43:02  Running post deployment command(s)...
+2025-06-25T23:43:02  
+2025-06-25T23:43:02  Generating summary of Oryx build
+2025-06-25T23:43:03  Parsing the build logs
+2025-06-25T23:43:03  Found 0 issue(s)
+2025-06-25T23:43:03  
+2025-06-25T23:43:03  Build Summary :
+2025-06-25T23:43:03  ===============
+2025-06-25T23:43:03  Errors (0)
+2025-06-25T23:43:04  Warnings (0)
+2025-06-25T23:43:04  
+2025-06-25T23:43:04  Triggering container recycle for OneDeploy by adding/updating restartTrigger.txt to the site root path
+2025-06-25T23:43:05  Deployment successful. deployer = OneDeploy deploymentPath = OneDeploy

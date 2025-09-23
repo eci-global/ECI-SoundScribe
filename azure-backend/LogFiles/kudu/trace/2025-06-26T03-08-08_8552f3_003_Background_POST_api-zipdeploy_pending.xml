@@ -1,0 +1,136 @@
+<step title="BackgroundTrace" date="2025-06-26T03:08:08.432" instance="8552f3" url="/api/zipdeploy" method="POST" >
+  <step title="Creating temporary deployment - FetchDeploymentManager" date="2025-06-26T03:08:08.615" /><!-- duration: 8ms -->
+  <step title="Creating temporary deployment" date="2025-06-26T03:08:08.654" /><!-- duration: 111ms -->
+  <step title="Performing fetch based deployment" date="2025-06-26T03:08:09.076" >
+    <step title="Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/b3e01250-ac74-4a11-832e-7e0660b070cb.zip (0.01 MB) to /tmp/zipdeploy/extracted" date="2025-06-26T03:08:10.421" >
+      <step title="ChmodRecursive Process exited with total time taken in ms: 161" date="2025-06-26T03:08:11.012" /><!-- duration: 9ms -->
+    </step><!-- duration: 603ms -->
+    <step title="Deployment timer started" date="2025-06-26T03:08:13.060" >
+      <step title="DeploymentManager.Deploy(id:d47bfd2d-0273-4807-985b-4c36d834072d)" date="2025-06-26T03:08:13.079" >
+        <step title="Collecting changeset information" date="2025-06-26T03:08:13.119" /><!-- duration: 128ms -->
+        <step title="Updating submodules" date="2025-06-26T03:08:13.259" /><!-- duration: 1174ms -->
+        <step title="Determining deployment builder" date="2025-06-26T03:08:14.796" >
+          <step title="Builder is OryxBuilder" date="2025-06-26T03:08:14.816" /><!-- duration: 8ms -->
+        </step><!-- duration: 32ms -->
+        <step title="PreDeployment: context.CleanOutputPath False" date="2025-06-26T03:08:14.873" >
+          <step title="PreDeployment: context.OutputPath /home/site/wwwroot" date="2025-06-26T03:08:14.987" >
+            <step title="Building" date="2025-06-26T03:08:15.137" >
+              <step title="Executing external process" date="2025-06-26T03:08:15.578" type="process" path="bash" arguments="-c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb45eb1246acb -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" >
+                <step title="Cpu: npm install(931,19.590s)+build.sh(834,0.070s)+oryx(812,4.540s)+tee(813,0.010s)+bash(811,0.000s)=total(24.200s)" date="2025-06-26T03:09:44.275" /><!-- duration: 19ms -->
+                <step title="bash: no io activity for 60s, prev-cpu=-1.000s, current-cpu=24.200s" date="2025-06-26T03:09:44.314" /><!-- duration: 2ms -->
+                <step title="Cpu: npm install(931,44.190s)+build.sh(834,0.070s)+oryx(812,4.710s)+tee(813,0.010s)+bash(811,0.000s)=total(48.970s)" date="2025-06-26T03:10:44.604" /><!-- duration: 18ms -->
+                <step title="bash: no io activity for 121s, prev-cpu=24.200s, current-cpu=48.970s" date="2025-06-26T03:10:44.635" /><!-- duration: 51ms -->
+                <step title="Process dump" date="2025-06-26T03:11:10.921" exitCode="23" type="processOutput" /><!-- duration: 4ms -->
+              </step><!-- duration: 175364ms -->
+              <step title="Error occurred" date="2025-06-26T03:11:10.999" type="error" text="npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+npm warn deprecated node-domexception@1.0.0: Use your platform&apos;s native DOMException instead
+npm warn deprecated @azure/openai@1.0.0-beta.13: The Azure OpenAI client library for JavaScript beta has been retired. Please migrate to the stable OpenAI SDK for JavaScript using the migration guide: https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/openai/openai/MIGRATION.md.
+npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\audioProcessor.js.gGtyh7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\azureOpenAI.js.HPDOJ9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\logger.js.9w8kM7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\rateLimiter.js.4NgjP6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\redisClient.js.NWjra6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\supabaseClient.js.KQTdw9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\websocketService.js.UvYEk6&quot; failed: Invalid argument (22)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1333) [sender=3.2.3]
+/bin/bash -c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb45eb1246acb -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" stackTrace="   at Kudu.Core.Infrastructure.Executable.ExecuteInternal(ITracer tracer, Func`2 onWriteOutput, Func`2 onWriteError, CancellationToken token, Encoding encoding, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 239
+   at Kudu.Core.Infrastructure.Executable.ExecuteWithProgressWriter(ILogger logger, ITracer tracer, CancellationToken token, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 118
+   at Kudu.Core.Deployment.Generator.ExternalCommandBuilder.RunCommand(DeploymentContext context, String command, Boolean ignoreManifest, CancellationToken token, String message) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/ExternalCommandBuilder.cs:line 122" /><!-- duration: 2ms -->
+              <step title="Error occurred" date="2025-06-26T03:11:11.028" type="error" text="npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+npm warn deprecated node-domexception@1.0.0: Use your platform&apos;s native DOMException instead
+npm warn deprecated @azure/openai@1.0.0-beta.13: The Azure OpenAI client library for JavaScript beta has been retired. Please migrate to the stable OpenAI SDK for JavaScript using the migration guide: https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/openai/openai/MIGRATION.md.
+npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\audioProcessor.js.gGtyh7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\azureOpenAI.js.HPDOJ9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\logger.js.9w8kM7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\rateLimiter.js.4NgjP6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\redisClient.js.NWjra6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\supabaseClient.js.KQTdw9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\websocketService.js.UvYEk6&quot; failed: Invalid argument (22)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1333) [sender=3.2.3]
+/bin/bash -c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb45eb1246acb -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" stackTrace="   at Kudu.Core.Infrastructure.Executable.ExecuteInternal(ITracer tracer, Func`2 onWriteOutput, Func`2 onWriteError, CancellationToken token, Encoding encoding, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 239
+   at Kudu.Core.Infrastructure.Executable.ExecuteWithProgressWriter(ILogger logger, ITracer tracer, CancellationToken token, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 118
+   at Kudu.Core.Deployment.Generator.ExternalCommandBuilder.RunCommand(DeploymentContext context, String command, Boolean ignoreManifest, CancellationToken token, String message) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/ExternalCommandBuilder.cs:line 122
+   at Kudu.Core.Deployment.Generator.OryxBuilder.RunBuildCommand(IOryxArguments args, DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 282
+   at Kudu.Core.Deployment.Generator.OryxBuilder.Build(DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 123
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 771" /><!-- duration: 2ms -->
+              <step title="Using GenericDeploymentLogParser" date="2025-06-26T03:11:11.240" /><!-- duration: 1ms -->
+            </step><!-- duration: 177266ms -->
+          </step><!-- duration: 177420ms -->
+          <step title="Error occurred" date="2025-06-26T03:11:12.412" type="error" text="npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+npm warn deprecated node-domexception@1.0.0: Use your platform&apos;s native DOMException instead
+npm warn deprecated @azure/openai@1.0.0-beta.13: The Azure OpenAI client library for JavaScript beta has been retired. Please migrate to the stable OpenAI SDK for JavaScript using the migration guide: https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/openai/openai/MIGRATION.md.
+npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\audioProcessor.js.gGtyh7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\azureOpenAI.js.HPDOJ9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\logger.js.9w8kM7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\rateLimiter.js.4NgjP6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\redisClient.js.NWjra6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\supabaseClient.js.KQTdw9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\websocketService.js.UvYEk6&quot; failed: Invalid argument (22)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1333) [sender=3.2.3]
+/bin/bash -c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb45eb1246acb -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" stackTrace="   at Kudu.Core.Infrastructure.Executable.ExecuteInternal(ITracer tracer, Func`2 onWriteOutput, Func`2 onWriteError, CancellationToken token, Encoding encoding, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 239
+   at Kudu.Core.Infrastructure.Executable.ExecuteWithProgressWriter(ILogger logger, ITracer tracer, CancellationToken token, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 118
+   at Kudu.Core.Deployment.Generator.ExternalCommandBuilder.RunCommand(DeploymentContext context, String command, Boolean ignoreManifest, CancellationToken token, String message) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/ExternalCommandBuilder.cs:line 122
+   at Kudu.Core.Deployment.Generator.OryxBuilder.RunBuildCommand(IOryxArguments args, DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 282
+   at Kudu.Core.Deployment.Generator.OryxBuilder.Build(DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 123
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 771
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 840" /><!-- duration: 2ms -->
+          <step title="Cleaning up temp files" date="2025-06-26T03:11:12.492" /><!-- duration: 1098ms -->
+          <step title="Cleaning up temp files" date="2025-06-26T03:11:13.600" /><!-- duration: 509ms -->
+          <step title="Error occurred" date="2025-06-26T03:11:14.134" type="error" text="npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+npm warn deprecated node-domexception@1.0.0: Use your platform&apos;s native DOMException instead
+npm warn deprecated @azure/openai@1.0.0-beta.13: The Azure OpenAI client library for JavaScript beta has been retired. Please migrate to the stable OpenAI SDK for JavaScript using the migration guide: https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/openai/openai/MIGRATION.md.
+npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\audioProcessor.js.gGtyh7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\azureOpenAI.js.HPDOJ9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\logger.js.9w8kM7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\rateLimiter.js.4NgjP6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\redisClient.js.NWjra6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\supabaseClient.js.KQTdw9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\websocketService.js.UvYEk6&quot; failed: Invalid argument (22)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1333) [sender=3.2.3]
+/bin/bash -c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb45eb1246acb -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" stackTrace="   at Kudu.Core.Infrastructure.Executable.ExecuteInternal(ITracer tracer, Func`2 onWriteOutput, Func`2 onWriteError, CancellationToken token, Encoding encoding, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 239
+   at Kudu.Core.Infrastructure.Executable.ExecuteWithProgressWriter(ILogger logger, ITracer tracer, CancellationToken token, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 118
+   at Kudu.Core.Deployment.Generator.ExternalCommandBuilder.RunCommand(DeploymentContext context, String command, Boolean ignoreManifest, CancellationToken token, String message) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/ExternalCommandBuilder.cs:line 122
+   at Kudu.Core.Deployment.Generator.OryxBuilder.RunBuildCommand(IOryxArguments args, DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 282
+   at Kudu.Core.Deployment.Generator.OryxBuilder.Build(DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 123
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 771
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 840
+   at Kudu.Core.Deployment.DeploymentManager.DeployAsync(IRepository repository, ChangeSet changeSet, String deployer, Boolean clean, DeploymentInfoBase deploymentInfo, Boolean needFileUpdate, Boolean fullBuildByDefault) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 266" /><!-- duration: 2ms -->
+        </step><!-- duration: 179271ms -->
+        <step title="Reloading status file with latest updates" date="2025-06-26T03:11:14.167" >
+          <step title="WebHooksManager.PublishEventAsync: PostDeployment" date="2025-06-26T03:11:14.175" /><!-- duration: 103ms -->
+        </step><!-- duration: 113ms -->
+        <step title="Error occurred" date="2025-06-26T03:11:14.286" type="error" text="npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+npm warn deprecated node-domexception@1.0.0: Use your platform&apos;s native DOMException instead
+npm warn deprecated @azure/openai@1.0.0-beta.13: The Azure OpenAI client library for JavaScript beta has been retired. Please migrate to the stable OpenAI SDK for JavaScript using the migration guide: https://github.com/Azure/azure-sdk-for-js/blob/main/sdk/openai/openai/MIGRATION.md.
+npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\audioProcessor.js.gGtyh7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\azureOpenAI.js.HPDOJ9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\logger.js.9w8kM7&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\rateLimiter.js.4NgjP6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\redisClient.js.NWjra6&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\supabaseClient.js.KQTdw9&quot; failed: Invalid argument (22)
+rsync: [receiver] mkstemp &quot;/home/site/wwwroot/.utils\websocketService.js.UvYEk6&quot; failed: Invalid argument (22)
+rsync error: some files/attrs were not transferred (see previous errors) (code 23) at main.c(1333) [sender=3.2.3]
+/bin/bash -c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb45eb1246acb -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" stackTrace="   at Kudu.Core.Infrastructure.Executable.ExecuteInternal(ITracer tracer, Func`2 onWriteOutput, Func`2 onWriteError, CancellationToken token, Encoding encoding, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 239
+   at Kudu.Core.Infrastructure.Executable.ExecuteWithProgressWriter(ILogger logger, ITracer tracer, CancellationToken token, String arguments, Object[] args) in /tmp/KuduLite/Kudu.Core/Infrastructure/Executable.cs:line 118
+   at Kudu.Core.Deployment.Generator.ExternalCommandBuilder.RunCommand(DeploymentContext context, String command, Boolean ignoreManifest, CancellationToken token, String message) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/ExternalCommandBuilder.cs:line 122
+   at Kudu.Core.Deployment.Generator.OryxBuilder.RunBuildCommand(IOryxArguments args, DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 282
+   at Kudu.Core.Deployment.Generator.OryxBuilder.Build(DeploymentContext context, CancellationToken token) in /tmp/KuduLite/Kudu.Core/Deployment/Generator/OryxBuilder.cs:line 123
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 771
+   at Kudu.Core.Deployment.DeploymentManager.Build(ChangeSet changeSet, ITracer tracer, IDisposable deployStep, IRepository repository, DeploymentInfoBase deploymentInfo, DeploymentAnalytics deploymentAnalytics, Boolean fullBuildByDefault, CancellationToken cancellationToken) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 840
+   at Kudu.Core.Deployment.DeploymentManager.DeployAsync(IRepository repository, ChangeSet changeSet, String deployer, Boolean clean, DeploymentInfoBase deploymentInfo, Boolean needFileUpdate, Boolean fullBuildByDefault) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 266" /><!-- duration: 2ms -->
+        <step title="Marking deployment as failed and cleaning up the temp deployment" date="2025-06-26T03:11:14.350" /><!-- duration: 2ms -->
+      </step><!-- duration: 181332ms -->
+      <step title="Error occurred" date="2025-06-26T03:11:14.422" type="error" text="One or more errors occurred. (Deployment failed)" stackTrace="   at System.Threading.Tasks.Task.ThrowIfExceptional(Boolean includeTaskCanceledExceptions)
+   at System.Threading.Tasks.Task.Wait(Int32 millisecondsTimeout, CancellationToken cancellationToken)
+   at System.Threading.Tasks.Task.Wait()
+   at Kudu.Core.Deployment.FetchDeploymentManager.&lt;&gt;c__DisplayClass22_1.&lt;PerformBackgroundDeployment&gt;b__3() in /tmp/KuduLite/Kudu.Core/Deployment/FetchDeploymentManager.cs:line 414
+   at Kudu.Contracts.Infrastructure.LockExtensions.TryLockOperation(IOperationLock lockObj, Action operation, String operationName, TimeSpan timeout) in /tmp/KuduLite/Kudu.Contracts/Infrastructure/LockExtensions.cs:line 34
+   at Kudu.Contracts.Infrastructure.LockExtensions.LockOperation(IOperationLock lockObj, Action operation, String operationName, TimeSpan timeout) in /tmp/KuduLite/Kudu.Contracts/Infrastructure/LockExtensions.cs:line 46
+   at Kudu.Core.Deployment.FetchDeploymentManager.&lt;&gt;c__DisplayClass22_0.&lt;PerformBackgroundDeployment&gt;b__1() in /tmp/KuduLite/Kudu.Core/Deployment/FetchDeploymentManager.cs:line 393" innerText="Deployment failed" innerStackTrace="   at Kudu.Core.Deployment.DeploymentManager.DeployAsync(IRepository repository, ChangeSet changeSet, String deployer, Boolean clean, DeploymentInfoBase deploymentInfo, Boolean needFileUpdate, Boolean fullBuildByDefault) in /tmp/KuduLite/Kudu.Core/Deployment/DeploymentManager.cs:line 307
+   at Kudu.Core.Deployment.FetchDeploymentManager.PerformDeployment(DeploymentInfoBase deploymentInfo, IDisposable tempDeployment, ChangeSet tempChangeSet, DeployStatusApiResult updateStatusObj) in /tmp/KuduLite/Kudu.Core/Deployment/FetchDeploymentManager.cs:line 230" /><!-- duration: 1ms -->
+    </step><!-- duration: 181388ms -->

@@ -1,0 +1,101 @@
+2025-06-25T23:35:20  Fetching changes.
+2025-06-25T23:35:20    Starting  LocalZipHandler
+2025-06-25T23:35:20    Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/6c9d640c-04e9-47c4-86f2-71bc35972859.zip (0.00 MB) to /tmp/zipdeploy/extracted
+2025-06-25T23:35:24  Updating submodules.
+2025-06-25T23:35:24  Preparing deployment for commit id 'd66caa77-5'.
+2025-06-25T23:35:24  PreDeployment: context.CleanOutputPath False
+2025-06-25T23:35:24  PreDeployment: context.OutputPath /home/site/wwwroot
+2025-06-25T23:35:25  Repository path is /tmp/zipdeploy/extracted
+2025-06-25T23:35:25  Running oryx build...
+2025-06-25T23:35:25    Command: oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb440f5962cc0 -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log
+2025-06-25T23:35:27    Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2025-06-25T23:35:27    You can report issues at https://github.com/Microsoft/Oryx/issues
+2025-06-25T23:35:27    
+2025-06-25T23:35:27    Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493, Commit: 0649de32f1279969c9023dd41b389cce4bb94493, ReleaseTagName: 20250611.1
+2025-06-25T23:35:27    
+2025-06-25T23:35:27    Build Operation ID: fb4e0b5930f8a826
+2025-06-25T23:35:27    Repository Commit : d66caa77-5f90-497c-b07c-90c6296d6d9d
+2025-06-25T23:35:27    OS Type           : bullseye
+2025-06-25T23:35:27    Image Type        : githubactions
+2025-06-25T23:35:27    
+2025-06-25T23:35:27    Primary SDK Storage URL: https://oryxsdks-cdn.azureedge.net
+2025-06-25T23:35:27    Backup SDK Storage URL: https://oryx-cdn.microsoft.io
+2025-06-25T23:35:27    Detecting platforms...
+2025-06-25T23:35:27    External SDK provider is enabled.
+2025-06-25T23:35:28    Requesting metadata for platform nodejs from external SDK provider
+2025-06-25T23:35:28    Requesting metadata for platform nodejs from external SDK provider
+2025-06-25T23:35:29    Successfully requested blob for platform nodejs, blobName defaultVersion.bullseye.txt, available at /var/OryxSdks/nodejs/defaultVersion.bullseye.txt
+2025-06-25T23:35:29    Detected following platforms:
+2025-06-25T23:35:29      nodejs: 18.20.8
+2025-06-25T23:35:29    Requesting metadata for platform nodejs from external SDK provider
+2025-06-25T23:35:31    Successfully requested blob for platform nodejs, blobName nodejs-bullseye-18.20.8.tar.gz, available at /var/OryxSdks/nodejs/nodejs-bullseye-18.20.8.tar.gz
+2025-06-25T23:35:32    Version '18.20.8' of platform 'nodejs' is not installed. Generating script to install it...
+2025-06-25T23:35:33    Detected the following frameworks: Express
+2025-06-25T23:35:33    
+2025-06-25T23:35:34    Using intermediate directory '/tmp/8ddb440f5962cc0'.
+2025-06-25T23:35:34    
+2025-06-25T23:35:34    Copying files to the intermediate directory...
+2025-06-25T23:35:34    Done in 0 sec(s).
+2025-06-25T23:35:34    
+2025-06-25T23:35:34    Source directory     : /tmp/8ddb440f5962cc0
+2025-06-25T23:35:34    Destination directory: /home/site/wwwroot
+2025-06-25T23:35:34    
+2025-06-25T23:35:34    
+2025-06-25T23:35:34    Downloading and extracting 'nodejs' version '18.20.8' to '/tmp/oryx/platforms/nodejs/18.20.8'...
+2025-06-25T23:35:34    Detected image debian flavor: bullseye.
+2025-06-25T23:35:34    Skipping download of nodejs version 18.20.8 as it is available in external sdk provider cache...
+2025-06-25T23:35:34    Extracting contents...
+2025-06-25T23:35:42    Successfully extracted nodejs version 18.20.8 from external sdk provider cache...
+2025-06-25T23:35:42    Done in 8 sec(s).
+2025-06-25T23:35:42    
+2025-06-25T23:35:43    Removing existing manifest file
+2025-06-25T23:35:43    Creating directory for command manifest file if it does not exist
+2025-06-25T23:35:43    Creating a manifest file...
+2025-06-25T23:35:43    Node Build Command Manifest file created.
+2025-06-25T23:35:43    
+2025-06-25T23:35:43    Using Node version:
+2025-06-25T23:35:43    v18.20.8
+2025-06-25T23:35:43    
+2025-06-25T23:35:43    Using Npm version:
+2025-06-25T23:35:43    10.8.2
+2025-06-25T23:35:44    
+2025-06-25T23:35:44    Running 'npm install'...
+2025-06-25T23:35:44    
+2025-06-25T23:36:02    npm notice
+2025-06-25T23:36:03    added 71 packages, and audited 72 packages in 18s
+2025-06-25T23:36:03    npm notice New major version of npm available! 10.8.2 -> 11.4.2
+2025-06-25T23:36:03    
+2025-06-25T23:36:03    14 packages are looking for funding
+2025-06-25T23:36:03      run `npm fund` for details
+2025-06-25T23:36:03    
+2025-06-25T23:36:03    npm notice Changelog: https://github.com/npm/cli/releases/tag/v11.4.2
+2025-06-25T23:36:03    found 0 vulnerabilities
+2025-06-25T23:36:03    npm notice To update run: npm install -g npm@11.4.2
+2025-06-25T23:36:03    
+2025-06-25T23:36:03    npm notice
+2025-06-25T23:36:03    Zipping existing node_modules folder...
+2025-06-25T23:36:04    Done in 1 sec(s).
+2025-06-25T23:36:04    Preparing output...
+2025-06-25T23:36:04    
+2025-06-25T23:36:04    Copying files to destination directory '/home/site/wwwroot'...
+2025-06-25T23:36:04    Done in 0 sec(s).
+2025-06-25T23:36:04    
+2025-06-25T23:36:04    Removing existing manifest file
+2025-06-25T23:36:04    Creating a manifest file...
+2025-06-25T23:36:04    Manifest file created.
+2025-06-25T23:36:04    Copying .ostype to manifest output directory.
+2025-06-25T23:36:04    
+2025-06-25T23:36:05    Done in 30 sec(s).
+2025-06-25T23:36:05  Running post deployment command(s)...
+2025-06-25T23:36:05  
+2025-06-25T23:36:05  Generating summary of Oryx build
+2025-06-25T23:36:05  Parsing the build logs
+2025-06-25T23:36:05  Found 0 issue(s)
+2025-06-25T23:36:06  
+2025-06-25T23:36:06  Build Summary :
+2025-06-25T23:36:06  ===============
+2025-06-25T23:36:06  Errors (0)
+2025-06-25T23:36:06  Warnings (0)
+2025-06-25T23:36:06  
+2025-06-25T23:36:06  Triggering container recycle for OneDeploy by adding/updating restartTrigger.txt to the site root path
+2025-06-25T23:36:06  Deployment successful. deployer = OneDeploy deploymentPath = OneDeploy

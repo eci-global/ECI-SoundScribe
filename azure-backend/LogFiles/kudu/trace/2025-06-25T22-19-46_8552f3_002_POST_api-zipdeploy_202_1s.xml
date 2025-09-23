@@ -1,0 +1,17 @@
+<step title="Incoming Request" date="2025-06-25T22:19:46.178" instance="8552f3" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="772,1,7" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0 (MSI)" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="27139" x-ms-client-request-id="7b08fa70-5212-11f0-b28d-8c1759c91239" x-ms-artifact-checksum="38394bdff4c65fc1725ef915a783c21dd62d421c4479df9cc87213600c67bf05" X-ARR-LOG-ID="7b08fa70-5212-11f0-b28d-8c1759c91239" CLIENT-IP="58.8.155.119:59686" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="58.8.155.119" X-Client-Port="59686" >
+  <step title="ZipPushDeploy" date="2025-06-25T22:19:46.756" >
+    <step title="ZipDeploy. Extract zip." date="2025-06-25T22:19:46.767" /><!-- duration: 2ms -->
+    <step title="None repository commit" date="2025-06-25T22:19:46.774" >
+      <step title="Commit id: 5a208804-9cbb-4d98-824c-d13febd0c4a4" date="2025-06-25T22:19:46.776" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 2ms -->
+    </step><!-- duration: 6ms -->
+    <step title="Starting PushDeployAsync" date="2025-06-25T22:19:46.782" /><!-- duration: 2ms -->
+    <step title="Writing artifact to /tmp/zipdeploy/ea60ebcf-9a75-4308-80c9-51351182f08d.zip" date="2025-06-25T22:19:46.797" >
+      <step title="Writing multipart request body to /tmp/zipdeploy/ea60ebcf-9a75-4308-80c9-51351182f08d.zip" date="2025-06-25T22:19:46.800" /><!-- duration: 5ms -->
+    </step><!-- duration: 89ms -->
+    <step title="Start deployment in the background" date="2025-06-25T22:19:46.904" >
+      <step title="Acquiring Deployment Lock" date="2025-06-25T22:19:46.987" /><!-- duration: 9ms -->
+      <step title="Acquired Deployment Lock" date="2025-06-25T22:19:47.254" /><!-- duration: 3ms -->
+    </step><!-- duration: 427ms -->
+  </step><!-- duration: 590ms -->
+  <step title="Outgoing response" date="2025-06-25T22:19:47.368" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 3ms -->
+</step><!-- duration: 1194ms -->

@@ -1,0 +1,80 @@
+project_id = "qinkldgvejheppheykfl"
+
+[api]
+enabled = true
+port = 54321
+schemas = ["public", "storage", "graphql_public"]
+extra_search_path = ["public", "extensions"]
+max_rows = 1000
+
+[auth]
+enabled = true
+site_url = "http://localhost:8080"
+additional_redirect_urls = ["http://localhost:3000", "http://localhost:8080", "https://preview--echo-ai-scribe-app.lovable.app"]
+jwt_expiry = 3600
+enable_signup = true
+enable_manual_linking = false
+
+[auth.email]
+enable_signup = true
+double_confirm_changes = true
+enable_confirmations = false
+
+[db]
+port = 55432
+shadow_port = 55433
+major_version = 17
+
+[functions]
+
+[functions.process-recording]
+verify_jwt = false
+
+[functions.process-large-recording]
+verify_jwt = false
+
+[functions.chat-with-recording]
+verify_jwt = false
+
+[functions.reprocess-coaching]
+verify_jwt = false
+
+[functions.generate-coaching]
+verify_jwt = false
+
+[functions.generate-ai-moments]
+verify_jwt = false
+
+[functions.analyze-speakers-topics]
+verify_jwt = false
+
+[functions.sentiment-analysis-focused]
+verify_jwt = false
+
+[functions.test-azure-openai]
+verify_jwt = false
+
+[functions.upload-scorecard-data]
+verify_jwt = false
+
+[functions.extract-duration]
+verify_jwt = false
+
+[functions.evaluate-bdr-scorecard]
+verify_jwt = false
+
+[functions.get-training-analytics]
+verify_jwt = false
+
+[functions.match-training-calls]
+verify_jwt = false
+
+[functions.process-training-batch]
+verify_jwt = false
+
+[functions.validate-training-data]
+verify_jwt = false
+
+[storage]
+enabled = true
+file_size_limit = "500MiB"

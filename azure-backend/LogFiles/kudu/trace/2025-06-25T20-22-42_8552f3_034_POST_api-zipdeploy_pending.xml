@@ -1,0 +1,17 @@
+<step title="Incoming Request" date="2025-06-25T20:22:42.513" instance="8552f3" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="769,1,27" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0 (MSI)" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="323991612" x-ms-client-request-id="1fdd112a-5202-11f0-bb20-8c1759c91239" x-ms-artifact-checksum="43df9bcc23b44809300fc666624a8d1a43d80b3925c4645e92354a1046643c48" X-ARR-LOG-ID="1fdd112a-5202-11f0-bb20-8c1759c91239" CLIENT-IP="58.8.155.119:49944" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="58.8.155.119" X-Client-Port="49944" >
+  <step title="Cleanup Xml Logs" date="2025-06-25T20:22:42.520" /><!-- duration: 3ms -->
+  <step title="ZipPushDeploy" date="2025-06-25T20:22:42.541" >
+    <step title="ZipDeploy. Extract zip." date="2025-06-25T20:22:42.545" /><!-- duration: 1ms -->
+    <step title="Starting PushDeployAsync" date="2025-06-25T20:22:42.549" /><!-- duration: 2ms -->
+    <step title="Removing node_modules symlink" date="2025-06-25T20:22:42.561" >
+      <step title="Writing artifact to /tmp/zipdeploy/06b3f4dd-8208-4aa7-9bd9-aa1ac8d2c4ae.zip" date="2025-06-25T20:22:42.652" >
+        <step title="Writing multipart request body to /tmp/zipdeploy/06b3f4dd-8208-4aa7-9bd9-aa1ac8d2c4ae.zip" date="2025-06-25T20:22:42.654" /><!-- duration: 5ms -->
+      </step><!-- duration: 22697ms -->
+      <step title="Removing previous build artifact&apos;s manifest file" date="2025-06-25T20:23:05.355" >
+        <step title="Start deployment in the background" date="2025-06-25T20:23:05.371" >
+          <step title="Acquiring Deployment Lock" date="2025-06-25T20:23:05.404" /><!-- duration: 8ms -->
+          <step title="Acquired Deployment Lock" date="2025-06-25T20:23:05.437" /><!-- duration: 1ms -->
+        </step><!-- duration: 143ms -->
+      </step><!-- duration: 168ms -->
+      <step title="Outgoing response" date="2025-06-25T20:23:05.531" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 7ms -->
+    </step><!-- duration: 22980ms -->

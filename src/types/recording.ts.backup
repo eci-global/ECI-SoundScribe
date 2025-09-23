@@ -1,0 +1,67 @@
+export interface Recording {
+  id: string;
+  title: string;
+  description?: string;
+  file_type: 'audio' | 'video';
+  duration?: number;
+  status: 'uploading' | 'processing' | 'completed' | 'failed';
+  created_at: string;
+  summary?: string;
+  file_url?: string;
+  transcript?: string;
+  content_type?: string;
+  enable_coaching?: boolean;
+  coaching_evaluation?: {
+    overallScore?: number;
+    strengths?: string[];
+    improvements?: string[];
+    criteria?: Record<string, any>;
+    summary?: string;
+    [key: string]: any;
+  };
+  thumbnail_url?: string;
+  file_size?: number;
+  updated_at?: string;
+  user_id?: string;
+  // AI-generated content fields
+  ai_summary?: string;
+  ai_next_steps?: object;
+  ai_insights?: string;
+  ai_generated_at?: string;
+  ai_moments?: any[]; // JSONB array of AI moments
+  ai_speaker_analysis?: {
+    identified_speakers: Array<{
+      name: string;
+      confidence: number;
+      segments: Array<{
+        start_time: number;
+        end_time: number;
+        text: string;
+      }>;
+      characteristics?: {
+        role?: string;
+        organization?: string;
+        introduction_method?: string;
+      };
+      original_name?: string;
+      user_corrected?: boolean;
+    }>;
+    unidentified_segments?: Array<{
+      speaker_label: string;
+      segments: Array<{
+        start_time: number;
+        end_time: number;
+        text: string;
+      }>;
+    }>;
+    confidence_score: number;
+    analysis_method: string;
+  };
+  ai_speakers_updated_at?: string;
+}
+
+export interface FileOperationsProps {
+  onRecordingProcessed: () => void;
+}
+
+export type ContentType = 'sales_call' | 'customer_support' | 'team_meeting' | 'training_session' | 'other';

@@ -1,0 +1,49 @@
+2025-06-26T13:02:54  Fetching changes.
+2025-06-26T13:02:55    Starting  LocalZipHandler
+2025-06-26T13:02:55    Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/dc6af3d1-43ce-415c-831e-8408c4641292.zip (0.03 MB) to /tmp/zipdeploy/extracted
+2025-06-26T13:03:00  Updating submodules.
+2025-06-26T13:03:00  Preparing deployment for commit id '011d5976-b'.
+2025-06-26T13:03:02  PreDeployment: context.CleanOutputPath False
+2025-06-26T13:03:02  PreDeployment: context.OutputPath /home/site/wwwroot
+2025-06-26T13:03:02  Repository path is /tmp/zipdeploy/extracted
+2025-06-26T13:03:03  Running oryx build...
+2025-06-26T13:03:03    Command: oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddb4b1c80fdfd3 -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log
+2025-06-26T13:03:10    Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2025-06-26T13:03:10    You can report issues at https://github.com/Microsoft/Oryx/issues
+2025-06-26T13:03:10    
+2025-06-26T13:03:11    Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493, Commit: 0649de32f1279969c9023dd41b389cce4bb94493, ReleaseTagName: 20250611.1
+2025-06-26T13:03:11    
+2025-06-26T13:03:11    Build Operation ID: a0c1041f771fdccd
+2025-06-26T13:03:11    Repository Commit : 011d5976-bae6-44a2-a0a2-987e4cc0a946
+2025-06-26T13:03:12    OS Type           : bullseye
+2025-06-26T13:03:12    Image Type        : githubactions
+2025-06-26T13:03:12    
+2025-06-26T13:03:12    Primary SDK Storage URL: https://oryxsdks-cdn.azureedge.net
+2025-06-26T13:03:12    Backup SDK Storage URL: https://oryx-cdn.microsoft.io
+2025-06-26T13:03:12    Detecting platforms...
+2025-06-26T13:03:12    External SDK provider is enabled.
+2025-06-26T13:03:13    Requesting metadata for platform nodejs from external SDK provider
+2025-06-26T13:03:14    Requesting metadata for platform nodejs from external SDK provider
+2025-06-26T13:03:16    Detected following platforms:
+2025-06-26T13:03:16      nodejs: 18.20.8
+2025-06-26T13:03:16    Requesting metadata for platform nodejs from external SDK provider
+2025-06-26T13:03:20    Version '18.20.8' of platform 'nodejs' is not installed. Generating script to install it...
+2025-06-26T13:03:28    Detected the following frameworks: Express
+2025-06-26T13:03:28    
+2025-06-26T13:03:28    Using intermediate directory '/tmp/8ddb4b1c80fdfd3'.
+2025-06-26T13:03:29    
+2025-06-26T13:03:29    Copying files to the intermediate directory...
+2025-06-26T13:03:29    Done in 0 sec(s).
+2025-06-26T13:03:29    
+2025-06-26T13:03:30    Source directory     : /tmp/8ddb4b1c80fdfd3
+2025-06-26T13:03:30    Destination directory: /home/site/wwwroot
+2025-06-26T13:03:30    
+2025-06-26T13:03:30    
+2025-06-26T13:03:30    Downloading and extracting 'nodejs' version '18.20.8' to '/tmp/oryx/platforms/nodejs/18.20.8'...
+2025-06-26T13:03:30    Detected image debian flavor: bullseye.
+2025-06-26T13:03:30    Skipping download of nodejs version 18.20.8 as it is available in external sdk provider cache...
+2025-06-26T13:03:30    Extracting contents...
+2025-06-26T13:03:40    Successfully extracted nodejs version 18.20.8 from external sdk provider cache...
+2025-06-26T13:03:40    Done in 16 sec(s).
+2025-06-26T13:03:40    
+2025-06-26T13:03:42    Removing existing manifest file

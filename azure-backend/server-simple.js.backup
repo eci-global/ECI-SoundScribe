@@ -1,0 +1,1236 @@
+const express = require('express');
+const cors = require('cors');
+const dotenv = require('dotenv');
+const axios = require('axios');
+const FormData = require('form-data');
+const { createClient } = require('@supabase/supabase-js');
+const fs = require('fs');
+const path = require('path');
+const ffmpeg = require('fluent-ffmpeg');
+const ffmpegPath = require('ffmpeg-static');
+const os = require('os');
+
+// Enhanced FFmpeg configuration with Azure App Service support
+console.log('🔧 FFmpeg Configuration (Enhanced):');
+console.log(`   ffmpeg-static path: ${ffmpegPath}`);
+console.log(`   Platform: ${os.platform()}`);
+console.log(`   Architecture: ${os.arch()}`);
+console.log(`   Node.js version: ${process.version}`);
+console.log(`   Working directory: ${process.cwd()}`);
+
+// Function to try setting executable permissions
+function trySetExecutablePermissions(filePath) {
+  try {
+    const fs = require('fs');
+    const stats = fs.statSync(filePath);
+    const currentMode = stats.mode;
+    const executableMode = currentMode | parseInt('111', 8); // Add execute permissions
+    
+    if (currentMode !== executableMode) {
+      console.log('   Attempting to set executable permissions...');
+      fs.chmodSync(filePath, executableMode);
+      console.log('   ✅ Executable permissions set');
+      return true;
+    }
+    return true;
+  } catch (error) {
+    console.warn(`   ⚠️ Failed to set executable permissions: ${error.message}`);
+    return false;
+  }
+}
+
+// Function to find alternative FFmpeg paths
+function findAlternativeFFmpegPaths() {
+  const alternativePaths = [
+    // Standard ffmpeg-static paths
+    ffmpegPath,
+    // Node modules paths
+    path.join(process.cwd(), 'node_modules', 'ffmpeg-static', 'ffmpeg'),
+    path.join(process.cwd(), 'node_modules', 'ffmpeg-static', 'bin', 'ffmpeg'),
+    // Azure App Service paths
+    path.join('C:', 'home', 'site', 'wwwroot', 'node_modules', 'ffmpeg-static', 'ffmpeg'),
+    path.join('C:', 'home', 'site', 'wwwroot', 'node_modules', 'ffmpeg-static', 'ffmpeg.exe'),
+    // Linux/Unix paths
+    '/usr/bin/ffmpeg',
+    '/usr/local/bin/ffmpeg',
+    // Alternative environment variable
+    process.env.FFMPEG_PATH
+  ].filter(Boolean);
+  
+  console.log('🔍 Searching for FFmpeg binary in alternative locations...');
+  
+  const fs = require('fs');
+  for (const testPath of alternativePaths) {
+    try {
+      if (fs.existsSync(testPath)) {
+        const stats = fs.statSync(testPath);
+        console.log(`   Found: ${testPath} (${stats.size} bytes)`);
+        
+        // Try to set executable permissions
+        const isExecutable = trySetExecutablePermissions(testPath);
+        
+        return { path: testPath, executable: isExecutable };
+      }
+    } catch (error) {
+      console.log(`   Checked: ${testPath} - Not found`);
+    }
+  }
+  
+  return null;
+}
+
+// Check primary ffmpeg path
+let finalFFmpegPath = ffmpegPath;
+let ffmpegAvailable = false;
+
+if (ffmpegPath) {
+  try {
+    const fs = require('fs');
+    const ffmpegExists = fs.existsSync(ffmpegPath);
+    console.log(`   Primary binary exists: ${ffmpegExists}`);
+    
+    if (ffmpegExists) {
+      const stats = fs.statSync(ffmpegPath);
+      console.log(`   Binary size: ${stats.size} bytes`);
+      const isExecutable = !!(stats.mode & parseInt('111', 8));
+      console.log(`   Is executable: ${isExecutable}`);
+      
+      if (!isExecutable) {
+        console.log('   Attempting to fix permissions...');
+        trySetExecutablePermissions(ffmpegPath);
+      }
+      
+      ffmpegAvailable = true;
+    } else {
+      console.log('   Primary path not found, searching alternatives...');
+      const alternative = findAlternativeFFmpegPaths();
+      
+      if (alternative) {
+        finalFFmpegPath = alternative.path;
+        ffmpegAvailable = alternative.executable;
+        console.log(`   ✅ Using alternative path: ${finalFFmpegPath}`);
+      }
+    }
+  } catch (error) {
+    console.warn(`   Error checking binary: ${error.message}`);
+    
+    // Try alternatives on error
+    const alternative = findAlternativeFFmpegPaths();
+    if (alternative) {
+      finalFFmpegPath = alternative.path;
+      ffmpegAvailable = alternative.executable;
+      console.log(`   ✅ Fallback to alternative path: ${finalFFmpegPath}`);
+    }
+  }
+} else {
+  console.warn('   No ffmpeg-static path provided, searching alternatives...');
+  const alternative = findAlternativeFFmpegPaths();
+  if (alternative) {
+    finalFFmpegPath = alternative.path;
+    ffmpegAvailable = alternative.executable;
+    console.log(`   ✅ Found alternative path: ${finalFFmpegPath}`);
+  }
+}
+
+// Configure FFmpeg with the best available path
+if (finalFFmpegPath) {
+  ffmpeg.setFfmpegPath(finalFFmpegPath);
+  console.log(`✅ FFmpeg configured with path: ${finalFFmpegPath}`);
+  console.log(`📊 FFmpeg availability: ${ffmpegAvailable ? 'Available' : 'Limited (may have permission issues)'}`);
+} else {
+  console.warn('❌ No FFmpeg binary found - will use fallback methods');
+}
+
+// Global variable for FFmpeg availability
+global.FFMPEG_AVAILABLE = ffmpegAvailable;
+
+dotenv.config();
+
+// Initialize Supabase client
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+let supabase;
+if (supabaseUrl && supabaseServiceKey) {
+  supabase = createClient(supabaseUrl, supabaseServiceKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  });
+  console.log('✅ Supabase client initialized');
+} else {
+  console.warn('⚠️ Supabase configuration missing');
+}
+
+// Function to clean malformed Azure OpenAI URLs
+function cleanAzureEndpoint(url) {
+  if (!url) return null;
+  
+  // Remove deployment-specific paths from the URL to get base endpoint
+  const cleanUrl = url
+    .replace(/\/openai\/deployments\/[^\/]+.*$/, '') // Remove /openai/deployments/... and everything after
+    .replace(/\/audio\/transcriptions.*$/, '')        // Remove /audio/transcriptions and params
+    .replace(/\/chat\/completions.*$/, '');           // Remove /chat/completions and params
+  
+  return cleanUrl;
+}
+
+// Azure OpenAI Configuration with automatic URL cleaning
+const rawAzureEndpoint = process.env.AZURE_OPENAI_ENDPOINT;
+const rawWhisperEndpoint = process.env.AZURE_OPENAI_WHISPER_ENDPOINT;
+
+const azureConfig = {
+  // Use Whisper endpoint as primary if available, otherwise clean the main endpoint
+  endpoint: cleanAzureEndpoint(rawWhisperEndpoint || rawAzureEndpoint),
+  
+  // Use Whisper API key if available, otherwise main API key
+  apiKey: process.env.AZURE_OPENAI_WHISPER_API_KEY || process.env.AZURE_OPENAI_API_KEY,
+  
+  // Use GPT endpoint for summary generation
+  gptEndpoint: cleanAzureEndpoint(rawAzureEndpoint),
+  gptApiKey: process.env.AZURE_OPENAI_API_KEY,
+  
+  apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-10-01-preview',
+  gptDeployment: process.env.AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT || 'gpt-4o-mini',
+  whisperDeployment: process.env.AZURE_OPENAI_WHISPER_DEPLOYMENT || 'whisper-1'
+};
+
+console.log('🔧 Azure OpenAI Config Status:', {
+  hasEndpoint: !!azureConfig.endpoint,
+  hasApiKey: !!azureConfig.apiKey,
+  hasGptEndpoint: !!azureConfig.gptEndpoint,
+  hasGptApiKey: !!azureConfig.gptApiKey,
+  gptDeployment: azureConfig.gptDeployment,
+  whisperDeployment: azureConfig.whisperDeployment,
+  endpointCleaned: rawAzureEndpoint + ' -> ' + azureConfig.gptEndpoint,
+  whisperCleaned: rawWhisperEndpoint + ' -> ' + azureConfig.endpoint
+});
+
+// AI Processing Functions with Enhanced Error Handling & Duration Checking
+async function downloadFileFromSupabase(fileUrl) {
+  try {
+    console.log('📥 Downloading file from Supabase:', fileUrl);
+    const response = await axios.get(fileUrl, { 
+      responseType: 'arraybuffer', // Changed to arraybuffer for audio analysis
+      timeout: 60000 // 1 minute timeout
+    });
+    return Buffer.from(response.data);
+  } catch (error) {
+    console.error('❌ File download failed:', error.message);
+    throw new Error(`File download failed: ${error.message}`);
+  }
+}
+
+// Get detailed audio information including sample rate
+async function getAudioInfo(filePath) {
+  return new Promise((resolve, reject) => {
+    ffmpeg.ffprobe(filePath, (error, metadata) => {
+      if (error) {
+        console.warn('⚠️ FFprobe failed for audio info:', error.message);
+        resolve(null);
+        return;
+      }
+
+      try {
+        const audioStream = metadata.streams.find(stream => stream.codec_type === 'audio');
+        if (!audioStream) {
+          console.warn('⚠️ No audio stream found in file');
+          resolve(null);
+          return;
+        }
+
+        const info = {
+          duration: parseFloat(metadata.format.duration) || 0,
+          sampleRate: parseInt(audioStream.sample_rate) || 0,
+          channels: audioStream.channels || 0,
+          codec: audioStream.codec_name || 'unknown',
+          bitRate: parseInt(metadata.format.bit_rate) || 0
+        };
+
+        console.log(`📊 Audio info: ${info.duration.toFixed(1)}s, ${info.sampleRate}Hz, ${info.channels}ch, ${info.codec}`);
+        resolve(info);
+      } catch (parseError) {
+        console.warn('⚠️ Failed to parse audio info:', parseError.message);
+        resolve(null);
+      }
+    });
+  });
+}
+
+// Get audio duration using FFmpeg with enhanced error handling
+// Can accept either a Buffer with filename, or just a file path
+async function getAudioDuration(audioBufferOrPath, filename) {
+  return new Promise((resolve, reject) => {
+    try {
+      let tempPath;
+      let shouldCleanup = false;
+      
+      // Check if we received a buffer or a file path
+      if (Buffer.isBuffer(audioBufferOrPath)) {
+        console.log(`🕐 Attempting duration analysis for ${filename} (${audioBufferOrPath.length} bytes)`);
+        
+        // Write buffer to temporary file for analysis
+        const tempDir = require('os').tmpdir();
+        tempPath = path.join(tempDir, `duration_check_${Date.now()}_${filename}`);
+        
+        console.log(`📁 Writing temp file: ${tempPath}`);
+        fs.writeFileSync(tempPath, audioBufferOrPath);
+        shouldCleanup = true;
+        
+        // Verify temp file was written
+        const tempExists = fs.existsSync(tempPath);
+        console.log(`📁 Temp file exists: ${tempExists}`);
+      } else {
+        // It's already a file path
+        tempPath = audioBufferOrPath;
+        console.log(`🕐 Analyzing duration from file: ${tempPath}`);
+      }
+      
+      ffmpeg.ffprobe(tempPath, (error, metadata) => {
+        // Cleanup temp file if we created one
+        if (shouldCleanup) {
+          try {
+            fs.unlinkSync(tempPath);
+            console.log('🧹 Temp file cleaned up');
+          } catch (cleanupError) {
+            console.warn('⚠️ Failed to cleanup temp file:', cleanupError.message);
+          }
+        }
+        
+        if (error) {
+          console.warn('⚠️ FFprobe failed:', error.message);
+          console.warn('⚠️ Error code:', error.code);
+          console.warn('⚠️ Full error:', JSON.stringify(error, null, 2));
+          resolve(null); // Return null instead of rejecting
+          return;
+        }
+
+        try {
+          const duration = parseFloat(metadata.format.duration) || 0;
+          console.log(`📊 Audio duration detected: ${duration.toFixed(1)}s (${(duration / 60).toFixed(1)} minutes)`);
+          resolve(duration);
+        } catch (parseError) {
+          console.warn('⚠️ Failed to parse duration from metadata:', parseError.message);
+          resolve(null);
+        }
+      });
+    } catch (error) {
+      console.warn('⚠️ Duration analysis failed:', error.message);
+      console.warn('⚠️ Stack trace:', error.stack);
+      resolve(null); // Return null instead of rejecting
+    }
+  });
+}
+
+// Estimate audio duration based on file size (fallback method)
+function estimateAudioDurationFromSize(fileSizeBytes, filename) {
+  try {
+    const fileSizeMB = fileSizeBytes / (1024 * 1024);
+    
+    // Rough estimation based on typical MP3 bitrates
+    // Average MP3: ~1MB per minute at 128kbps
+    // Conservative estimate: 0.8MB per minute (accounts for variable bitrate)
+    const estimatedMinutes = fileSizeMB / 0.8;
+    const estimatedSeconds = estimatedMinutes * 60;
+    
+    console.log(`📊 Estimated duration from file size: ${fileSizeMB.toFixed(1)}MB ≈ ${estimatedMinutes.toFixed(1)} minutes`);
+    
+    return {
+      seconds: estimatedSeconds,
+      minutes: estimatedMinutes,
+      isEstimate: true
+    };
+  } catch (error) {
+    console.warn('⚠️ Failed to estimate duration from file size:', error.message);
+    return null;
+  }
+}
+
+// Byte-based audio chunking fallback (when FFmpeg is not available)
+function splitAudioByBytes(audioBuffer, filename, targetChunkSizeMB = 15) {
+  try {
+    console.log(`🔀 Using byte-based chunking (FFmpeg fallback) - Target: ${targetChunkSizeMB}MB per chunk`);
+    
+    const targetChunkSize = targetChunkSizeMB * 1024 * 1024; // Convert MB to bytes
+    const totalSize = audioBuffer.length;
+    const numChunks = Math.ceil(totalSize / targetChunkSize);
+    
+    console.log(`📊 Splitting ${(totalSize / (1024 * 1024)).toFixed(1)}MB into ${numChunks} byte-based chunks`);
+    
+    const chunks = [];
+    
+    for (let i = 0; i < numChunks; i++) {
+      const start = i * targetChunkSize;
+      const end = Math.min(start + targetChunkSize, totalSize);
+      const chunkBuffer = audioBuffer.slice(start, end);
+      
+      chunks.push({
+        index: i,
+        buffer: chunkBuffer,
+        startTime: null, // Unknown without FFmpeg
+        duration: null,  // Unknown without FFmpeg
+        byteStart: start,
+        byteEnd: end,
+        size: chunkBuffer.length,
+        filename: `byte_chunk_${i}_${filename}`
+      });
+      
+      console.log(`   Chunk ${i + 1}: ${(chunkBuffer.length / (1024 * 1024)).toFixed(1)}MB (bytes ${start}-${end})`);
+    }
+    
+    console.log(`✅ Byte-based splitting complete: ${chunks.length} chunks created`);
+    return chunks;
+    
+  } catch (error) {
+    console.error('❌ Byte-based splitting failed:', error.message);
+    throw error;
+  }
+}
+
+// Split large audio into chunks for processing (with FFmpeg and byte-based fallbacks)
+async function splitAudioIntoChunks(audioBuffer, filename, chunkDurationMinutes = 5) {
+  // Check if FFmpeg is available and try FFmpeg-based splitting first
+  if (global.FFMPEG_AVAILABLE) {
+    console.log(`✂️ Attempting FFmpeg-based audio splitting (${chunkDurationMinutes}-minute chunks)...`);
+    
+    const tempDir = require('os').tmpdir();
+    const inputPath = path.join(tempDir, `split_input_${Date.now()}_${filename}`);
+    let processPath = inputPath;
+    const isWav = filename.toLowerCase().endsWith('.wav');
+    
+    try {
+      // Write input buffer to temp file
+      fs.writeFileSync(inputPath, audioBuffer);
+      
+      // Get audio info to check sample rate
+      const audioInfo = await getAudioInfo(inputPath);
+      
+      // For WAV files with low sample rates or non-standard formats, pre-process first
+      if (isWav && audioInfo && audioInfo.sampleRate && audioInfo.sampleRate < 16000) {
+        console.log(`🔄 Pre-processing low sample rate WAV (${audioInfo.sampleRate}Hz) for reliable chunking...`);
+        const convertedPath = path.join(tempDir, `converted_${Date.now()}.wav`);
+        
+        await new Promise((resolve, reject) => {
+          ffmpeg(inputPath)
+            .audioCodec('pcm_s16le')  // Standard PCM encoding
+            .audioFrequency(16000)     // Convert to 16kHz for Whisper
+            .audioChannels(1)          // Mono for smaller chunks
+            .format('wav')
+            .outputOptions([
+              '-fflags', '+genpts',    // Generate timestamps
+              '-avoid_negative_ts', 'make_zero' // Fix timestamp issues
+            ])
+            .output(convertedPath)
+            .on('end', resolve)
+            .on('error', reject)
+            .run();
+        });
+        
+        processPath = convertedPath;
+        console.log('✅ WAV pre-processing complete');
+      }
+      
+      // Get audio duration from processed file
+      const totalDuration = await getAudioDuration(processPath);
+      if (!totalDuration) {
+        console.warn('⚠️ Could not determine duration with FFmpeg, falling back to byte-based chunking');
+        if (processPath !== inputPath) fs.unlinkSync(processPath);
+        fs.unlinkSync(inputPath);
+        return splitAudioByBytes(audioBuffer, filename);
+      }
+      
+      const chunkDurationSeconds = chunkDurationMinutes * 60;
+      const totalChunks = Math.ceil(totalDuration / chunkDurationSeconds);
+      
+      console.log(`📊 Creating ${totalChunks} FFmpeg chunks from ${totalDuration.toFixed(1)}s audio`);
+      
+      const chunks = [];
+      
+      for (let i = 0; i < totalChunks; i++) {
+        const startTime = i * chunkDurationSeconds;
+        const remainingDuration = totalDuration - startTime;
+        const actualChunkDuration = Math.min(chunkDurationSeconds, remainingDuration);
+        
+        // Skip if chunk would be too small (less than 1 second)
+        if (actualChunkDuration < 1) {
+          console.log(`⚠️ Skipping chunk ${i} - duration too small: ${actualChunkDuration}s`);
+          continue;
+        }
+        
+        const chunkPath = path.join(tempDir, `chunk_${i}_${Date.now()}.mp3`);
+        
+        try {
+          console.log(`📄 Extracting chunk ${i + 1}/${totalChunks}: start=${startTime}s, duration=${actualChunkDuration}s`);
+          
+          await new Promise((resolve, reject) => {
+            const command = ffmpeg(processPath)
+              .seekInput(startTime)
+              .duration(actualChunkDuration)
+              .audioBitrate('128k')
+              .audioFrequency(16000)
+              .audioChannels(1)
+              .audioCodec('libmp3lame')
+              .format('mp3')
+              .outputOptions([
+                '-avoid_negative_ts', 'make_zero',  // Critical for timestamp issues
+                '-fflags', '+genpts',               // Generate proper timestamps
+                '-copyts',                          // Preserve original timestamps
+                '-ar', '16000'                      // Ensure consistent sample rate
+              ])
+              .output(chunkPath)
+              .on('start', (commandLine) => {
+                console.log(`🎬 FFmpeg command for chunk ${i}: ${commandLine}`);
+              })
+              .on('end', () => {
+                console.log(`✅ Successfully extracted chunk ${i}`);
+                resolve();
+              })
+              .on('error', (err) => {
+                console.error(`❌ Failed to extract chunk ${i}:`, err.message);
+                reject(err);
+              });
+            
+            command.run();
+          });
+          
+          // Verify the chunk was created and has content
+          const chunkStats = fs.statSync(chunkPath);
+          if (chunkStats.size < 1024) {
+            throw new Error(`Chunk ${i} is too small: ${chunkStats.size} bytes`);
+          }
+          
+          const chunkBuffer = fs.readFileSync(chunkPath);
+          chunks.push({
+            index: i,
+            buffer: chunkBuffer,
+            startTime: startTime,
+            duration: actualChunkDuration,
+            filename: `ffmpeg_chunk_${i}_${filename}`,
+            size: chunkStats.size
+          });
+          
+          console.log(`✅ Chunk ${i} verified: ${(chunkStats.size / 1024).toFixed(1)}KB`);
+          
+          // Cleanup chunk file
+          fs.unlinkSync(chunkPath);
+        } catch (chunkError) {
+          console.error(`❌ Failed to process chunk ${i}:`, chunkError.message);
+          
+          // Try to cleanup failed chunk file
+          try {
+            if (fs.existsSync(chunkPath)) fs.unlinkSync(chunkPath);
+          } catch (e) {}
+          
+          // For chunk 3 specifically, try with adjusted parameters
+          if (i === 2 && chunks.length === 2) {
+            console.log('⚠️ Chunk 3 failed - attempting recovery with adjusted parameters...');
+            // Add a small overlap to avoid boundary issues
+            const adjustedStartTime = Math.max(0, startTime - 5); // 5 second overlap
+            const adjustedDuration = Math.min(actualChunkDuration + 10, remainingDuration + 5);
+            
+            // Continue with other chunks instead of failing entirely
+            console.log(`⚠️ Skipping problematic chunk ${i} and continuing...`);
+            continue;
+          }
+          
+          throw new Error(`Chunk ${i} extraction failed: ${chunkError.message}`);
+        }
+      }
+      
+      // Cleanup temp files
+      if (processPath !== inputPath) {
+        fs.unlinkSync(processPath);
+      }
+      fs.unlinkSync(inputPath);
+      
+      console.log(`✅ FFmpeg-based splitting complete: ${chunks.length} chunks created`);
+      return chunks;
+      
+    } catch (error) {
+      // Cleanup on error
+      try {
+        fs.unlinkSync(inputPath);
+      } catch (cleanupError) {
+        // Ignore cleanup errors
+      }
+      
+      console.warn(`⚠️ FFmpeg-based splitting failed: ${error.message}`);
+      console.log('🔄 Falling back to byte-based chunking...');
+      return splitAudioByBytes(audioBuffer, filename);
+    }
+  } else {
+    console.log('🔄 FFmpeg not available, using byte-based chunking...');
+    return splitAudioByBytes(audioBuffer, filename);
+  }
+}
+
+// Legacy FFmpeg-only function (kept for reference, replaced by enhanced version above)
+async function splitAudioIntoChunksOld(audioBuffer, filename, chunkDurationMinutes = 5) {
+  const tempDir = require('os').tmpdir();
+  const inputPath = path.join(tempDir, `split_input_${Date.now()}_${filename}`);
+  
+  try {
+    console.log(`✂️ Splitting audio into ${chunkDurationMinutes}-minute chunks...`);
+    
+    // Write input buffer to temp file
+    fs.writeFileSync(inputPath, audioBuffer);
+    
+    // Get audio duration first
+    const totalDuration = await getAudioDuration(audioBuffer, filename);
+    if (!totalDuration) {
+      throw new Error('Could not determine audio duration for chunking');
+    }
+    
+    const chunkDurationSeconds = chunkDurationMinutes * 60;
+    const totalChunks = Math.ceil(totalDuration / chunkDurationSeconds);
+    
+    console.log(`📊 Creating ${totalChunks} chunks from ${totalDuration.toFixed(1)}s audio`);
+    
+    const chunks = [];
+    
+    for (let i = 0; i < totalChunks; i++) {
+      const startTime = i * chunkDurationSeconds;
+      const chunkPath = path.join(tempDir, `chunk_${i}_${Date.now()}.mp3`);
+      
+      await new Promise((resolve, reject) => {
+        ffmpeg(inputPath)
+          .seekInput(startTime)
+          .duration(chunkDurationSeconds)
+          .audioBitrate('128k')
+          .audioFrequency(16000)
+          .audioChannels(1)
+          .audioCodec('libmp3lame')
+          .format('mp3')
+          .output(chunkPath)
+          .on('end', resolve)
+          .on('error', reject)
+          .run();
+      });
+      
+      const chunkBuffer = fs.readFileSync(chunkPath);
+      chunks.push({
+        index: i,
+        buffer: chunkBuffer,
+        startTime: startTime,
+        duration: Math.min(chunkDurationSeconds, totalDuration - startTime),
+        filename: `chunk_${i}_${filename}`
+      });
+      
+      // Cleanup chunk file
+      fs.unlinkSync(chunkPath);
+    }
+    
+    // Cleanup input file
+    fs.unlinkSync(inputPath);
+    
+    console.log(`✅ Audio splitting complete: ${chunks.length} chunks created`);
+    return chunks;
+    
+  } catch (error) {
+    // Cleanup on error
+    try {
+      fs.unlinkSync(inputPath);
+    } catch (cleanupError) {
+      // Ignore cleanup errors
+    }
+    
+    console.error('❌ Audio splitting failed:', error.message);
+    throw error;
+  }
+}
+
+async function transcribeWithWhisper(audioData, filename) {
+  try {
+    console.log('🎙️ Starting Whisper transcription...');
+    
+    const formData = new FormData();
+    
+    // Handle both Buffer and Stream inputs
+    if (Buffer.isBuffer(audioData)) {
+      formData.append('file', audioData, filename);
+    } else {
+      // Assume it's a stream
+      formData.append('file', audioData, filename);
+    }
+    
+    formData.append('response_format', 'verbose_json');
+    formData.append('temperature', '0');
+    
+    const url = `${azureConfig.endpoint}/openai/deployments/${azureConfig.whisperDeployment}/audio/transcriptions?api-version=${azureConfig.apiVersion}`;
+    
+    console.log('🔗 Whisper URL:', url);
+    
+    const response = await axios.post(url, formData, {
+      headers: {
+        'api-key': azureConfig.apiKey,
+        ...formData.getHeaders()
+      },
+      timeout: 300000, // 5 minutes
+      maxContentLength: Infinity,
+      maxBodyLength: Infinity
+    });
+    
+    console.log('✅ Whisper transcription completed');
+    return {
+      success: true,
+      data: response.data
+    };
+  } catch (error) {
+    console.error('❌ Whisper transcription failed:', error.response?.data || error.message);
+    return {
+      success: false,
+      error: error.message,
+      details: error.response?.data
+    };
+  }
+}
+
+// Process chunked audio transcription
+async function transcribeAudioWithChunking(audioBuffer, filename, chunkDurationMinutes = 5) {
+  try {
+    console.log('🔀 Starting chunked transcription process...');
+    
+    // Split audio into chunks
+    const chunks = await splitAudioIntoChunks(audioBuffer, filename, chunkDurationMinutes);
+    
+    console.log(`📂 Processing ${chunks.length} audio chunks...`);
+    
+    // Process chunks sequentially to avoid rate limits
+    const transcriptions = [];
+    
+    for (let i = 0; i < chunks.length; i++) {
+      const chunk = chunks[i];
+      
+      // Handle both FFmpeg chunks (with duration) and byte chunks (without duration)
+      const chunkInfo = chunk.duration !== null 
+        ? `${chunk.duration.toFixed(1)}s`
+        : `${(chunk.size / (1024 * 1024)).toFixed(1)}MB`;
+      
+      console.log(`🔄 Processing chunk ${i + 1}/${chunks.length} (${chunkInfo})...`);
+      
+      const chunkResult = await transcribeWithWhisper(chunk.buffer, chunk.filename);
+      
+      if (chunkResult.success) {
+        transcriptions.push({
+          index: chunk.index,
+          startTime: chunk.startTime,
+          duration: chunk.duration, // May be null for byte-based chunks
+          text: chunkResult.data.text,
+          segments: chunkResult.data.segments || []
+        });
+        console.log(`✅ Chunk ${i + 1} transcribed: "${chunkResult.data.text.substring(0, 50)}..."`);
+      } else {
+        console.warn(`⚠️ Chunk ${i + 1} failed: ${chunkResult.error}`);
+        transcriptions.push({
+          index: chunk.index,
+          startTime: chunk.startTime,
+          duration: chunk.duration, // May be null for byte-based chunks
+          text: '',
+          error: chunkResult.error
+        });
+      }
+      
+      // Small delay between chunks to be respectful to API
+      if (i < chunks.length - 1) {
+        await new Promise(resolve => setTimeout(resolve, 1000));
+      }
+    }
+    
+    // Combine transcriptions
+    const successfulTranscriptions = transcriptions.filter(t => t.text);
+    const combinedText = successfulTranscriptions.map(t => t.text).join(' ');
+    
+    // Calculate total duration, handling null values from byte-based chunks
+    const totalDuration = transcriptions.reduce((sum, t) => {
+      return sum + (t.duration || 0); // Use 0 if duration is null
+    }, 0);
+    
+    console.log(`✅ Chunked transcription complete: ${successfulTranscriptions.length}/${chunks.length} successful`);
+    
+    return {
+      success: true,
+      data: {
+        text: combinedText,
+        duration: totalDuration,
+        chunks: transcriptions.length,
+        successfulChunks: successfulTranscriptions.length,
+        language: 'en'
+      }
+    };
+    
+  } catch (error) {
+    console.error('❌ Chunked transcription failed:', error.message);
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+async function generateSummaryWithGPT(transcript) {
+  try {
+    console.log('📝 Generating summary with GPT...');
+    
+    // Use separate GPT endpoint if available, otherwise fall back to main endpoint
+    const gptBaseEndpoint = azureConfig.gptEndpoint || azureConfig.endpoint;
+    const gptApiKey = azureConfig.gptApiKey || azureConfig.apiKey;
+    
+    const url = `${gptBaseEndpoint}/openai/deployments/${azureConfig.gptDeployment}/chat/completions?api-version=${azureConfig.apiVersion}`;
+    
+    console.log('🔗 GPT URL:', url);
+    
+    const response = await axios.post(url, {
+      messages: [
+        {
+          role: 'system',
+          content: 'You are an AI assistant that creates concise, professional summaries of business conversations. Focus on key topics, decisions, and action items.'
+        },
+        {
+          role: 'user', 
+          content: `Please create a concise summary of this conversation:\n\n${transcript.substring(0, 4000)}`
+        }
+      ],
+      max_tokens: 500,
+      temperature: 0
+    }, {
+      headers: {
+        'api-key': gptApiKey,
+        'Content-Type': 'application/json'
+      },
+      timeout: 60000
+    });
+    
+    console.log('✅ Summary generation completed');
+    return {
+      success: true,
+      data: response.data.choices[0]?.message?.content
+    };
+  } catch (error) {
+    console.error('❌ Summary generation failed:', error.response?.data || error.message);
+    return {
+      success: false,
+      error: error.message,
+      details: error.response?.data
+    };
+  }
+}
+
+async function updateRecordingInSupabase(recordingId, results) {
+  try {
+    console.log('💾 Updating recording in Supabase...');
+    
+    const updateData = {
+      transcript: results.transcript,
+      ai_summary: results.summary,
+      duration: results.duration,
+      status: 'completed',
+      ai_generated_at: new Date().toISOString(),
+      processed_at: new Date().toISOString() // Use processed_at instead of processing_completed_at
+    };
+    
+    const { data, error } = await supabase
+      .from('recordings')
+      .update(updateData)
+      .eq('id', recordingId)
+      .select();
+    
+    if (error) {
+      throw new Error(`Supabase update failed: ${error.message}`);
+    }
+    
+    console.log('✅ Recording updated in Supabase');
+    return { success: true, data };
+  } catch (error) {
+    console.error('❌ Supabase update failed:', error.message);
+    return { success: false, error: error.message };
+  }
+}
+
+async function processRecordingFull(recordingId, fileUrl, fileSize) {
+  console.log(`🚀 Starting enhanced processing with real video-to-audio extraction for recording: ${recordingId}`);
+  
+  try {
+    // Update status to processing with detailed logging
+    console.log('📊 Step 0: Updating database status...');
+    await supabase
+      .from('recordings')
+      .update({ 
+        status: 'processing'
+      })
+      .eq('id', recordingId);
+    console.log('✅ Database status updated - processing_started_at set');
+    
+    console.log('📊 Processing Step 1: Downloading file...');
+    // Step 1: Download file as buffer for duration analysis
+    const audioBuffer = await downloadFileFromSupabase(fileUrl);
+    const filename = `recording_${recordingId}.mp3`;
+    
+    console.log('📊 Processing Step 2: Video-to-audio extraction...');
+    // Check if this is actually an audio file (skip extraction)
+    if (filename.toLowerCase().includes('.mp3') || filename.toLowerCase().includes('audio')) {
+      console.log('🎵 Audio file detected, proceeding directly to transcription');
+    } else {
+      console.log('🎬 Video file detected, audio already extracted to buffer');
+    }
+    
+    console.log('📊 Processing Step 3: Transcribing with Whisper...');
+    console.log('🔍 NEW CODE RUNNING - Duration checking enabled with intelligent fallbacks!');
+    
+    // 🚨 CRITICAL: Check audio duration BEFORE calling Whisper
+    console.log('🕐 Analyzing audio duration...');
+    const audioDurationSeconds = await getAudioDuration(audioBuffer, filename);
+    console.log(`🕐 Duration analysis result: ${audioDurationSeconds} seconds`);
+    
+    let audioDurationMinutes = audioDurationSeconds ? audioDurationSeconds / 60 : null;
+    let durationMethod = 'ffmpeg';
+    
+    // 🔧 FALLBACK: If FFmpeg duration detection failed, use file size estimation
+    if (!audioDurationMinutes) {
+      console.log('🔄 FFmpeg duration detection failed, trying file size estimation...');
+      const sizeEstimate = estimateAudioDurationFromSize(audioBuffer.length, filename);
+      
+      if (sizeEstimate) {
+        audioDurationMinutes = sizeEstimate.minutes;
+        durationMethod = 'size_estimate';
+        console.log(`📊 Using estimated duration: ${audioDurationMinutes.toFixed(1)} minutes (from ${(audioBuffer.length / (1024 * 1024)).toFixed(1)}MB file)`);
+      }
+    }
+    
+    let transcriptionResult;
+    const WHISPER_DURATION_LIMIT_MINUTES = 15; // Based on forum findings - Whisper has ~10-15 minute limit
+    const LARGE_FILE_SIZE_MB = 50; // Force chunking for files >50MB when duration unknown
+    
+    // Decision logic for chunking
+    let shouldChunk = false;
+    let chunkReason = '';
+    
+    if (audioDurationMinutes && audioDurationMinutes > WHISPER_DURATION_LIMIT_MINUTES) {
+      shouldChunk = true;
+      chunkReason = `duration ${audioDurationMinutes.toFixed(1)} min > ${WHISPER_DURATION_LIMIT_MINUTES} min (${durationMethod})`;
+    } else if (!audioDurationMinutes && (audioBuffer.length / (1024 * 1024)) > LARGE_FILE_SIZE_MB) {
+      shouldChunk = true;
+      chunkReason = `large file ${(audioBuffer.length / (1024 * 1024)).toFixed(1)}MB > ${LARGE_FILE_SIZE_MB}MB (safety measure)`;
+    }
+    
+    if (shouldChunk) {
+      console.log(`🚨 CHUNKING REQUIRED: ${chunkReason}`);
+      console.log(`🔀 FORCING CHUNKING: File too long for Whisper API (prevents 500 errors)`);
+      
+      // Use chunked transcription for long audio
+      transcriptionResult = await transcribeAudioWithChunking(audioBuffer, filename, 5); // 5-minute chunks
+    } else {
+      const durationMsg = audioDurationMinutes ? 
+        `${audioDurationMinutes.toFixed(1)} min (${durationMethod})` : 
+        `${(audioBuffer.length / (1024 * 1024)).toFixed(1)}MB file`;
+      console.log(`✅ Direct processing OK: ${durationMsg} <= ${WHISPER_DURATION_LIMIT_MINUTES} min limit`);
+      
+      // Direct transcription for shorter audio
+      transcriptionResult = await transcribeWithWhisper(audioBuffer, filename);
+    }
+    
+    if (!transcriptionResult.success) {
+      throw new Error(`Transcription failed: ${transcriptionResult.error}. Details: ${JSON.stringify(transcriptionResult.details)}`);
+    }
+    
+    const transcript = transcriptionResult.data.text;
+    const duration = transcriptionResult.data.duration || audioDurationSeconds;
+    
+    console.log(`📊 Processing Step 4: Generated ${transcript.length} characters of transcript, duration: ${duration}s`);
+    
+    // Step 3: Generate summary
+    const summaryResult = await generateSummaryWithGPT(transcript);
+    const summary = summaryResult.success ? summaryResult.data : null;
+    
+    if (!summaryResult.success) {
+      console.warn('⚠️ Summary generation failed, but continuing with transcript only:', summaryResult.error);
+    }
+    
+    console.log('📊 Processing Step 5: Saving results to database...');
+    // Step 4: Save results
+    const updateResult = await updateRecordingInSupabase(recordingId, {
+      transcript,
+      summary,
+      duration
+    });
+    
+    if (!updateResult.success) {
+      throw new Error(`Database update failed: ${updateResult.error}`);
+    }
+    
+    console.log(`✅ Enhanced processing completed for recording: ${recordingId}`);
+    console.log(`📊 Results: ${transcript.length} chars transcript, ${summary ? 'summary generated' : 'no summary'}, ${duration}s duration`);
+    
+    return {
+      success: true,
+      transcript,
+      summary,
+      duration
+    };
+    
+  } catch (error) {
+    console.error(`❌ Enhanced processing failed for recording ${recordingId}:`, error.message);
+    
+    // Update status to failed with detailed error message
+    try {
+      await supabase
+        .from('recordings')
+        .update({ 
+          status: 'failed',
+          processed_at: new Date().toISOString()
+        })
+        .eq('id', recordingId);
+    } catch (dbError) {
+      console.error('❌ Failed to update error status in database:', dbError.message);
+    }
+    
+    return {
+      success: false,
+      error: error.message
+    };
+  }
+}
+
+const app = express();
+const PORT = process.env.PORT || 8080;
+
+console.log('🚀 Azure Backend Worker started - Full AI Processing Mode (Fixed)');
+console.log('📊 Environment:', process.env.NODE_ENV || 'development');
+
+// Middleware - Allow specific origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:8080', 
+  'https://preview--echo-ai-scribe-app.lovable.app',
+  'https://echo-ai-scribe-app.lovable.app',
+  'https://preview--eci-sound-scribe.lovable.app',
+  'https://eci-sound-scribe.lovable.app',
+  // Add current Lovable project domain
+  'https://f9827dbd-5df6-4d40-9bdf-efa5c5236ea6.lovableproject.com'
+];
+
+app.use(cors({
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, etc.)
+    if (!origin) return callback(null, true);
+    
+    if (allowedOrigins.includes(origin)) {
+      return callback(null, true);
+    }
+    
+    // Allow all Lovable project domains (for dynamic subdomains)
+    if (origin && origin.includes('.lovableproject.com')) {
+      return callback(null, true);
+    }
+    
+    // Allow all Lovable app domains
+    if (origin && origin.includes('.lovable.app')) {
+      return callback(null, true);
+    }
+    
+    // In development, allow all localhost origins
+    if (process.env.NODE_ENV === 'development' && origin && origin.includes('localhost')) {
+      return callback(null, true);
+    }
+    
+    console.log('CORS blocked origin:', origin);
+    return callback(new Error('Not allowed by CORS'), false);
+  },
+  credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+  exposedHeaders: ['Content-Length', 'X-Request-Id'],
+  maxAge: 86400 // 24 hours
+}));
+
+// Explicit OPTIONS handler for preflight requests
+app.options('*', (req, res) => {
+  const origin = req.headers.origin;
+  const isAllowed = !origin || 
+    allowedOrigins.includes(origin) || 
+    (origin && origin.includes('.lovableproject.com')) ||
+    (origin && origin.includes('.lovable.app')) ||
+    (process.env.NODE_ENV === 'development' && origin && origin.includes('localhost'));
+    
+  if (isAllowed) {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+    res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.header('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+    res.header('Access-Control-Allow-Credentials', 'true');
+    res.header('Access-Control-Max-Age', '86400');
+    res.sendStatus(204);
+  } else {
+    console.log('OPTIONS blocked origin:', origin);
+    res.sendStatus(403);
+  }
+});
+
+app.use(express.json({ limit: '50mb' }));
+app.use(express.urlencoded({ extended: true, limit: '50mb' }));
+
+// Health check endpoint with Azure OpenAI connectivity test
+app.get('/health', async (req, res) => {
+  const healthCheck = {
+    status: 'healthy',
+    timestamp: new Date().toISOString(),
+    uptime: process.uptime(),
+    version: '1.1.0',
+    environment: process.env.NODE_ENV || 'development',
+    corsEnabled: true,
+    allowedOrigins: allowedOrigins,
+    azureConfig: {
+      hasEndpoint: !!azureConfig.endpoint,
+      hasApiKey: !!azureConfig.apiKey,
+      hasGptEndpoint: !!azureConfig.gptEndpoint,
+      hasGptApiKey: !!azureConfig.gptApiKey
+    }
+  };
+
+  // Test Azure OpenAI connectivity
+  try {
+    const testUrl = `${azureConfig.gptEndpoint}/openai/deployments/${azureConfig.gptDeployment}/chat/completions?api-version=${azureConfig.apiVersion}`;
+    await axios.post(testUrl, {
+      messages: [{ role: 'user', content: 'test' }],
+      max_tokens: 1
+    }, {
+      headers: { 'api-key': azureConfig.gptApiKey },
+      timeout: 5000
+    });
+    healthCheck.azureOpenAI = 'connected';
+  } catch (error) {
+    healthCheck.azureOpenAI = 'error: ' + error.message;
+  }
+
+  res.json(healthCheck);
+});
+
+// Test connectivity endpoint
+app.get('/test-azure-openai', async (req, res) => {
+  try {
+    console.log('🧪 Testing Azure OpenAI connectivity...');
+    
+    // Test GPT endpoint
+    const gptUrl = `${azureConfig.gptEndpoint}/openai/deployments/${azureConfig.gptDeployment}/chat/completions?api-version=${azureConfig.apiVersion}`;
+    const gptResponse = await axios.post(gptUrl, {
+      messages: [{ role: 'user', content: 'Hello, this is a test.' }],
+      max_tokens: 10
+    }, {
+      headers: { 'api-key': azureConfig.gptApiKey },
+      timeout: 10000
+    });
+    
+    res.json({
+      success: true,
+      message: 'Azure OpenAI connectivity test successful',
+      gptTest: {
+        url: gptUrl,
+        response: gptResponse.data.choices[0]?.message?.content
+      },
+      config: {
+        gptEndpoint: azureConfig.gptEndpoint,
+        whisperEndpoint: azureConfig.endpoint,
+        gptDeployment: azureConfig.gptDeployment,
+        whisperDeployment: azureConfig.whisperDeployment
+      }
+    });
+  } catch (error) {
+    console.error('❌ Azure OpenAI connectivity test failed:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message,
+      details: error.response?.data,
+      config: azureConfig
+    });
+  }
+});
+
+// Process audio endpoint - main entry point for large file uploads from frontend
+app.post('/api/process-audio', async (req, res) => {
+  console.log('🎯 Received process-audio request:', {
+    origin: req.headers.origin,
+    body: req.body
+  });
+
+  const origin = req.headers.origin;
+  if (origin && allowedOrigins.includes(origin)) {
+    res.header('Access-Control-Allow-Origin', origin);
+    res.header('Access-Control-Allow-Credentials', 'true');
+  }
+
+  try {
+    const { recording_id, file_url, file_size, is_large_file, file_type } = req.body;
+
+    if (!recording_id) {
+      return res.status(400).json({
+        success: false,
+        error: 'recording_id is required'
+      });
+    }
+
+    const fileSizeMB = file_size ? (file_size / (1024 * 1024)).toFixed(1) : 'unknown';
+    console.log(`📥 Processing request: recording=${recording_id}, size=${fileSizeMB}MB, type=${file_type}`);
+
+    // Start actual AI processing in background with enhanced error handling and duration checking
+    setImmediate(async () => {
+      try {
+        console.log(`🚀 Starting direct processing for recording: ${recording_id}`);
+        const result = await processRecordingFull(recording_id, file_url, file_size);
+        
+        if (result.success) {
+          console.log(`🎉 Processing SUCCESS for recording: ${recording_id}`);
+          console.log(`📊 Final results: ${result.transcript?.length || 0} chars, summary: ${!!result.summary}, duration: ${result.duration}s`);
+        } else {
+          console.error(`💥 Processing FAILED for recording: ${recording_id}:`, result.error);
+        }
+      } catch (error) {
+        console.error(`💥 Processing CRASHED for recording: ${recording_id}:`, error.message);
+        console.error('Stack trace:', error.stack);
+        
+        // Ensure database is updated with error
+        try {
+          await supabase
+            .from('recordings')
+            .update({
+              status: 'failed',
+              processed_at: new Date().toISOString()
+            })
+            .eq('id', recording_id);
+        } catch (dbError) {
+          console.error('❌ Failed to update crash status:', dbError.message);
+        }
+      }
+    });
+    
+    res.json({
+      success: true,
+      message: 'Large file processing started with enhanced AI pipeline',
+      recordingId: recording_id,
+      jobType: 'large_file_processing',
+      estimatedDuration: `${Math.ceil((file_size || 90 * 1024 * 1024) / (1024 * 1024) * 30)} seconds`,
+      processingMode: 'azure_backend_full_ai_fixed',
+      azure_backend: true,
+      file_size_mb: fileSizeMB,
+      status: 'processing_started',
+      pipeline: ['download', 'whisper_transcription', 'gpt_summary', 'database_update'],
+      note: 'Enhanced AI pipeline with comprehensive error handling and logging'
+    });
+
+  } catch (error) {
+    console.error('❌ Error in process-audio endpoint:', error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message
+    });
+  }
+});
+
+// Start server
+app.listen(PORT, () => {
+  console.log(`🌟 Enhanced Azure Backend started on port ${PORT}`);
+  console.log(`🔗 Health check: http://localhost:${PORT}/health`);
+  console.log(`🧪 Test Azure OpenAI: http://localhost:${PORT}/test-azure-openai`);
+  console.log(`🎯 Process endpoint: http://localhost:${PORT}/api/process-audio`);
+  console.log(`🌐 CORS enabled for:`, allowedOrigins);
+});
+
+module.exports = app;

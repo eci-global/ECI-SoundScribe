@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Processing Status Monitor</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1200px;
+            margin: 20px auto;
+            padding: 20px;
+            background-color: #f5f5f5;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        .recording {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 15px 0;
+            background: #fafafa;
+        }
+        .recording.completed { border-left: 5px solid #28a745; }
+        .recording.processing { border-left: 5px solid #ffc107; }
+        .recording.failed { border-left: 5px solid #dc3545; }
+        .recording.pending { border-left: 5px solid #6c757d; }
+        
+        .status {
+            display: inline-block;
+            padding: 4px 12px;
+            border-radius: 20px;
+            font-size: 14px;
+            font-weight: bold;
+            text-transform: uppercase;
+        }
+        .status.completed { background: #d4edda; color: #155724; }
+        .status.processing { background: #fff3cd; color: #856404; }
+        .status.failed { background: #f8d7da; color: #721c24; }
+        .status.pending { background: #e2e3e5; color: #383d41; }
+        
+        .detail {
+            margin: 8px 0;
+            color: #666;
+        }
+        .icon {
+            font-size: 18px;
+            margin-right: 8px;
+        }
+        .refresh-btn {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+        }
+        .refresh-btn:hover {
+            background: #0056b3;
+        }
+        .auto-refresh {
+            color: #666;
+            font-style: italic;
+        }
+        .summary {
+            background: #e9ecef;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+        .tips {
+            background: #d1ecf1;
+            border: 1px solid #bee5eb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 20px 0;
+        }
+        .loading {
+            text-align: center;
+            padding: 40px;
+            color: #666;
+        }
+        .error {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            color: #721c24;
+            padding: 15px;
+            border-radius: 5px;
+            margin: 20px 0;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎥 Processing Status Monitor</h1>
+        <p>Monitor the status of your video/audio file processing</p>
+        
+        <div>
+            <button class="refresh-btn" onclick="checkStatus()">🔄 Refresh Now</button>
+            <button class="refresh-btn" onclick="toggleAutoRefresh()">⏱️ Auto Refresh: <span id="autoStatus">Off</span></button>
+            <span class="auto-refresh" id="autoRefreshInfo"></span>
+        </div>
+        
+        <div id="status-container">
+            <div class="loading">
+                <h3>🔍 Loading recordings...</h3>
+                <p>Checking processing status...</p>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        const SUPABASE_URL = "https://qinkldgvejheppheykfl.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmtsZGd2ZWpoZXBwaGV5a2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTA0NDcsImV4cCI6MjA2NTE2NjQ0N30.xn9c-6Sr_kEbETzafRrlaWMHgbUIoqifsCQBrqYT7u4";
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let autoRefreshInterval = null;
+        let autoRefreshEnabled = false;
+        
+        function getStatusIcon(status) {
+            const icons = {
+                'pending': '⏳',
+                'uploading': '⬆️',
+                'processing': '🔄',
+                'transcribing': '🎤',
+                'processing_large_file': '📦',
+                'completed': '✅',
+                'failed': '❌',
+                'transcription_failed': '🚫',
+                'processing_failed': '💥'
+            };
+            return icons[status] || '❓';
+        }
+        
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMins / 60);
+            const diffDays = Math.floor(diffHours / 24);
+            
+            if (diffMins < 1) return 'Just now';
+            if (diffMins < 60) return `${diffMins} minute${diffMins > 1 ? 's' : ''} ago`;
+            if (diffHours < 24) return `${diffHours} hour${diffHours > 1 ? 's' : ''} ago`;
+            return `${diffDays} day${diffDays > 1 ? 's' : ''} ago`;
+        }
+        
+        function getProcessingEstimate(status, fileSizeMB, createdAgo) {
+            const size = parseFloat(fileSizeMB);
+            
+            if (['completed', 'failed', 'transcription_failed'].includes(status)) {
+                return null;
+            }
+            
+            if (status === 'pending' || status === 'uploading') {
+                return '🕐 Estimated start: Within 1-2 minutes';
+            }
+            
+            if (['processing', 'transcribing', 'processing_large_file'].includes(status)) {
+                let expectedMins;
+                if (size < 10) expectedMins = '2-5';
+                else if (size < 50) expectedMins = '5-10';
+                else if (size < 100) expectedMins = '10-20';
+                else expectedMins = '15-30';
+                
+                return `⏱️ Estimated completion: ${expectedMins} minutes`;
+            }
+            
+            return null;
+        }
+        
+        function renderRecording(recording, index) {
+            const fileSizeMB = recording.file_size ? (recording.file_size / (1024 * 1024)).toFixed(2) : 'Unknown';
+            const createdAgo = getTimeAgo(new Date(recording.created_at));
+            const updatedAgo = getTimeAgo(new Date(recording.updated_at));
+            const statusClass = getStatusClass(recording.status);
+            const processingEstimate = getProcessingEstimate(recording.status, fileSizeMB, createdAgo);
+            
+            return `
+                <div class="recording ${statusClass}">
+                    <h3>${getStatusIcon(recording.status)} ${recording.title}</h3>
+                    <div class="detail">
+                        <strong>📋 ID:</strong> ${recording.id}
+                    </div>
+                    <div class="detail">
+                        <strong>📏 Size:</strong> ${fileSizeMB}MB
+                    </div>
+                    <div class="detail">
+                        <strong>📊 Status:</strong> <span class="status ${statusClass}">${recording.status}</span>
+                    </div>
+                    <div class="detail">
+                        <strong>🕐 Created:</strong> ${createdAgo}
+                    </div>
+                    <div class="detail">
+                        <strong>⏰ Updated:</strong> ${updatedAgo}
+                    </div>
+                    
+                    <div class="detail">
+                        <strong>📝 Transcript:</strong> ${recording.transcript ? 
+                            `✅ ${recording.transcript.length} characters` : 
+                            '❌ Not available'}
+                    </div>
+                    
+                    <div class="detail">
+                        <strong>🤖 AI Summary:</strong> ${recording.ai_summary ? 
+                            `✅ ${recording.ai_summary.length} characters` : 
+                            '❌ Not available'}
+                    </div>
+                    
+                    <div class="detail">
+                        <strong>✨ AI Moments:</strong> ${(recording.ai_moments && recording.ai_moments.length > 0) ? 
+                            `✅ ${recording.ai_moments.length} moments` : 
+                            '❌ Not available'}
+                    </div>
+                    
+                    ${recording.error_message ? `
+                        <div class="detail" style="color: #721c24;">
+                            <strong>⚠️ Error:</strong> ${recording.error_message}
+                        </div>
+                    ` : ''}
+                    
+                    ${recording.processing_notes ? `
+                        <div class="detail">
+                            <strong>📋 Notes:</strong> ${recording.processing_notes}
+                        </div>
+                    ` : ''}
+                    
+                    ${processingEstimate ? `
+                        <div class="detail" style="color: #856404; font-weight: bold;">
+                            ${processingEstimate}
+                        </div>
+                    ` : ''}
+                </div>
+            `;
+        }
+        
+        function getStatusClass(status) {
+            if (['completed'].includes(status)) return 'completed';
+            if (['processing', 'transcribing', 'processing_large_file', 'uploading'].includes(status)) return 'processing';
+            if (['failed', 'transcription_failed', 'processing_failed'].includes(status)) return 'failed';
+            return 'pending';
+        }
+        
+        async function checkStatus() {
+            const container = document.getElementById('status-container');
+            
+            try {
+                // Show loading state
+                container.innerHTML = `
+                    <div class="loading">
+                        <h3>🔍 Checking status...</h3>
+                        <p>Fetching latest recording information...</p>
+                    </div>
+                `;
+                
+                // Check auth first
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    container.innerHTML = `
+                        <div class="error">
+                            <h3>🔐 Authentication Required</h3>
+                            <p>Please log in to view your recordings. <a href="/login">Go to Login</a></p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Fetch recordings
+                const { data: recordings, error } = await supabase
+                    .from('recordings')
+                    .select('id, title, file_size, status, created_at, updated_at, transcript, ai_summary, ai_moments, error_message, processing_notes')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                
+                if (error) {
+                    throw error;
+                }
+                
+                if (!recordings || recordings.length === 0) {
+                    container.innerHTML = `
+                        <div class="summary">
+                            <h3>📭 No Recordings Found</h3>
+                            <p>No recordings found in your account. Upload a video or audio file to get started.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Generate recordings HTML
+                const recordingsHTML = recordings.map((recording, index) => 
+                    renderRecording(recording, index)
+                ).join('');
+                
+                // Calculate status summary
+                const statusCounts = recordings.reduce((acc, r) => {
+                    acc[r.status] = (acc[r.status] || 0) + 1;
+                    return acc;
+                }, {});
+                
+                const pendingCount = recordings.filter(r => 
+                    ['pending', 'processing', 'transcribing', 'uploading', 'processing_large_file'].includes(r.status)
+                ).length;
+                
+                // Generate summary HTML
+                const summaryHTML = `
+                    <div class="summary">
+                        <h3>📊 Status Summary (${recordings.length} recordings)</h3>
+                        ${Object.entries(statusCounts).map(([status, count]) => 
+                            `<span style="margin-right: 15px;">${getStatusIcon(status)} ${status}: ${count}</span>`
+                        ).join('')}
+                    </div>
+                `;
+                
+                // Generate tips for pending recordings
+                let tipsHTML = '';
+                if (pendingCount > 0) {
+                    const largeFiles = recordings.filter(r => 
+                        ['pending', 'processing', 'transcribing', 'processing_large_file'].includes(r.status) &&
+                        r.file_size && r.file_size > 50 * 1024 * 1024
+                    );
+                    
+                    tipsHTML = `
+                        <div class="tips">
+                            <h4>💡 Processing Tips (${pendingCount} pending)</h4>
+                            <ul>
+                                <li><strong>Large files (>50MB):</strong> May take 10-20 minutes to process</li>
+                                <li><strong>Processing time:</strong> Depends on file size and Azure OpenAI quota</li>
+                                <li><strong>Auto-refresh:</strong> Enable auto-refresh to see updates without manual refresh</li>
+                                <li><strong>Status updates:</strong> Changes are reflected in real-time on the main dashboard</li>
+                                ${largeFiles.length > 0 ? `<li><strong>Large files detected:</strong> ${largeFiles.length} files >50MB processing</li>` : ''}
+                            </ul>
+                        </div>
+                    `;
+                }
+                
+                container.innerHTML = summaryHTML + recordingsHTML + tipsHTML;
+                
+                // Update last refresh time
+                const now = new Date().toLocaleTimeString();
+                document.getElementById('autoRefreshInfo').textContent = 
+                    autoRefreshEnabled ? `Last refresh: ${now}` : '';
+                
+            } catch (error) {
+                console.error('Error checking status:', error);
+                container.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Error Loading Status</h3>
+                        <p>Failed to load recording status: ${error.message}</p>
+                        <button class="refresh-btn" onclick="checkStatus()">🔄 Try Again</button>
+                    </div>
+                `;
+            }
+        }
+        
+        function toggleAutoRefresh() {
+            autoRefreshEnabled = !autoRefreshEnabled;
+            const statusElement = document.getElementById('autoStatus');
+            const infoElement = document.getElementById('autoRefreshInfo');
+            
+            if (autoRefreshEnabled) {
+                statusElement.textContent = 'On';
+                autoRefreshInterval = setInterval(checkStatus, 30000); // Refresh every 30 seconds
+                infoElement.textContent = 'Refreshing every 30 seconds...';
+            } else {
+                statusElement.textContent = 'Off';
+                if (autoRefreshInterval) {
+                    clearInterval(autoRefreshInterval);
+                    autoRefreshInterval = null;
+                }
+                infoElement.textContent = '';
+            }
+        }
+        
+        // Make functions globally available
+        window.checkStatus = checkStatus;
+        window.toggleAutoRefresh = toggleAutoRefresh;
+        
+        // Initial load
+        checkStatus();
+    </script>
+</body>
+</html>

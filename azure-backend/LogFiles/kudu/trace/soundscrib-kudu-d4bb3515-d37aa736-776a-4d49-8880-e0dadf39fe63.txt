@@ -1,0 +1,1 @@
+2025-07-01T09:30:28  Startup Request, url: /api/zip/site/wwwroot/, method: GET, type: request, pid: 774,1,24, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: LocalGit

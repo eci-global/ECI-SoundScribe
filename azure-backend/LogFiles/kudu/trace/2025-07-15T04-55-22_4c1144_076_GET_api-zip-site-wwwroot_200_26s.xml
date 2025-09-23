@@ -1,0 +1,6 @@
+<step title="Incoming Request" date="2025-07-15T04:55:22.568" instance="4c1144" url="/api/zip/site/wwwroot/" method="GET" type="request" pid="768,1,27" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="Go-http-client/2.0" Accept-Encoding="gzip" Authorization="Bea..." X-ARR-LOG-ID="fb8a1412-79c8-4a24-88ce-719d778a477f" CLIENT-IP="52.52.20.134:14218" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zip/site/wwwroot/" X-Client-IP="52.52.20.134" X-Client-Port="14218" >
+  <step title="Cleanup Xml Logs" date="2025-07-15T04:55:22.572" >
+    <step title="Cleanup Infos" date="2025-07-15T04:55:22.591" totalFiles="567" totalCleanup="407" /><!-- duration: 4ms -->
+  </step><!-- duration: 26ms -->
+  <step title="Outgoing response" date="2025-07-15T04:55:48.743" type="response" statusCode="200" statusText="OK" /><!-- duration: 10ms -->
+</step><!-- duration: 26189ms -->

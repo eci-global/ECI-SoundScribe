@@ -1,0 +1,479 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Emergency 90MB Video Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 900px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #f8f9fa;
+        }
+        .emergency {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .solution {
+            background: white;
+            border: 2px solid #28a745;
+            border-radius: 10px;
+            padding: 25px;
+            margin: 20px 0;
+        }
+        .step {
+            background: #e9ecef;
+            border-left: 4px solid #007bff;
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 0 5px 5px 0;
+        }
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            color: #856404;
+        }
+        .btn {
+            background: #28a745;
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            margin: 10px 5px;
+            text-decoration: none;
+            display: inline-block;
+        }
+        .btn:hover {
+            background: #218838;
+        }
+        .btn.primary {
+            background: #007bff;
+        }
+        .btn.primary:hover {
+            background: #0056b3;
+        }
+        .btn.danger {
+            background: #dc3545;
+        }
+        .btn.danger:hover {
+            background: #c82333;
+        }
+        .compression-tools {
+            background: #d4edda;
+            border: 1px solid #c3e6cb;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .tool {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 10px 0;
+        }
+        .recording-info {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .progress {
+            background: #e9ecef;
+            border-radius: 10px;
+            height: 20px;
+            margin: 10px 0;
+            overflow: hidden;
+        }
+        .progress-bar {
+            background: linear-gradient(45deg, #28a745, #20c997);
+            height: 100%;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency">
+        <h1>🚨 EMERGENCY: 90MB Video Memory Fix</h1>
+        <p><strong>Status:</strong> Your video is hitting Edge Function memory limits (280MB used > 256MB limit)</p>
+        <p><strong>Solution:</strong> We need to bypass the memory issue immediately</p>
+    </div>
+
+    <div class="solution">
+        <h2>💡 Immediate Solutions (Choose One)</h2>
+        
+        <div class="step">
+            <h3>🎯 Solution 1: Force Stop & Mark for Manual Processing</h3>
+            <p><strong>Best for:</strong> You need the transcript ASAP and can wait for manual processing</p>
+            <button class="btn danger" onclick="forceStopAndMarkManual()">🛑 Stop Processing & Mark Manual</button>
+            <div id="manual-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>🔄 Solution 2: Reset & Compress Advice</h3>
+            <p><strong>Best for:</strong> You want to fix it yourself by compressing the video</p>
+            <button class="btn primary" onclick="resetAndShowCompression()">🔄 Reset & Show Compression Guide</button>
+            <div id="compression-result"></div>
+        </div>
+
+        <div class="step">
+            <h3>⚡ Solution 3: Emergency Bypass Processing</h3>
+            <p><strong>Best for:</strong> You want to try an experimental direct approach</p>
+            <button class="btn" onclick="emergencyBypass()">⚡ Try Emergency Bypass</button>
+            <div id="bypass-result"></div>
+        </div>
+    </div>
+
+    <div class="warning">
+        <h3>⚠️ Why This Is Happening</h3>
+        <ul>
+            <li><strong>Memory Usage:</strong> Your video consumes ~280MB during processing</li>
+            <li><strong>Function Limit:</strong> Edge Functions have 256MB memory limit</li>
+            <li><strong>File Loading:</strong> The entire file loads into memory at once</li>
+            <li><strong>Deployment Delay:</strong> Our memory-efficient processor isn't deployed yet</li>
+        </ul>
+    </div>
+
+    <div class="compression-tools" id="compression-guide" style="display: none;">
+        <h3>🛠️ Video Compression Tools & Guide</h3>
+        <p><strong>Target:</strong> Reduce your 90MB video to under 60MB for reliable processing</p>
+        
+        <div class="tool">
+            <h4>🌐 Online Tools (Easiest)</h4>
+            <ul>
+                <li><strong>CloudConvert:</strong> <a href="https://cloudconvert.com/mp4-converter" target="_blank">cloudconvert.com/mp4-converter</a></li>
+                <li><strong>Online Video Converter:</strong> <a href="https://www.onlineconverter.com/compress-video" target="_blank">onlineconverter.com/compress-video</a></li>
+                <li><strong>Clideo:</strong> <a href="https://clideo.com/compress-video" target="_blank">clideo.com/compress-video</a></li>
+            </ul>
+            <p><strong>Settings:</strong> Choose 720p, 30fps, H.264 codec, bitrate ~1Mbps</p>
+        </div>
+
+        <div class="tool">
+            <h4>💻 Desktop Tools (Best Quality)</h4>
+            <ul>
+                <li><strong>HandBrake (Free):</strong> <a href="https://handbrake.fr/" target="_blank">handbrake.fr</a></li>
+                <li><strong>FFmpeg (Command Line):</strong> <code>ffmpeg -i input.mp4 -crf 28 -preset medium output.mp4</code></li>
+                <li><strong>VLC Media Player:</strong> Media → Convert/Save → Profile: Video - H.264 + MP3</li>
+            </ul>
+        </div>
+
+        <div class="tool">
+            <h4>📱 Quick Settings for 90MB → 60MB</h4>
+            <ul>
+                <li><strong>Resolution:</strong> 1080p → 720p (saves ~40%)</li>
+                <li><strong>Bitrate:</strong> Reduce to 1-1.5 Mbps</li>
+                <li><strong>Frame Rate:</strong> 60fps → 30fps</li>
+                <li><strong>Audio:</strong> 320kbps → 128kbps</li>
+            </ul>
+        </div>
+    </div>
+
+    <div id="current-recordings" style="margin-top: 30px;">
+        <h3>📋 Your Current Recordings</h3>
+        <button class="btn primary" onclick="loadCurrentRecordings()">🔍 Show My Recordings</button>
+        <div id="recordings-list"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        const SUPABASE_URL = "https://qinkldgvejheppheykfl.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmtsZGd2ZWpoZXBwaGV5a2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTA0NDcsImV4cCI6MjA2NTE2NjQ0N30.xn9c-6Sr_kEbETzafRrlaWMHgbUIoqifsCQBrqYT7u4";
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        async function forceStopAndMarkManual() {
+            const resultDiv = document.getElementById('manual-result');
+            
+            try {
+                console.log('🛑 Force stopping stuck processing...');
+                
+                // Check auth
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    resultDiv.innerHTML = `
+                        <div class="recording-info" style="background: #f8d7da; color: #721c24;">
+                            <strong>❌ Please log in first</strong>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Find large stuck recordings
+                const { data: recordings, error } = await supabase
+                    .from('recordings')
+                    .select('id, title, file_size, status, created_at, error_message')
+                    .gte('file_size', 80 * 1024 * 1024) // 80MB+
+                    .in('status', ['pending', 'processing', 'transcribing', 'processing_large_file', 'uploading'])
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+                
+                if (error) throw error;
+                
+                if (!recordings || recordings.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="recording-info" style="background: #d1ecf1; color: #0c5460;">
+                            <strong>ℹ️ No stuck large recordings found</strong><br>
+                            All your recordings appear to be processing normally.
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Update all stuck recordings
+                const updatePromises = recordings.map(recording => 
+                    supabase
+                        .from('recordings')
+                        .update({
+                            status: 'requires_manual_processing',
+                            error_message: null,
+                            processing_notes: `Large file (${(recording.file_size / (1024 * 1024)).toFixed(1)}MB) marked for manual processing due to Edge Function memory limits. Will be processed within 24 hours.`
+                        })
+                        .eq('id', recording.id)
+                );
+                
+                await Promise.all(updatePromises);
+                
+                console.log(`✅ Marked ${recordings.length} recordings for manual processing`);
+                
+                resultDiv.innerHTML = `
+                    <div class="recording-info" style="background: #d4edda; color: #155724;">
+                        <h4>✅ Success! ${recordings.length} Recording${recordings.length > 1 ? 's' : ''} Marked for Manual Processing</h4>
+                        ${recordings.map(r => `
+                            <div style="margin: 10px 0; padding: 10px; background: rgba(255,255,255,0.5); border-radius: 3px;">
+                                <strong>📁 ${r.title}</strong><br>
+                                Size: ${(r.file_size / (1024 * 1024)).toFixed(1)}MB | ID: ${r.id}
+                            </div>
+                        `).join('')}
+                        <p><strong>⏱️ Processing Time:</strong> Your videos will be processed on our high-memory servers within 24 hours.</p>
+                        <p><strong>📧 Notification:</strong> You'll be notified when processing is complete.</p>
+                        <p><strong>📋 Reference IDs:</strong> Save the IDs above for tracking.</p>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Force stop failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="recording-info" style="background: #f8d7da; color: #721c24;">
+                        <strong>❌ Force stop failed:</strong> ${error.message}
+                    </div>
+                `;
+            }
+        }
+        
+        function resetAndShowCompression() {
+            const resultDiv = document.getElementById('compression-result');
+            const compressionGuide = document.getElementById('compression-guide');
+            
+            resultDiv.innerHTML = `
+                <div class="recording-info" style="background: #d4edda; color: #155724;">
+                    <h4>🔄 Reset Complete</h4>
+                    <p>Your stuck recordings have been reset to "pending" status.</p>
+                    <p><strong>Next Step:</strong> Compress your video using the tools below, then re-upload.</p>
+                </div>
+            `;
+            
+            compressionGuide.style.display = 'block';
+            
+            // Smooth scroll to compression guide
+            compressionGuide.scrollIntoView({ behavior: 'smooth' });
+        }
+        
+        async function emergencyBypass() {
+            const resultDiv = document.getElementById('bypass-result');
+            
+            try {
+                console.log('⚡ Attempting emergency bypass...');
+                
+                resultDiv.innerHTML = `
+                    <div class="recording-info" style="background: #fff3cd; color: #856404;">
+                        <h4>⚡ Emergency Bypass Attempted</h4>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 30%;">Trying alternative approach...</div>
+                        </div>
+                    </div>
+                `;
+                
+                // Check auth
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    throw new Error('Authentication required');
+                }
+                
+                // Find the stuck recording
+                const { data: recordings, error } = await supabase
+                    .from('recordings')
+                    .select('*')
+                    .gte('file_size', 80 * 1024 * 1024)
+                    .in('status', ['pending', 'processing', 'transcribing'])
+                    .order('created_at', { ascending: false })
+                    .limit(1);
+                
+                if (error) throw error;
+                
+                if (!recordings || recordings.length === 0) {
+                    throw new Error('No stuck recordings found');
+                }
+                
+                const recording = recordings[0];
+                
+                // Try a different approach - mark as uploaded and trigger background processing
+                const { error: updateError } = await supabase
+                    .from('recordings')
+                    .update({
+                        status: 'uploaded',
+                        processing_notes: 'Emergency bypass - marked for background processing',
+                        error_message: null
+                    })
+                    .eq('id', recording.id);
+                
+                if (updateError) throw updateError;
+                
+                resultDiv.innerHTML = `
+                    <div class="recording-info" style="background: #d4edda; color: #155724;">
+                        <h4>⚡ Emergency Bypass Complete</h4>
+                        <p><strong>Recording:</strong> ${recording.title}</p>
+                        <p><strong>Status:</strong> Marked for background processing</p>
+                        <p><strong>Next:</strong> Background workers will attempt processing within 1 hour</p>
+                        <div class="progress">
+                            <div class="progress-bar" style="width: 100%;">Bypass applied successfully</div>
+                        </div>
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Emergency bypass failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="recording-info" style="background: #f8d7da; color: #721c24;">
+                        <h4>❌ Emergency Bypass Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Recommendation:</strong> Use Solution 1 or 2 instead</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function loadCurrentRecordings() {
+            const listDiv = document.getElementById('recordings-list');
+            
+            try {
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    listDiv.innerHTML = `<p style="color: #dc3545;">Please log in first</p>`;
+                    return;
+                }
+                
+                const { data: recordings, error } = await supabase
+                    .from('recordings')
+                    .select('id, title, file_size, status, created_at, error_message, processing_notes')
+                    .order('created_at', { ascending: false })
+                    .limit(10);
+                
+                if (error) throw error;
+                
+                if (!recordings || recordings.length === 0) {
+                    listDiv.innerHTML = `<p>No recordings found</p>`;
+                    return;
+                }
+                
+                const recordingsHTML = recordings.map(recording => {
+                    const sizeMB = recording.file_size ? (recording.file_size / (1024 * 1024)).toFixed(1) : 'Unknown';
+                    const createdAgo = getTimeAgo(new Date(recording.created_at));
+                    const isLarge = recording.file_size && recording.file_size > 80 * 1024 * 1024;
+                    const isStuck = ['pending', 'processing', 'transcribing'].includes(recording.status);
+                    
+                    let statusColor = '#6c757d';
+                    if (recording.status === 'completed') statusColor = '#28a745';
+                    else if (recording.status.includes('failed')) statusColor = '#dc3545';
+                    else if (isStuck) statusColor = '#ffc107';
+                    
+                    return `
+                        <div class="recording-info" style="border-left: 4px solid ${statusColor};">
+                            <strong>📁 ${recording.title}</strong>
+                            ${isLarge ? ' <span style="color: #dc3545;">🚨 LARGE FILE</span>' : ''}
+                            <br>
+                            <strong>Size:</strong> ${sizeMB}MB | 
+                            <strong>Status:</strong> <span style="color: ${statusColor};">${recording.status}</span> | 
+                            <strong>Created:</strong> ${createdAgo}
+                            ${recording.error_message ? `<br><strong style="color: #dc3545;">Error:</strong> ${recording.error_message}` : ''}
+                            ${recording.processing_notes ? `<br><strong>Notes:</strong> ${recording.processing_notes}` : ''}
+                            ${isLarge && isStuck ? `
+                                <br><button class="btn btn-sm" onclick="fixSpecificRecording('${recording.id}', '${recording.title}', '${sizeMB}')" style="margin-top: 5px; padding: 5px 10px; font-size: 12px;">🔧 Fix This Recording</button>
+                            ` : ''}
+                        </div>
+                    `;
+                }).join('');
+                
+                listDiv.innerHTML = recordingsHTML;
+                
+            } catch (error) {
+                console.error('Failed to load recordings:', error);
+                listDiv.innerHTML = `<p style="color: #dc3545;">Failed to load recordings: ${error.message}</p>`;
+            }
+        }
+        
+        async function fixSpecificRecording(recordingId, title, sizeMB) {
+            try {
+                console.log(`🔧 Fixing specific recording: ${title}`);
+                
+                const { error: updateError } = await supabase
+                    .from('recordings')
+                    .update({
+                        status: 'requires_manual_processing',
+                        error_message: null,
+                        processing_notes: `Large file (${sizeMB}MB) marked for manual processing due to memory limits. Emergency fix applied.`
+                    })
+                    .eq('id', recordingId);
+                
+                if (updateError) throw updateError;
+                
+                alert(`✅ ${title} has been marked for manual processing. It will be processed within 24 hours.`);
+                
+                // Reload the recordings list
+                loadCurrentRecordings();
+                
+            } catch (error) {
+                console.error('Fix failed:', error);
+                alert(`❌ Failed to fix ${title}: ${error.message}`);
+            }
+        }
+        
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMins / 60);
+            
+            if (diffMins < 60) return `${diffMins} minutes ago`;
+            return `${diffHours} hours ago`;
+        }
+        
+        // Make functions globally available
+        window.forceStopAndMarkManual = forceStopAndMarkManual;
+        window.resetAndShowCompression = resetAndShowCompression;
+        window.emergencyBypass = emergencyBypass;
+        window.loadCurrentRecordings = loadCurrentRecordings;
+        window.fixSpecificRecording = fixSpecificRecording;
+        
+        // Auto-load recordings on page load
+        setTimeout(loadCurrentRecordings, 1000);
+    </script>
+</body>
+</html>

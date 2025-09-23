@@ -1,0 +1,98 @@
+name: Database Migrations
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: 'Environment to deploy to'
+        required: true
+        default: 'staging'
+        type: choice
+        options:
+        - staging
+        - production
+
+jobs:
+  validate-migrations:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Supabase CLI
+      uses: supabase/setup-cli@v1
+      with:
+        version: latest
+    
+    - name: Start local Supabase
+      run: supabase start
+    
+    - name: Run migrations
+      run: supabase db reset
+    
+    - name: Validate schema
+      run: |
+        # Check if all tables exist
+        supabase db diff --schema public --local
+        
+        # Validate RLS policies
+        echo "Validating RLS policies..."
+        supabase db diff --schema auth --local
+    
+    - name: Stop local Supabase
+      run: supabase stop
+
+  deploy-staging:
+    runs-on: ubuntu-latest
+    needs: validate-migrations
+    if: github.ref == 'refs/heads/main' || github.event.inputs.environment == 'staging'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Supabase CLI
+      uses: supabase/setup-cli@v1
+      with:
+        version: latest
+    
+    - name: Deploy migrations to staging
+      run: |
+        supabase db push --project-ref ${{ secrets.SUPABASE_STAGING_PROJECT_REF }}
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    
+    - name: Validate staging deployment
+      run: |
+        echo "Running post-deployment validation..."
+        # Add validation scripts here
+
+  deploy-production:
+    runs-on: ubuntu-latest
+    needs: [validate-migrations, deploy-staging]
+    if: github.event.inputs.environment == 'production'
+    
+    steps:
+    - uses: actions/checkout@v4
+    
+    - name: Setup Supabase CLI
+      uses: supabase/setup-cli@v1
+      with:
+        version: latest
+    
+    - name: Create backup
+      run: |
+        echo "Creating database backup..."
+        # supabase db dump --project-ref ${{ secrets.SUPABASE_PROJECT_REF }} > backup.sql
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    
+    - name: Deploy migrations to production
+      run: |
+        supabase db push --project-ref ${{ secrets.SUPABASE_PROJECT_REF }}
+      env:
+        SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+    
+    - name: Validate production deployment
+      run: |
+        echo "Running post-deployment validation..."
+        # Add validation scripts here

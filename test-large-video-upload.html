@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Test Large Video Upload</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+        }
+        .upload-area {
+            border: 2px dashed #ccc;
+            border-radius: 8px;
+            padding: 40px;
+            text-align: center;
+            margin: 20px 0;
+        }
+        .upload-area.dragover {
+            background-color: #f0f0f0;
+            border-color: #666;
+        }
+        .progress {
+            margin: 20px 0;
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 30px;
+            background-color: #f0f0f0;
+            border-radius: 15px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .status {
+            margin: 20px 0;
+            padding: 15px;
+            border-radius: 8px;
+            display: none;
+        }
+        .status.success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .file-info {
+            margin: 20px 0;
+            padding: 15px;
+            background-color: #e9ecef;
+            border-radius: 8px;
+            display: none;
+        }
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .btn-primary {
+            background-color: #007bff;
+            color: white;
+        }
+        .btn-secondary {
+            background-color: #6c757d;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <h1>Test Large Video Upload (Up to 500MB)</h1>
+    
+    <div class="upload-area" id="uploadArea">
+        <h3>Drop your video file here or click to select</h3>
+        <p>Maximum file size: 500MB</p>
+        <input type="file" id="fileInput" accept="video/*,audio/*" style="display: none;">
+        <button class="btn-primary" onclick="document.getElementById('fileInput').click()">Select File</button>
+    </div>
+    
+    <div class="file-info" id="fileInfo"></div>
+    
+    <div class="progress" id="progressContainer">
+        <h4>Upload Progress</h4>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progressFill">0%</div>
+        </div>
+        <p id="progressStatus"></p>
+    </div>
+    
+    <div class="status" id="statusMessage"></div>
+    
+    <div style="margin-top: 30px;">
+        <button class="btn-secondary" onclick="runDiagnostics()">Run Diagnostics</button>
+        <button class="btn-secondary" onclick="checkSupabaseConnection()">Check Supabase Connection</button>
+    </div>
+
+    <script type="module">
+        // Import Supabase client
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        const SUPABASE_URL = "https://qinkldgvejheppheykfl.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmtsZGd2ZWpoZXBwaGV5a2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTA0NDcsImV4cCI6MjA2NTE2NjQ0N30.xn9c-6Sr_kEbETzafRrlaWMHgbUIoqifsCQBrqYT7u4";
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        window.supabase = supabase; // Make it globally accessible
+        
+        // File size limits
+        const FILE_SIZE_LIMITS = {
+            EDGE_FUNCTION_LIMIT: 25 * 1024 * 1024,    // 25MB
+            LARGE_FILE_THRESHOLD: 50 * 1024 * 1024,   // 50MB
+            MAX_FILE_SIZE: 500 * 1024 * 1024          // 500MB
+        };
+        
+        // Elements
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileInfo = document.getElementById('fileInfo');
+        const progressContainer = document.getElementById('progressContainer');
+        const progressFill = document.getElementById('progressFill');
+        const progressStatus = document.getElementById('progressStatus');
+        const statusMessage = document.getElementById('statusMessage');
+        
+        // Drag and drop handlers
+        uploadArea.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadArea.classList.add('dragover');
+        });
+        
+        uploadArea.addEventListener('dragleave', () => {
+            uploadArea.classList.remove('dragover');
+        });
+        
+        uploadArea.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadArea.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+        
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+        
+        function showStatus(message, isError = false) {
+            statusMessage.textContent = message;
+            statusMessage.className = 'status ' + (isError ? 'error' : 'success');
+            statusMessage.style.display = 'block';
+        }
+        
+        function updateProgress(percent, status = '') {
+            progressContainer.style.display = 'block';
+            progressFill.style.width = percent + '%';
+            progressFill.textContent = percent + '%';
+            if (status) {
+                progressStatus.textContent = status;
+            }
+        }
+        
+        async function handleFile(file) {
+            // Reset UI
+            statusMessage.style.display = 'none';
+            progressContainer.style.display = 'none';
+            
+            // Display file info
+            const sizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            fileInfo.innerHTML = `
+                <h4>Selected File:</h4>
+                <p><strong>Name:</strong> ${file.name}</p>
+                <p><strong>Type:</strong> ${file.type}</p>
+                <p><strong>Size:</strong> ${sizeMB} MB</p>
+                <p><strong>Upload Strategy:</strong> ${file.size > FILE_SIZE_LIMITS.LARGE_FILE_THRESHOLD ? 'Direct Storage Upload' : 'Standard Upload'}</p>
+            `;
+            fileInfo.style.display = 'block';
+            
+            // Check file size
+            if (file.size > FILE_SIZE_LIMITS.MAX_FILE_SIZE) {
+                showStatus(`File too large! Maximum size is ${FILE_SIZE_LIMITS.MAX_FILE_SIZE / (1024 * 1024)}MB`, true);
+                return;
+            }
+            
+            // Check authentication
+            const { data: { user }, error: authError } = await supabase.auth.getUser();
+            if (authError || !user) {
+                showStatus('Please log in first. Redirecting to login...', true);
+                setTimeout(() => {
+                    window.location.href = '/login';
+                }, 2000);
+                return;
+            }
+            
+            try {
+                updateProgress(0, 'Preparing upload...');
+                
+                // For large files, use direct storage upload
+                if (file.size > FILE_SIZE_LIMITS.LARGE_FILE_THRESHOLD) {
+                    await uploadLargeFileDirectly(file, user.id);
+                } else {
+                    await uploadStandardFile(file, user.id);
+                }
+                
+                showStatus('Upload completed successfully! 🎉');
+                
+            } catch (error) {
+                console.error('Upload error:', error);
+                showStatus(`Upload failed: ${error.message}`, true);
+            }
+        }
+        
+        async function uploadLargeFileDirectly(file, userId) {
+            updateProgress(10, 'Using direct storage upload for large file...');
+            
+            const timestamp = Date.now();
+            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const fileName = `${userId}/${timestamp}_${sanitizedName}`;
+            
+            updateProgress(20, 'Uploading to storage...');
+            
+            // Direct upload to storage
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('recordings')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false,
+                    metadata: {
+                        userId,
+                        originalName: file.name,
+                        mimeType: file.type,
+                        uploadedAt: new Date().toISOString(),
+                        fileSize: file.size.toString(),
+                        largeFileUpload: 'true'
+                    }
+                });
+            
+            if (uploadError) {
+                throw new Error(`Storage upload failed: ${uploadError.message}`);
+            }
+            
+            updateProgress(60, 'Getting public URL...');
+            
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('recordings')
+                .getPublicUrl(fileName);
+            
+            updateProgress(80, 'Creating database record...');
+            
+            // Create recording in database
+            const { data: recording, error: dbError } = await supabase
+                .from('recordings')
+                .insert({
+                    user_id: userId,
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    description: `Large file upload test - ${new Date().toLocaleString()}`,
+                    file_url: publicUrl,
+                    file_type: file.type.startsWith('video/') ? 'video' : 'audio',
+                    file_size: file.size,
+                    status: 'processing'
+                })
+                .select()
+                .single();
+            
+            if (dbError) {
+                throw new Error(`Database error: ${dbError.message}`);
+            }
+            
+            updateProgress(100, 'Upload complete!');
+            
+            console.log('Large file uploaded successfully:', {
+                fileName,
+                publicUrl,
+                recordingId: recording.id
+            });
+        }
+        
+        async function uploadStandardFile(file, userId) {
+            updateProgress(10, 'Using standard upload...');
+            
+            const timestamp = Date.now();
+            const sanitizedName = file.name.replace(/[^a-zA-Z0-9.-]/g, '_');
+            const fileName = `${userId}/${timestamp}_${sanitizedName}`;
+            
+            updateProgress(30, 'Uploading to storage...');
+            
+            // Standard upload
+            const { data: uploadData, error: uploadError } = await supabase.storage
+                .from('recordings')
+                .upload(fileName, file, {
+                    cacheControl: '3600',
+                    upsert: false
+                });
+            
+            if (uploadError) {
+                throw new Error(`Upload failed: ${uploadError.message}`);
+            }
+            
+            updateProgress(70, 'Creating database record...');
+            
+            // Get public URL
+            const { data: { publicUrl } } = supabase.storage
+                .from('recordings')
+                .getPublicUrl(fileName);
+            
+            // Create recording
+            const { data: recording, error: dbError } = await supabase
+                .from('recordings')
+                .insert({
+                    user_id: userId,
+                    title: file.name.replace(/\.[^/.]+$/, ""),
+                    description: `Standard upload test - ${new Date().toLocaleString()}`,
+                    file_url: publicUrl,
+                    file_type: file.type.startsWith('video/') ? 'video' : 'audio',
+                    file_size: file.size,
+                    status: 'uploaded'
+                })
+                .select()
+                .single();
+            
+            if (dbError) {
+                throw new Error(`Database error: ${dbError.message}`);
+            }
+            
+            updateProgress(100, 'Upload complete!');
+            
+            console.log('Standard file uploaded successfully:', {
+                fileName,
+                publicUrl,
+                recordingId: recording.id
+            });
+        }
+        
+        // Diagnostic functions
+        window.runDiagnostics = async function() {
+            console.log('Running diagnostics...');
+            
+            try {
+                // Check auth
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                console.log('Auth check:', user ? `Logged in as ${user.email}` : 'Not logged in', authError);
+                
+                // Check storage access
+                const { data: files, error: listError } = await supabase.storage
+                    .from('recordings')
+                    .list('', { limit: 1 });
+                console.log('Storage access:', listError ? `Error: ${listError.message}` : 'Success', files);
+                
+                // Check database access
+                const { data: recordings, error: dbError } = await supabase
+                    .from('recordings')
+                    .select('id')
+                    .limit(1);
+                console.log('Database access:', dbError ? `Error: ${dbError.message}` : 'Success', recordings);
+                
+                showStatus('Diagnostics complete! Check console for details.');
+                
+            } catch (error) {
+                console.error('Diagnostic error:', error);
+                showStatus('Diagnostics failed! Check console for details.', true);
+            }
+        };
+        
+        window.checkSupabaseConnection = async function() {
+            try {
+                const { data, error } = await supabase
+                    .from('recordings')
+                    .select('count')
+                    .limit(1);
+                
+                if (error) {
+                    showStatus(`Connection failed: ${error.message}`, true);
+                } else {
+                    showStatus('Supabase connection successful!');
+                }
+            } catch (error) {
+                showStatus(`Connection error: ${error.message}`, true);
+            }
+        };
+    </script>
+</body>
+</html>

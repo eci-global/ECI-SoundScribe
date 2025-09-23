@@ -1,0 +1,114 @@
+{
+  "description": "Perform a comprehensive review of the echo-ai-scribe-app SaaS application",
+  "focus_areas": [
+    {
+      "title": "Overall Architecture and System Design",
+      "points": [
+        "System architecture and components",
+        "Data flow and communication patterns",
+        "Service boundaries and responsibilities",
+        "Integration points and external dependencies"
+      ]
+    },
+    {
+      "title": "React Frontend Implementation",
+      "points": [
+        "Component structure and organization",
+        "State management approach",
+        "Routing implementation",
+        "UI/UX patterns and consistency",
+        "Responsive design implementation"
+      ]
+    },
+    {
+      "title": "Supabase Backend Integration",
+      "points": [
+        "Data model design",
+        "Table relationships and constraints",
+        "Query optimization",
+        "Real-time subscription usage",
+        "Storage implementation"
+      ]
+    },
+    {
+      "title": "Authentication and Security",
+      "points": [
+        "Authentication flow",
+        "Authorization rules",
+        "Data access controls",
+        "Security best practices implementation",
+        "API endpoint protection"
+      ]
+    },
+    {
+      "title": "API Design",
+      "points": [
+        "API structure and organization",
+        "Error handling patterns",
+        "Request/response formats",
+        "API documentation",
+        "Integration patterns"
+      ]
+    },
+    {
+      "title": "Performance",
+      "points": [
+        "Frontend optimization techniques",
+        "Database query performance",
+        "Caching strategy",
+        "Asset optimization",
+        "Load time analysis"
+      ]
+    },
+    {
+      "title": "Scalability",
+      "points": [
+        "Horizontal scaling capabilities",
+        "Database scaling considerations",
+        "Resource utilization",
+        "Bottleneck identification",
+        "Load handling strategies"
+      ]
+    },
+    {
+      "title": "Code Organization",
+      "points": [
+        "Project structure",
+        "Code modularity",
+        "Design patterns usage",
+        "Code reusability",
+        "Documentation quality"
+      ]
+    },
+    {
+      "title": "Testing Strategy",
+      "points": [
+        "Test coverage analysis",
+        "Testing methodologies",
+        "Integration test setup",
+        "E2E testing approach",
+        "Test automation"
+      ]
+    },
+    {
+      "title": "DevOps and Deployment",
+      "points": [
+        "CI/CD pipeline setup",
+        "Environment configuration",
+        "Deployment strategy",
+        "Monitoring and logging",
+        "Backup and recovery procedures"
+      ]
+    }
+  ],
+  "deliverables": [
+    "Comprehensive architecture review document",
+    "Security assessment report",
+    "Performance analysis and recommendations",
+    "Code quality evaluation",
+    "Scalability assessment",
+    "Prioritized improvement recommendations"
+  ],
+  "priority": "high",
+  "estimated_completion_time": "48 hours"
+}

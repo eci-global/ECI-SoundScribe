@@ -1,0 +1,30 @@
+# Echo AI Scribe App - FlowMaestro Configuration
+
+project_name: echo-ai-scribe-app
+description: "AI-powered transcription and note-taking SaaS application"
+
+enabled_roles:
+  - architect
+  - builder
+  - validator
+  - scribe
+  - security_checker
+  - performance_profiler
+
+github:
+  repository: geek187/echo-ai-scribe-app
+  branch: main
+  access_token: ${GITHUB_TOKEN}  # Set via environment variable
+
+supabase:
+  url: ${SUPABASE_URL}
+  key: ${SUPABASE_KEY}
+  project_id: ${SUPABASE_PROJECT_ID}
+
+messaging:
+  base_dir: orchestrator/messaging/echo-ai-scribe-app
+  heartbeat_interval: 60
+
+logging:
+  level: INFO
+  file: logs/orchestrator.log

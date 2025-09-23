@@ -1,0 +1,11 @@
+# This is a placeholder for the test audio file
+# In a real implementation, you would have an actual MP3 file here
+# For now, this serves as a marker that a test audio file should be placed here
+
+# To add a real test file:
+# 1. Record a short (10-30 second) audio clip
+# 2. Convert to MP3 format
+# 3. Place in cypress/fixtures/test-audio.mp3
+# 4. Remove this text file
+
+# The test file should be small (< 1MB) to keep tests fast

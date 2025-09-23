@@ -1,0 +1,28 @@
+# Redis URL Format Options - Try these in Render Environment Variables
+
+# Option 1: URL Encoded (current)
+redis://default:UP%23k6RxP23kUvYN@redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+# Option 2: Alternative format with rediss:// (SSL)
+rediss://default:UP%23k6RxP23kUvYN@redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+# Option 3: Without username prefix
+redis://:UP%23k6RxP23kUvYN@redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+# Option 4: Double encode the # character
+redis://default:UP%2523k6RxP23kUvYN@redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+# Option 5: Use Redis Cloud's connection string format
+redis://UP%23k6RxP23kUvYN@redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+=== RECOMMENDED ACTION ===
+1. Check your Redis Cloud dashboard for the exact connection string
+2. Copy it exactly as provided
+3. If it has special characters, URL encode them:
+   # → %23
+   @ → %40
+   : → %3A
+   ? → %3F
+
+=== QUICK TEST ===
+Try Option 2 first (rediss:// with SSL) as Redis Cloud often requires SSL connections.

@@ -1,0 +1,554 @@
+
+/* ECI AI Incubator Typography - Inter + Helvetica Neue stack */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* ECI AI Incubator Design System */
+
+@layer base {
+  :root {
+    --background: 0 0% 100%;
+    --foreground: 215 25% 20%; /* Darker for better contrast */
+
+    --card: 0 0% 100%;
+    --card-foreground: 215 25% 20%;
+
+    --popover: 0 0% 100%;
+    --popover-foreground: 215 25% 20%;
+
+    --primary: 356 90% 58%; /* ECI red */
+    --primary-foreground: 0 0% 100%;
+
+    --secondary: 210 40% 98%;
+    --secondary-foreground: 215 25% 20%;
+
+    --muted: 210 40% 98%;
+    --muted-foreground: 215 16% 46%;
+
+    --accent: 210 40% 98%;
+    --accent-foreground: 215 25% 20%;
+
+    --destructive: 356 90% 58%;
+    --destructive-foreground: 0 0% 100%;
+
+    --border: 214 32% 91%;
+    --input: 214 32% 91%;
+    --ring: 356 90% 58%;
+
+    --radius: 0.5rem;
+  }
+
+  .dark {
+    --background: 215 25% 15%;
+    --foreground: 0 0% 98%;
+
+    --card: 215 25% 15%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 215 25% 15%;
+    --popover-foreground: 0 0% 98%;
+
+    --primary: 356 90% 58%;
+    --primary-foreground: 215 25% 15%;
+
+    --secondary: 215 25% 18%;
+    --secondary-foreground: 0 0% 98%;
+
+    --muted: 215 25% 18%;
+    --muted-foreground: 215 20% 65%;
+
+    --accent: 215 25% 18%;
+    --accent-foreground: 0 0% 98%;
+
+    --destructive: 356 90% 58%;
+    --destructive-foreground: 0 0% 98%;
+
+    --border: 215 25% 18%;
+    --input: 215 25% 18%;
+    --ring: 356 90% 58%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    font-family: 'Inter', 'Helvetica Neue', 'Helvetica', 'Arial', sans-serif;
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+    font-feature-settings: "kern" 1;
+    font-kerning: normal;
+  }
+
+  /* Refined Typography Scale */
+  h1 {
+    font-size: 28px;
+    line-height: 1.2;
+    font-weight: 700;
+    color: #1e293b;
+    letter-spacing: -0.025em;
+  }
+
+  h2 {
+    font-size: 24px;
+    line-height: 1.3;
+    font-weight: 600;
+    color: #1e293b;
+    letter-spacing: -0.02em;
+  }
+
+  h3 {
+    font-size: 20px;
+    line-height: 1.4;
+    font-weight: 600;
+    color: #334155;
+    letter-spacing: -0.015em;
+  }
+
+  h4 {
+    font-size: 18px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: #334155;
+    letter-spacing: -0.01em;
+  }
+
+  h5 {
+    font-size: 16px;
+    line-height: 1.5;
+    font-weight: 500;
+    color: #475569;
+  }
+
+  h6 {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 500;
+    color: #475569;
+    text-transform: uppercase;
+    letter-spacing: 0.025em;
+  }
+
+  /* Body text variations */
+  .text-large {
+    font-size: 18px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-body {
+    font-size: 16px;
+    line-height: 1.6;
+    font-weight: 400;
+  }
+
+  .text-small {
+    font-size: 14px;
+    line-height: 1.5;
+    font-weight: 400;
+  }
+
+  .text-caption {
+    font-size: 12px;
+    line-height: 1.4;
+    font-weight: 500;
+    color: #64748b;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+  }
+}
+
+/* ECI AI Incubator design elements */
+.eci-shadow {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+.eci-shadow-lg {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+}
+
+.eci-shadow-subtle {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+}
+
+/* Professional, minimal animations */
+@keyframes fade-in {
+  0% {
+    opacity: 0;
+    transform: translateY(2px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes slide-in {
+  0% {
+    opacity: 0;
+    transform: translateX(-5px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.15s ease-out;
+}
+
+.animate-slide-in {
+  animation: slide-in 0.15s ease-out;
+}
+
+/* Line clamping for text truncation */
+.line-clamp-1 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+}
+
+.line-clamp-2 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+.line-clamp-3 {
+  overflow: hidden;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+}
+
+/* Professional scrollbar */
+::-webkit-scrollbar {
+  width: 4px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 2px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Focus styles for accessibility */
+.focus-ring {
+  @apply focus:outline-none focus:ring-2 focus:ring-eci-red/20 focus:ring-offset-2;
+}
+
+/* Professional button effects */
+.button-hover {
+  @apply transition-all duration-150 hover:shadow-sm;
+}
+
+/* Card hover effects */
+.card-hover {
+  @apply transition-all duration-150 hover:shadow-lg;
+}
+
+/* ECI AI Incubator button styles */
+.btn-primary {
+  background-color: #F5333F;
+  color: white;
+  border: none;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.btn-primary:hover {
+  background-color: #D12B37;
+  transform: translateY(-1px);
+  box-shadow: 0 2px 4px rgba(245, 51, 63, 0.2);
+}
+
+.btn-secondary {
+  background-color: #f8fafc;
+  color: #334155;
+  border: 1px solid #e2e8f0;
+  font-weight: 500;
+  font-size: 14px;
+  padding: 12px 20px;
+  border-radius: 8px;
+  transition: all 0.15s ease;
+}
+
+.btn-secondary:hover {
+  background-color: #f1f5f9;
+  border-color: #cbd5e1;
+}
+
+/* Call Brief Formatting Styles */
+.formatted-ai-text {
+  color: #374151;
+  line-height: 1.75;
+}
+
+.formatted-ai-text p {
+  margin-bottom: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.formatted-ai-text h4 {
+  margin-top: 0.75rem;
+  margin-bottom: 0.375rem;
+  font-weight: 600;
+  color: #111827;
+  font-size: 0.875rem;
+}
+
+.formatted-ai-text strong {
+  font-weight: 600;
+  color: #111827;
+}
+
+.formatted-ai-text ul,
+.formatted-ai-text ol {
+  margin-bottom: 0.75rem;
+  list-style-position: outside;
+  padding-left: 0;
+}
+
+.formatted-ai-text ul li {
+  list-style-type: disc;
+  margin-left: 1.5rem;
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+.formatted-ai-text ol li {
+  list-style-type: decimal;
+  margin-left: 1.5rem;
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.75;
+}
+
+/* Ensure proper bullet point rendering */
+.formatted-ai-text li::marker {
+  color: #6b7280;
+}
+
+/* Hover effects for list items */
+.formatted-ai-text li:hover {
+  background-color: #f8fafc;
+  border-radius: 0.375rem;
+  transition: background-color 0.2s ease;
+}
+
+/* Enhanced styling for key-value pairs */
+.formatted-ai-text div[class*="bg-slate-50"] {
+  border-left: 3px solid #e2e8f0;
+  transition: all 0.2s ease;
+}
+
+.formatted-ai-text div[class*="bg-slate-50"]:hover {
+  border-left-color: #cbd5e1;
+  background-color: #f1f5f9;
+}
+
+/* Enhanced styling for headers with content */
+.formatted-ai-text div[class*="bg-gradient-to-r"] {
+  box-shadow: 0 1px 3px 0 rgba(0, 0, 0, 0.1);
+  transition: all 0.2s ease;
+}
+
+.formatted-ai-text div[class*="bg-gradient-to-r"]:hover {
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
+}
+
+/* Enhanced bold text styling */
+.formatted-ai-text strong[class*="bg-yellow-50"] {
+  box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+  transition: all 0.2s ease;
+}
+
+.formatted-ai-text strong[class*="bg-yellow-50"]:hover {
+  background-color: #fef3c7;
+  transform: scale(1.02);
+}
+
+/* Smooth animations for content loading */
+.formatted-ai-text {
+  animation: fadeInUp 0.4s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced spacing and typography */
+.formatted-ai-text > *:first-child {
+  margin-top: 0;
+}
+
+.formatted-ai-text > *:last-child {
+  margin-bottom: 0;
+}
+
+/* Better visual hierarchy */
+.formatted-ai-text h4 + ul,
+.formatted-ai-text h4 + ol {
+  margin-top: 0.5rem;
+}
+
+/* Enhanced list spacing */
+.formatted-ai-text ul,
+.formatted-ai-text ol {
+  margin-top: 0.5rem;
+  margin-bottom: 1rem;
+}
+
+.call-brief-content {
+  max-height: 400px;
+  overflow-y: auto;
+  padding-right: 0.5rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #374151;
+}
+
+.call-brief-content::-webkit-scrollbar {
+  width: 6px;
+}
+
+.call-brief-content::-webkit-scrollbar-track {
+  background: #f8fafc;
+  border-radius: 3px;
+}
+
+.call-brief-content::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+  transition: background-color 0.2s ease;
+}
+
+.call-brief-content::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Enhanced styling for formatted content within CallBriefCard */
+.call-brief-content h4 {
+  margin-top: 1rem;
+  margin-bottom: 0.5rem;
+  font-weight: 600;
+  color: #1e293b;
+  font-size: 0.875rem;
+}
+
+.call-brief-content strong {
+  font-weight: 600;
+  color: #1e293b;
+}
+
+.call-brief-content ul,
+.call-brief-content ol {
+  margin-bottom: 0.75rem;
+  list-style-position: outside;
+  padding-left: 0;
+}
+
+.call-brief-content ul li {
+  list-style-type: disc;
+  margin-left: 1.25rem;
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.call-brief-content ol li {
+  list-style-type: decimal;
+  margin-left: 1.25rem;
+  margin-bottom: 0.375rem;
+  padding-left: 0.25rem;
+  font-size: 0.875rem;
+  line-height: 1.6;
+  color: #475569;
+}
+
+.call-brief-content li::marker {
+  color: #64748b;
+  font-weight: 500;
+}
+
+.call-brief-content p {
+  margin-bottom: 0.75rem;
+  color: #475569;
+}
+
+/* Add subtle animations for better UX */
+.call-brief-content {
+  animation: fadeInUp 0.3s ease-out;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+/* Enhanced scrollbar for redesigned outline panel */
+.outline-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: #cbd5e1 transparent;
+}
+
+.outline-scrollbar::-webkit-scrollbar {
+  width: 6px;
+}
+
+.outline-scrollbar::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+.outline-scrollbar::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 3px;
+}
+
+.outline-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+

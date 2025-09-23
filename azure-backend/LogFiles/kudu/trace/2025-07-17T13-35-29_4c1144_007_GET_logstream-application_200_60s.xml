@@ -1,0 +1,8 @@
+<step title="Incoming Request" date="2025-07-17T13:35:29.047" instance="4c1144" url="/logstream/application" method="GET" type="request" pid="768,1,20" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0" Accept-Encoding="identity" Authorization="Bas..." x-ms-client-request-id="e061efd5-6312-11f0-8348-8c1759c9123c" X-ARR-LOG-ID="e061efd5-6312-11f0-8348-8c1759c9123c" CLIENT-IP="124.120.207.32:54998" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/logstream/application" X-Client-IP="124.120.207.32" X-Client-Port="54998" >
+  <step title="Cleanup Xml Logs" date="2025-07-17T13:35:29.051" >
+    <step title="Cleanup Infos" date="2025-07-17T13:35:29.068" totalFiles="612" totalCleanup="452" /><!-- duration: 2ms -->
+  </step><!-- duration: 20ms -->
+  <step title="LogStreamHandlerMiddleware.Invoke" date="2025-07-17T13:35:29.077" /><!-- duration: 234ms -->
+  <step title="Error occurred" date="2025-07-17T13:36:29.312" type="error" text="LogStreamManager: ProcessRequest end" /><!-- duration: 4ms -->
+  <step title="Outgoing response" date="2025-07-17T13:36:29.344" type="response" statusCode="200" statusText="OK" /><!-- duration: 2ms -->
+</step><!-- duration: 60301ms -->

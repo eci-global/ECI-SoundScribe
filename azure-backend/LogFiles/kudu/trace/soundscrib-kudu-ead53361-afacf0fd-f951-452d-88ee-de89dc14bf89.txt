@@ -1,0 +1,1 @@
+2025-07-08T10:05:19  Startup Request, url: /api/vfs/site/wwwroot/package.json, method: GET, type: request, pid: 772,1,7, ScmType: LocalGit, SCM_DO_BUILD_DURING_DEPLOYMENT: true

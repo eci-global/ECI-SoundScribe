@@ -1,0 +1,20 @@
+<step title="Incoming Request" date="2025-07-04T16:46:52.292" instance="d52a4a" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="768,1,15" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="21750" x-ms-client-request-id="6a0acdb9-58f6-11f0-9550-8c1759c91239" x-ms-artifact-checksum="59c6a329c58b974d93424a8025f52f96a192aa0e86bce92d8b20817d5971d81a" X-ARR-LOG-ID="6a0acdb9-58f6-11f0-9550-8c1759c91239" CLIENT-IP="124.122.129.209:52249" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="124.122.129.209" X-Client-Port="52249" >
+  <step title="ZipPushDeploy" date="2025-07-04T16:46:53.164" >
+    <step title="ZipDeploy. Extract zip. Remote build." date="2025-07-04T16:46:53.174" /><!-- duration: 4ms -->
+    <step title="None repository commit" date="2025-07-04T16:46:53.185" >
+      <step title="Commit id: 6d0c295f-c789-49bf-9187-c982abd0b571" date="2025-07-04T16:46:53.187" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 2ms -->
+    </step><!-- duration: 8ms -->
+    <step title="Starting PushDeployAsync" date="2025-07-04T16:46:53.196" /><!-- duration: 2ms -->
+    <step title="Removing node_modules symlink" date="2025-07-04T16:46:53.236" >
+      <step title="Removing _del_node_modules symlink" date="2025-07-04T16:46:53.324" >
+        <step title="Writing artifact to /tmp/zipdeploy/69f8ae6e-e4d9-405d-9b22-1f9e7a125e89.zip" date="2025-07-04T16:46:53.419" >
+          <step title="Writing multipart request body to /tmp/zipdeploy/69f8ae6e-e4d9-405d-9b22-1f9e7a125e89.zip" date="2025-07-04T16:46:53.436" /><!-- duration: 2ms -->
+        </step><!-- duration: 124ms -->
+        <step title="Removing previous build artifact&apos;s manifest file" date="2025-07-04T16:46:53.564" >
+          <step title="Start deployment in the background" date="2025-07-04T16:46:53.603" >
+            <step title="Acquiring Deployment Lock" date="2025-07-04T16:46:53.649" /><!-- duration: 6ms -->
+            <step title="Acquired Deployment Lock" date="2025-07-04T16:46:53.710" /><!-- duration: 3ms -->
+          </step><!-- duration: 199ms -->
+        </step><!-- duration: 247ms -->
+        <step title="Outgoing response" date="2025-07-04T16:46:53.838" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 3ms -->
+      </step><!-- duration: 522ms -->

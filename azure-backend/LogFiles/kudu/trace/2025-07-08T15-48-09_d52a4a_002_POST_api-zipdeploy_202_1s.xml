@@ -1,0 +1,17 @@
+<step title="Incoming Request" date="2025-07-08T15:48:09.629" instance="d52a4a" url="/api/zipdeploy?isAsync=true" method="POST" type="request" pid="767,1,16" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="8225" x-ms-client-request-id="ec2fbf52-5c12-11f0-9bda-8c1759c91239" x-ms-artifact-checksum="416d2d49db143c1ab3cf06d913c4770cc91e3417aaee7c63c41a5bea087399c3" X-ARR-LOG-ID="ec2fbf52-5c12-11f0-9bda-8c1759c91239" CLIENT-IP="115.87.153.87:62411" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/zipdeploy?isAsync=true" X-Client-IP="115.87.153.87" X-Client-Port="62411" >
+  <step title="ZipPushDeploy" date="2025-07-08T15:48:10.289" >
+    <step title="ZipDeploy. Extract zip. Remote build." date="2025-07-08T15:48:10.319" /><!-- duration: 10ms -->
+    <step title="None repository commit" date="2025-07-08T15:48:10.347" >
+      <step title="Commit id: 5e6b7386-94f0-4106-9a32-ff0011f74f45" date="2025-07-08T15:48:10.356" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 3ms -->
+    </step><!-- duration: 15ms -->
+    <step title="Starting PushDeployAsync" date="2025-07-08T15:48:10.365" /><!-- duration: 2ms -->
+    <step title="Writing artifact to /tmp/zipdeploy/520f6026-23e5-4345-98d1-521c5199416f.zip" date="2025-07-08T15:48:10.378" >
+      <step title="Writing multipart request body to /tmp/zipdeploy/520f6026-23e5-4345-98d1-521c5199416f.zip" date="2025-07-08T15:48:10.382" /><!-- duration: 5ms -->
+    </step><!-- duration: 68ms -->
+    <step title="Start deployment in the background" date="2025-07-08T15:48:10.475" >
+      <step title="Acquiring Deployment Lock" date="2025-07-08T15:48:10.540" /><!-- duration: 10ms -->
+      <step title="Acquired Deployment Lock" date="2025-07-08T15:48:10.630" /><!-- duration: 16ms -->
+    </step><!-- duration: 276ms -->
+  </step><!-- duration: 473ms -->
+  <step title="Outgoing response" date="2025-07-08T15:48:10.789" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 4ms -->
+</step><!-- duration: 1167ms -->

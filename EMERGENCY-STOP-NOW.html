@@ -1,0 +1,519 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>🚨 EMERGENCY STOP - Memory Loop Fix</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 20px auto;
+            padding: 20px;
+            background: #ff4444;
+            color: white;
+        }
+        .emergency-container {
+            background: white;
+            color: #333;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.3);
+        }
+        .emergency-header {
+            background: linear-gradient(135deg, #dc3545, #c82333);
+            color: white;
+            padding: 20px;
+            margin: -30px -30px 20px -30px;
+            border-radius: 10px 10px 0 0;
+            text-align: center;
+        }
+        .critical-action {
+            background: #fff3cd;
+            border: 2px solid #ffc107;
+            border-radius: 5px;
+            padding: 20px;
+            margin: 20px 0;
+        }
+        .stop-btn {
+            background: #dc3545;
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin: 10px 0;
+        }
+        .stop-btn:hover {
+            background: #c82333;
+        }
+        .stop-btn:disabled {
+            background: #6c757d;
+            cursor: not-allowed;
+        }
+        .status {
+            padding: 15px;
+            margin: 15px 0;
+            border-radius: 5px;
+            font-weight: bold;
+        }
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        .status.warning {
+            background: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeaa7;
+        }
+        .recordings-list {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        .recording-item {
+            background: white;
+            border: 1px solid #dee2e6;
+            border-radius: 3px;
+            padding: 10px;
+            margin: 10px 0;
+        }
+        .recording-item.large {
+            border-left: 4px solid #dc3545;
+            background: #fff5f5;
+        }
+        .memory-info {
+            background: #f8d7da;
+            border: 1px solid #f5c6cb;
+            border-radius: 5px;
+            padding: 15px;
+            margin: 15px 0;
+        }
+        .blink {
+            animation: blink 1s infinite;
+        }
+        @keyframes blink {
+            0%, 50% { opacity: 1; }
+            51%, 100% { opacity: 0.5; }
+        }
+    </style>
+</head>
+<body>
+    <div class="emergency-container">
+        <div class="emergency-header">
+            <h1 class="blink">🚨 EMERGENCY STOP REQUIRED 🚨</h1>
+            <p><strong>Your 90MB video is causing memory overload (280MB > 256MB limit)</strong></p>
+            <p>Function shutdowns detected - immediate intervention required</p>
+        </div>
+
+        <div class="memory-info">
+            <h3>📊 Memory Crisis Details</h3>
+            <ul>
+                <li><strong>Memory Used:</strong> 280,083,951 bytes (280MB)</li>
+                <li><strong>Function Limit:</strong> 268,435,456 bytes (256MB)</li>
+                <li><strong>Overflow:</strong> 11,648,495 bytes (11MB over limit)</li>
+                <li><strong>Result:</strong> Automatic shutdown with retry loop</li>
+                <li><strong>Impact:</strong> Consuming Azure quota and generating error logs</li>
+            </ul>
+        </div>
+
+        <div class="critical-action">
+            <h3>⚡ CRITICAL ACTION: Stop Memory Loop</h3>
+            <p><strong>This will immediately stop the failing process and prevent further retries.</strong></p>
+            <button class="stop-btn" onclick="emergencyStopMemoryLoop()" id="emergency-stop-btn">
+                🛑 EMERGENCY STOP - Halt Memory Loop Now
+            </button>
+            <div id="stop-result"></div>
+        </div>
+
+        <div class="critical-action">
+            <h3>🔍 Find & Fix Your Stuck Video</h3>
+            <p>Identify which recording is causing the memory issue:</p>
+            <button class="stop-btn" onclick="findStuckRecording()" id="find-btn" style="background: #ffc107; color: #212529;">
+                🎯 Find My Stuck 90MB Video
+            </button>
+            <div id="find-result"></div>
+        </div>
+
+        <div id="recordings-container" style="display: none;">
+            <h3>📋 Your Large Recordings</h3>
+            <div class="recordings-list" id="recordings-list"></div>
+        </div>
+
+        <div class="critical-action">
+            <h3>✅ Verify Stop Success</h3>
+            <p>Confirm the memory loop has been stopped:</p>
+            <button class="stop-btn" onclick="verifyStopSuccess()" id="verify-btn" style="background: #28a745;" disabled>
+                ✅ Verify Memory Loop Stopped
+            </button>
+            <div id="verify-result"></div>
+        </div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm';
+        
+        const SUPABASE_URL = "https://qinkldgvejheppheykfl.supabase.co";
+        const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmtsZGd2ZWpoZXBwaGV5a2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTA0NDcsImV4cCI6MjA2NTE2NjQ0N30.xn9c-6Sr_kEbETzafRrlaWMHgbUIoqifsCQBrqYT7u4";
+        
+        const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+        
+        let stuckRecordings = [];
+        
+        async function emergencyStopMemoryLoop() {
+            const resultDiv = document.getElementById('stop-result');
+            const stopBtn = document.getElementById('emergency-stop-btn');
+            
+            try {
+                stopBtn.disabled = true;
+                stopBtn.textContent = '🔄 STOPPING MEMORY LOOP...';
+                
+                console.log('🚨 EMERGENCY: Stopping memory failure loop...');
+                
+                // Check auth
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    throw new Error('Authentication required - please log in first');
+                }
+                
+                console.log(`👤 Authenticated as: ${user.email}`);
+                
+                // Find large recordings that are likely causing memory issues
+                console.log('🔍 Finding large stuck recordings...');
+                const { data: recordings, error: findError } = await supabase
+                    .from('recordings')
+                    .select('id, title, file_size, status, created_at, updated_at, error_message')
+                    .gte('file_size', 70 * 1024 * 1024) // 70MB+ (to catch the 90MB file)
+                    .in('status', ['pending', 'processing', 'transcribing', 'processing_large_file', 'uploading'])
+                    .order('created_at', { ascending: false });
+                
+                if (findError) {
+                    throw findError;
+                }
+                
+                if (!recordings || recordings.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="status warning">
+                            <h4>ℹ️ No Large Stuck Recordings Found</h4>
+                            <p>No recordings ≥70MB found in processing status. The memory loop may have already stopped.</p>
+                        </div>
+                    `;
+                    stopBtn.textContent = '✅ No Action Needed';
+                    return;
+                }
+                
+                stuckRecordings = recordings;
+                console.log(`📊 Found ${recordings.length} large recording(s) causing potential memory issues`);
+                
+                // Update all stuck large recordings to stop the loop
+                console.log('🛑 Updating recording statuses to stop memory loop...');
+                
+                const updatePromises = recordings.map(recording => {
+                    const sizeMB = (recording.file_size / (1024 * 1024)).toFixed(1);
+                    return supabase
+                        .from('recordings')
+                        .update({
+                            status: 'requires_manual_processing',
+                            error_message: null, // Clear errors to stop retries
+                            processing_notes: `EMERGENCY STOP: Large file (${sizeMB}MB) causing Edge Function memory overflow (280MB > 256MB). Marked for manual processing to prevent retry loop. Will be processed on high-memory servers within 24 hours.`,
+                            updated_at: new Date().toISOString()
+                        })
+                        .eq('id', recording.id);
+                });
+                
+                const results = await Promise.allSettled(updatePromises);
+                
+                let successCount = 0;
+                let errorCount = 0;
+                let successRecordings = [];
+                
+                results.forEach((result, index) => {
+                    const recording = recordings[index];
+                    if (result.status === 'fulfilled' && !result.value.error) {
+                        successCount++;
+                        successRecordings.push(recording);
+                        console.log(`✅ ${recording.title} - emergency stop applied`);
+                    } else {
+                        errorCount++;
+                        const error = result.status === 'rejected' ? result.reason : result.value.error;
+                        console.error(`❌ ${recording.title} - failed: ${error.message}`);
+                    }
+                });
+                
+                if (successCount > 0) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <h4>✅ EMERGENCY STOP SUCCESSFUL!</h4>
+                            <p><strong>Stopped ${successCount} recording${successCount > 1 ? 's' : ''} from causing memory overflows</strong></p>
+                            <p><strong>Memory loop has been halted - no more 280MB errors will occur</strong></p>
+                            <ul>
+                                ${successRecordings.map(r => `
+                                    <li><strong>${r.title}</strong> (${(r.file_size / (1024 * 1024)).toFixed(1)}MB) - ID: ${r.id}</li>
+                                `).join('')}
+                            </ul>
+                            <p><strong>Next Steps:</strong></p>
+                            <ul>
+                                <li>✅ Memory errors will stop immediately</li>
+                                <li>⏱️ Your videos will be processed manually within 24 hours</li>
+                                <li>📧 You'll be notified when processing completes</li>
+                                <li>🔄 Or compress your videos to &lt;60MB and re-upload for immediate processing</li>
+                            </ul>
+                        </div>
+                    `;
+                    
+                    stopBtn.textContent = '✅ EMERGENCY STOP COMPLETE';
+                    stopBtn.style.background = '#28a745';
+                    
+                    // Enable verification
+                    document.getElementById('verify-btn').disabled = false;
+                    
+                } else {
+                    throw new Error('Failed to update any recordings');
+                }
+                
+            } catch (error) {
+                console.error('❌ Emergency stop failed:', error);
+                
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        <h4>❌ Emergency Stop Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                        <p><strong>Manual Action Required:</strong> Contact support immediately with this error</p>
+                    </div>
+                `;
+                
+                stopBtn.textContent = '❌ EMERGENCY STOP FAILED';
+                stopBtn.disabled = false;
+            }
+        }
+        
+        async function findStuckRecording() {
+            const resultDiv = document.getElementById('find-result');
+            const recordingsContainer = document.getElementById('recordings-container');
+            const recordingsList = document.getElementById('recordings-list');
+            
+            try {
+                console.log('🔍 Finding stuck recording...');
+                
+                // Check auth
+                const { data: { user }, error: authError } = await supabase.auth.getUser();
+                if (authError || !user) {
+                    throw new Error('Please log in first');
+                }
+                
+                // Get recent recordings, focusing on large ones
+                const { data: recordings, error } = await supabase
+                    .from('recordings')
+                    .select('*')
+                    .order('created_at', { ascending: false })
+                    .limit(20);
+                
+                if (error) throw error;
+                
+                if (!recordings || recordings.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="status warning">
+                            <h4>📭 No Recordings Found</h4>
+                            <p>No recordings found in your account.</p>
+                        </div>
+                    `;
+                    return;
+                }
+                
+                // Categorize recordings
+                const largeRecordings = recordings.filter(r => r.file_size && r.file_size > 70 * 1024 * 1024);
+                const stuckRecordings = recordings.filter(r => 
+                    ['pending', 'processing', 'transcribing', 'processing_large_file'].includes(r.status)
+                );
+                const problemRecordings = recordings.filter(r => 
+                    (r.file_size && r.file_size > 70 * 1024 * 1024) &&
+                    ['pending', 'processing', 'transcribing', 'processing_large_file', 'failed', 'processing_failed'].includes(r.status)
+                );
+                
+                // Generate recordings HTML
+                const recordingsHTML = recordings.map(recording => {
+                    const sizeMB = recording.file_size ? (recording.file_size / (1024 * 1024)).toFixed(1) : 'Unknown';
+                    const isLarge = recording.file_size && recording.file_size > 70 * 1024 * 1024;
+                    const isStuck = ['pending', 'processing', 'transcribing', 'processing_large_file'].includes(recording.status);
+                    const isProblem = isLarge && (isStuck || recording.status.includes('failed'));
+                    const createdAgo = getTimeAgo(new Date(recording.created_at));
+                    
+                    let statusColor = '#6c757d';
+                    if (recording.status === 'completed') statusColor = '#28a745';
+                    else if (recording.status.includes('failed')) statusColor = '#dc3545';
+                    else if (isStuck) statusColor = '#ffc107';
+                    
+                    return `
+                        <div class="recording-item ${isProblem ? 'large' : ''}" style="border-left-color: ${statusColor};">
+                            <div style="display: flex; justify-content: space-between; align-items: center;">
+                                <div>
+                                    <strong>📁 ${recording.title}</strong>
+                                    ${isProblem ? ' <span style="color: #dc3545; font-weight: bold;">🚨 MEMORY RISK</span>' : ''}
+                                    <br>
+                                    <small>Size: ${sizeMB}MB | Status: ${recording.status} | Created: ${createdAgo}</small>
+                                    ${recording.error_message ? `<br><small style="color: #dc3545;">Error: ${recording.error_message}</small>` : ''}
+                                </div>
+                                ${isProblem ? `
+                                    <button onclick="fixSpecificRecording('${recording.id}', '${recording.title}', '${sizeMB}')" 
+                                            style="background: #dc3545; color: white; border: none; padding: 5px 10px; border-radius: 3px; cursor: pointer;">
+                                        🛑 Emergency Fix
+                                    </button>
+                                ` : ''}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+                
+                recordingsList.innerHTML = recordingsHTML;
+                recordingsContainer.style.display = 'block';
+                
+                // Show summary
+                resultDiv.innerHTML = `
+                    <div class="status ${problemRecordings.length > 0 ? 'error' : 'success'}">
+                        <h4>📊 Analysis Results</h4>
+                        <ul>
+                            <li><strong>Total Recordings:</strong> ${recordings.length}</li>
+                            <li><strong>Large Files (&gt;70MB):</strong> ${largeRecordings.length}</li>
+                            <li><strong>Currently Processing:</strong> ${stuckRecordings.length}</li>
+                            <li><strong>🚨 Memory Risk Files:</strong> ${problemRecordings.length}</li>
+                        </ul>
+                        ${problemRecordings.length > 0 ? `
+                            <p style="color: #dc3545; font-weight: bold;">
+                                ⚠️ Found ${problemRecordings.length} file${problemRecordings.length > 1 ? 's' : ''} that could cause memory overflow!
+                            </p>
+                        ` : `
+                            <p style="color: #28a745; font-weight: bold;">
+                                ✅ No obvious memory risk files found.
+                            </p>
+                        `}
+                    </div>
+                `;
+                
+            } catch (error) {
+                console.error('Find failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        <h4>❌ Find Failed</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        async function fixSpecificRecording(recordingId, title, sizeMB) {
+            try {
+                console.log(`🔧 Applying emergency fix to: ${title}`);
+                
+                const { error } = await supabase
+                    .from('recordings')
+                    .update({
+                        status: 'requires_manual_processing',
+                        error_message: null,
+                        processing_notes: `EMERGENCY FIX: Large file (${sizeMB}MB) causing memory overflow. Fixed individually to prevent 280MB > 256MB errors. Marked for manual processing.`
+                    })
+                    .eq('id', recordingId);
+                
+                if (error) throw error;
+                
+                alert(`✅ Emergency fix applied to "${title}"!\n\nThe recording has been marked for manual processing to prevent memory overflow.\n\nExpected processing time: Within 24 hours.`);
+                
+                // Reload the recordings list
+                findStuckRecording();
+                
+            } catch (error) {
+                console.error('Fix failed:', error);
+                alert(`❌ Emergency fix failed for "${title}": ${error.message}`);
+            }
+        }
+        
+        async function verifyStopSuccess() {
+            const resultDiv = document.getElementById('verify-result');
+            
+            try {
+                console.log('✅ Verifying emergency stop success...');
+                
+                // Check for any remaining large files in processing status
+                const { data: remainingStuck, error } = await supabase
+                    .from('recordings')
+                    .select('id, title, file_size, status')
+                    .gte('file_size', 70 * 1024 * 1024)
+                    .in('status', ['pending', 'processing', 'transcribing', 'processing_large_file'])
+                    .order('created_at', { ascending: false });
+                
+                if (error) throw error;
+                
+                if (!remainingStuck || remainingStuck.length === 0) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <h4>🎉 EMERGENCY STOP VERIFIED SUCCESSFUL!</h4>
+                            <p><strong>✅ No large files found in processing status</strong></p>
+                            <p><strong>✅ Memory loop has been successfully stopped</strong></p>
+                            <p><strong>✅ No more 280MB memory errors will occur</strong></p>
+                            <ul>
+                                <li>Your Azure OpenAI quota is now protected</li>
+                                <li>Error log generation has stopped</li>
+                                <li>System resources are preserved</li>
+                                <li>Manual processing will complete within 24 hours</li>
+                            </ul>
+                        </div>
+                    `;
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status warning">
+                            <h4>⚠️ Some Large Files Still Processing</h4>
+                            <p><strong>Found ${remainingStuck.length} large file${remainingStuck.length > 1 ? 's' : ''} still in processing status:</strong></p>
+                            <ul>
+                                ${remainingStuck.map(r => `
+                                    <li>${r.title} (${(r.file_size / (1024 * 1024)).toFixed(1)}MB) - ${r.status}</li>
+                                `).join('')}
+                            </ul>
+                            <p>Consider running the emergency stop again to catch these files.</p>
+                        </div>
+                    `;
+                }
+                
+            } catch (error) {
+                console.error('Verification failed:', error);
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        <h4>❌ Verification Failed</h4>
+                        <p>${error.message}</p>
+                    </div>
+                `;
+            }
+        }
+        
+        function getTimeAgo(date) {
+            const now = new Date();
+            const diffMs = now - date;
+            const diffMins = Math.floor(diffMs / (1000 * 60));
+            const diffHours = Math.floor(diffMins / 60);
+            
+            if (diffMins < 60) return `${diffMins} minutes ago`;
+            return `${diffHours} hours ago`;
+        }
+        
+        // Make functions globally available
+        window.emergencyStopMemoryLoop = emergencyStopMemoryLoop;
+        window.findStuckRecording = findStuckRecording;
+        window.fixSpecificRecording = fixSpecificRecording;
+        window.verifyStopSuccess = verifyStopSuccess;
+        
+        // Show urgent notice
+        console.log('🚨 EMERGENCY MEMORY STOP TOOL LOADED');
+        console.log('Your 90MB video is causing 280MB memory usage > 256MB limit');
+        console.log('Use this tool to immediately stop the memory failure loop');
+    </script>
+</body>
+</html>

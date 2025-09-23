@@ -1,0 +1,44 @@
+{
+  "name": "echo-ai-background-worker",
+  "version": "1.0.0",
+  "description": "Background worker for processing large audio/video files with AI analysis",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js",
+    "test": "node test.js"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "dotenv": "^16.3.1",
+    "@supabase/supabase-js": "^2.50.1",
+    "multer": "^1.4.5-lts.1",
+    "axios": "^1.6.2",
+    "uuid": "^9.0.1",
+    "node-fetch": "^3.3.2",
+    "form-data": "^4.0.0",
+    "winston": "^3.11.0",
+    "bull": "^4.12.0",
+    "redis": "^4.6.10",
+    "stream-json": "^1.8.0",
+    "fluent-ffmpeg": "^2.1.2",
+    "ffmpeg-static": "^5.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2"
+  },
+  "keywords": [
+    "audio-processing",
+    "ai-transcription",
+    "background-worker",
+    "supabase",
+    "azure-openai"
+  ],
+  "author": "Echo AI Team",
+  "license": "MIT"
+}

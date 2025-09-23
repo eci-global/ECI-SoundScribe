@@ -1,0 +1,6 @@
+2025-07-08T10:24:44  Startup Request, url: /api/command, method: POST, type: request, pid: 767,1,15, SCM_DO_BUILD_DURING_DEPLOYMENT: true, ScmType: LocalGit
+2025-07-08T10:24:45      Error occurred, type: error, text: An error occurred trying to start process '/opt/Kudu/Scripts/starter.sh' with working directory '/home/site\wwwroot'. Invalid argument, stackTrace:    at System.Diagnostics.Process.ForkAndExecProcess(ProcessStartInfo startInfo, String resolvedFilename, String[] argv, String[] envp, String cwd, Boolean setCredentials, UInt32 userId, UInt32 groupId, UInt32[] groups, Int32& stdinFd, Int32& stdoutFd, Int32& stderrFd, Boolean usesTerminal, Boolean throwOnNoExec)
+   at System.Diagnostics.Process.StartCore(ProcessStartInfo startInfo)
+   at Kudu.Core.Commands.CommandExecutor.ExecuteCommandAsync(String command, String relativeWorkingDirectory) in /tmp/KuduLite/Kudu.Core/Commands/CommandExecutor.cs:line 151
+   at Kudu.Core.Commands.CommandExecutor.ExecuteCommand(String command, String workingDirectory) in /tmp/KuduLite/Kudu.Core/Commands/CommandExecutor.cs:line 78
+   at Kudu.Services.Commands.CommandController.ExecuteCommand(JObject input) in /tmp/KuduLite/Kudu.Services/Commands/CommandController.cs:line 44

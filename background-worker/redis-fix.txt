@@ -1,0 +1,19 @@
+# Redis URL Fix for Bull Queue Library
+
+# Bull library has strict URL parsing. Try these formats in Render:
+
+# Option 1: Standard Redis format (most compatible with Bull)
+redis://redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+# Then add separate environment variables:
+REDIS_PASSWORD=UP#k6RxP23kUvYN
+REDIS_USERNAME=default
+
+# Option 2: Simple format without special characters
+redis://redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938/0
+
+# Option 3: If SSL is required
+rediss://redis-14938.c263.us-east-1-2.ec2.redns.redis-cloud.com:14938
+
+# RECOMMENDED: Use Option 1 with separate password environment variable
+# This avoids URL parsing issues with special characters

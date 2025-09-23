@@ -1,0 +1,168 @@
+import { useState, useEffect } from 'react';
+import { useAuth } from '@/hooks/useAuth';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
+import type { Recording } from '@/types/recording';
+import { Json } from '@/integrations/supabase/types';
+
+export const useDashboard = () => {
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [recordings, setRecordings] = useState<Recording[]>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (user) {
+      fetchRecordings();
+      
+      // Set up real-time subscription for recordings
+      const channel = supabase
+        .channel('recordings-changes')
+        .on(
+          'postgres_changes',
+          {
+            event: '*',
+            schema: 'public',
+            table: 'recordings'
+          },
+          (payload) => {
+            console.log('Real-time update received:', payload);
+            
+            // Check if the recording belongs to the current user
+            const recordingUserId = (payload.new as any)?.user_id || (payload.old as any)?.user_id;
+            if (recordingUserId !== user.id) {
+              return; // Ignore updates for other users' recordings
+            }
+            
+            if (payload.eventType === 'INSERT') {
+              // Add new recording
+              setRecordings(prev => {
+                const newRecording = {
+                  ...payload.new,
+                  file_type: (payload.new as any).file_type as 'audio' | 'video',
+                  status: (payload.new as any).status as 'uploading' | 'processing' | 'completed' | 'failed' | 'transcribed' | 'transcription_failed'
+                } as Recording;
+                return [newRecording, ...prev];
+              });
+            } else if (payload.eventType === 'UPDATE') {
+              // Update existing recording
+              setRecordings(prev => prev.map(recording => 
+                recording.id === (payload.new as any).id 
+                  ? {
+                      ...payload.new,
+                      file_type: (payload.new as any).file_type as 'audio' | 'video',
+                      status: (payload.new as any).status as 'uploading' | 'processing' | 'completed' | 'failed' | 'transcribed' | 'transcription_failed'
+                    } as Recording
+                  : recording
+              ));
+            } else if (payload.eventType === 'DELETE') {
+              // Remove deleted recording
+              setRecordings(prev => prev.filter(recording => recording.id !== (payload.old as any).id));
+            }
+          }
+        )
+        .subscribe();
+
+      return () => {
+        channel.unsubscribe();
+      };
+    }
+  }, [user]);
+
+  const fetchRecordings = async () => {
+    try {
+      if (!user?.id) {
+        console.log('No user logged in, skipping recordings fetch');
+        setRecordings([]);
+        return;
+      }
+
+      console.log('Fetching recordings for user:', user.id);
+      
+      const { data, error } = await supabase
+        .from('recordings')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false });
+
+      if (error) {
+        console.error('Error fetching recordings:', error);
+        throw error;
+      }
+      
+      console.log('Fetched recordings:', data?.length || 0);
+      
+      // Cast the data to match our Recording interface with proper Json types
+      const typedRecordings: Recording[] = (data || []).map(record => ({
+        ...record,
+        file_type: record.file_type as 'audio' | 'video',
+        status: record.status as 'uploading' | 'processing' | 'completed' | 'failed' | 'transcribed' | 'transcription_failed',
+        coaching_evaluation: record.coaching_evaluation as Json,
+        ai_moments: record.ai_moments as Json,
+        ai_speaker_analysis: record.ai_speaker_analysis as Json,
+        ai_next_steps: record.ai_next_steps as Json,
+        ai_insights: record.ai_insights as Json,
+        transcription_metadata: record.transcription_metadata as Json
+      }));
+      
+      setRecordings(typedRecordings);
+    } catch (error) {
+      console.error('Error fetching recordings:', error);
+      toast({
+        title: "Error",
+        description: "Failed to load recordings",
+        variant: "destructive"
+      });
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const processRecording = async (recordingId: string) => {
+    try {
+      console.log('Starting processing for recording:', recordingId);
+      
+      const { data, error } = await supabase.functions.invoke('process-recording', {
+        body: { recording_id: recordingId }
+      });
+
+      if (error) {
+        console.error('Processing error:', error);
+        throw error;
+      }
+
+      if (data?.success) {
+        console.log('Processing completed for recording:', recordingId);
+        fetchRecordings();
+        
+        toast({
+          title: "Processing complete",
+          description: "Your recording has been transcribed and summarized"
+        });
+      }
+    } catch (error) {
+      console.error('Failed to process recording:', error);
+      
+      await supabase
+        .from('recordings')
+        .update({ status: 'failed' })
+        .eq('id', recordingId);
+      
+      fetchRecordings();
+      
+      toast({
+        title: "Processing failed",
+        description: "There was an error processing your recording",
+        variant: "destructive"
+      });
+    }
+  };
+
+  return {
+    recordings,
+    loading,
+    fetchRecordings,
+    processRecording,
+    user
+  };
+};

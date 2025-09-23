@@ -1,0 +1,53 @@
+<step title="Incoming Request" date="2025-07-09T09:29:02.536" instance="4c1144" url="/api/publish?type=zip" method="POST" type="request" pid="768,1,5" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0 (MSI)" Accept-Encoding="gzip, deflate" Authorization="Bas..." Cache-Control="no-cache" Content-Type="application/octet-stream" Content-Length="4195" x-ms-client-request-id="21a472d5-5ca7-11f0-9714-8c1759c91239" x-ms-artifact-checksum="26b953fb2aec0251715facc06c9f2ca7098e4eb4dcd36f2ce97f54cef3ae99b2" X-ARR-LOG-ID="21a472d5-5ca7-11f0-9714-8c1759c91239" CLIENT-IP="115.87.153.87:53935" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/publish?type=zip" X-Client-IP="115.87.153.87" X-Client-Port="53935" >
+  <step title="Cleanup Xml Logs" date="2025-07-09T09:29:02.541" >
+    <step title="Cleanup Infos" date="2025-07-09T09:29:02.561" totalFiles="500" totalCleanup="340" /><!-- duration: 4ms -->
+  </step><!-- duration: 26ms -->
+  <step title="OneDeploy" date="2025-07-09T09:29:02.600" >
+    <step title="None repository commit" date="2025-07-09T09:29:02.609" >
+      <step title="Commit id: 01c47ef3-f426-4a0b-81cd-e2851f201dee" date="2025-07-09T09:29:02.612" Message="N/A" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 4ms -->
+    </step><!-- duration: 10ms -->
+    <step title="Starting PushDeployAsync" date="2025-07-09T09:29:02.624" /><!-- duration: 3ms -->
+    <step title="Writing artifact to /tmp/zipdeploy/64807e04-b181-43ea-ac79-6b30eaac7e87.zip" date="2025-07-09T09:29:02.642" >
+      <step title="Writing multipart request body to /tmp/zipdeploy/64807e04-b181-43ea-ac79-6b30eaac7e87.zip" date="2025-07-09T09:29:02.645" /><!-- duration: 5ms -->
+    </step><!-- duration: 22ms -->
+    <step title="Attempting to fetch target branch HEAD" date="2025-07-09T09:29:02.673" /><!-- duration: 2ms -->
+    <step title="Acquiring Deployment Lock" date="2025-07-09T09:29:02.680" /><!-- duration: 5ms -->
+    <step title="Acquired Deployment Lock" date="2025-07-09T09:29:02.727" /><!-- duration: 4ms -->
+    <step title="Performing fetch based deployment" date="2025-07-09T09:29:02.742" >
+      <step title="Creating temporary deployment" date="2025-07-09T09:29:02.745" /><!-- duration: 65ms -->
+      <step title="Releasing Deployment Lock" date="2025-07-09T09:29:03.968" /><!-- duration: 9ms -->
+      <step title="Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/64807e04-b181-43ea-ac79-6b30eaac7e87.zip (0.00 MB) to /tmp/zipdeploy/extracted" date="2025-07-09T09:29:03.997" >
+        <step title="ChmodRecursive Process exited with total time taken in ms: 26" date="2025-07-09T09:29:04.034" /><!-- duration: 7ms -->
+      </step><!-- duration: 48ms -->
+      <step title="None repository commit" date="2025-07-09T09:29:04.051" >
+        <step title="Commit id: 01c47ef3-f426-4a0b-81cd-e2851f201dee" date="2025-07-09T09:29:04.055" Message="OneDeploy" AuthorName="N/A" AuthorEmail="N/A" /><!-- duration: 5ms -->
+      </step><!-- duration: 12ms -->
+      <step title="Deployment timer started" date="2025-07-09T09:29:06.070" >
+        <step title="DeploymentManager.Deploy(id:01c47ef3-f426-4a0b-81cd-e2851f201dee)" date="2025-07-09T09:29:06.081" >
+          <step title="Collecting changeset information" date="2025-07-09T09:29:06.102" /><!-- duration: 107ms -->
+          <step title="Updating submodules" date="2025-07-09T09:29:06.219" /><!-- duration: 1143ms -->
+          <step title="Determining deployment builder" date="2025-07-09T09:29:07.623" >
+            <step title="Builder is OryxBuilder" date="2025-07-09T09:29:07.636" /><!-- duration: 4ms -->
+          </step><!-- duration: 21ms -->
+          <step title="PreDeployment: context.CleanOutputPath False" date="2025-07-09T09:29:07.693" >
+            <step title="PreDeployment: context.OutputPath /home/site/wwwroot" date="2025-07-09T09:29:07.819" >
+              <step title="Building" date="2025-07-09T09:29:07.959" >
+                <step title="Executing external process" date="2025-07-09T09:29:08.297" type="process" path="bash" arguments="-c &quot;oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddbecb0dda0277 -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log ; exit $PIPESTATUS &quot;" /><!-- duration: 15199ms -->
+                <step title="Using GenericDeploymentLogParser" date="2025-07-09T09:29:24.023" /><!-- duration: 5ms -->
+                <step title="Modified file to trigger a restart of the app container." date="2025-07-09T09:29:25.275" /><!-- duration: 7ms -->
+                <step title="Skip function trigger and logicapp sync because function is not enabled." date="2025-07-09T09:29:25.287" /><!-- duration: 5ms -->
+                <step title="Purge deployment items" date="2025-07-09T09:29:26.355" >
+                  <step title="Remove 87456e8c-, Success, received at 07/08/2025 18:06:49" date="2025-07-09T09:29:26.416" /><!-- duration: 5ms -->
+                </step><!-- duration: 70ms -->
+              </step><!-- duration: 18537ms -->
+            </step><!-- duration: 18687ms -->
+            <step title="Cleaning up temp files" date="2025-07-09T09:29:26.511" /><!-- duration: 21ms -->
+            <step title="Cleaning up temp files" date="2025-07-09T09:29:26.536" /><!-- duration: 506ms -->
+            <step title="Reloading status file with latest updates" date="2025-07-09T09:29:27.106" >
+              <step title="WebHooksManager.PublishEventAsync: PostDeployment" date="2025-07-09T09:29:27.112" /><!-- duration: 45ms -->
+            </step><!-- duration: 56ms -->
+            <step title="Cleaning up temporary deployment - fetch deployment was successful" date="2025-07-09T09:29:27.169" /><!-- duration: 3ms -->
+          </step><!-- duration: 19578ms -->
+        </step><!-- duration: 21199ms -->
+        <step title="Outgoing response" date="2025-07-09T09:29:27.288" type="response" statusCode="200" statusText="OK" /><!-- duration: 5ms -->
+      </step><!-- duration: 21228ms -->

@@ -1,0 +1,28 @@
+services:
+  - type: web
+    name: echo-ai-background-worker
+    runtime: node
+    rootDir: background-worker
+    buildCommand: npm install
+    startCommand: npm start
+    envVars:
+      - key: NODE_ENV
+        value: production
+      - key: PORT
+        value: 10000
+      - key: WORKER_CONCURRENCY
+        value: 3
+      - key: MAX_FILE_SIZE_MB
+        value: 500
+      - key: CHUNK_SIZE_MB
+        value: 25
+      - key: PROCESSING_TIMEOUT_MS
+        value: 300000
+      - key: LOG_LEVEL
+        value: info
+      - key: HEALTH_CHECK_INTERVAL
+        value: 30000
+      # Add other environment variables through Render dashboard for security
+    healthCheckPath: /health
+    autoDeploy: true
+    plan: free  # or 'starter' for paid plan

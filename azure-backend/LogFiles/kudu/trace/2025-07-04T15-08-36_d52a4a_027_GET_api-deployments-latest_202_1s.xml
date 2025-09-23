@@ -1,0 +1,11 @@
+<step title="Incoming Request" date="2025-07-04T15:08:36.752" instance="d52a4a" url="/api/deployments/latest" method="GET" type="request" pid="772,1,56" Accept="*/*" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0" Accept-Encoding="gzip, deflate" Authorization="Bas..." x-ms-client-request-id="b727027e-58e8-11f0-b13a-8c1759c91239" X-ARR-LOG-ID="b727027e-58e8-11f0-b13a-8c1759c91239" CLIENT-IP="124.122.129.209:57842" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/api/deployments/latest" X-Client-IP="124.122.129.209" X-Client-Port="57842" >
+  <step title="Cleanup Xml Logs" date="2025-07-04T15:08:36.771" >
+    <step title="Cleanup Infos" date="2025-07-04T15:08:36.831" totalFiles="276" totalCleanup="116" /><!-- duration: 3ms -->
+  </step><!-- duration: 81ms -->
+  <step title="DeploymentService.GetResult" date="2025-07-04T15:08:36.879" >
+    <step title="DeploymentService.GetLatestDeployment" date="2025-07-04T15:08:36.882" >
+      <step title="DeploymentManager.GetResults" date="2025-07-04T15:08:36.890" /><!-- duration: 1153ms -->
+    </step><!-- duration: 1175ms -->
+  </step><!-- duration: 1194ms -->
+  <step title="Outgoing response" date="2025-07-04T15:08:38.133" type="response" statusCode="202" statusText="Accepted" /><!-- duration: 18ms -->
+</step><!-- duration: 1411ms -->

@@ -1,0 +1,12 @@
+<step title="Incoming Request" date="2025-07-08T16:35:23.070" instance="d52a4a" url="/dump" method="GET" type="request" pid="770,1,39" Host="soundscribe-backend.scm.azurewebsites.net" User-Agent="AZURECLI/2.66.0" Accept-Encoding="identity" Authorization="Bas..." x-ms-client-request-id="861c9fff-5c19-11f0-a6ad-8c1759c91239" X-ARR-LOG-ID="861c9fff-5c19-11f0-a6ad-8c1759c91239" CLIENT-IP="115.87.153.87:50403" X-SITE-DEPLOYMENT-ID="soundscribe-backend" WAS-DEFAULT-HOSTNAME="soundscribe-backend.scm.azurewebsites.net" X-Forwarded-Proto="https" X-AppService-Proto="https" X-Forwarded-TlsVersion="1.3" X-WAWS-Unencoded-URL="/dump" X-Client-IP="115.87.153.87" X-Client-Port="50403" >
+  <step title="Cleanup Xml Logs" date="2025-07-08T16:35:23.074" >
+    <step title="Cleanup Infos" date="2025-07-08T16:35:23.109" totalFiles="396" totalCleanup="236" /><!-- duration: 4ms -->
+  </step><!-- duration: 42ms -->
+  <step title="Error occurred" date="2025-07-08T16:35:39.253" type="error" text="Unable to open /home/LogFiles/kudu/trace/2025-07-08T16-34-26_d52a4a_002_GET_logstream_pending.xml, System.IO.FileNotFoundException: Could not find file &apos;/home/LogFiles/kudu/trace/2025-07-08T16-34-26_d52a4a_002_GET_logstream_pending.xml&apos;.
+File name: &apos;/home/LogFiles/kudu/trace/2025-07-08T16-34-26_d52a4a_002_GET_logstream_pending.xml&apos;
+   at Interop.ThrowExceptionForIoErrno(ErrorInfo errorInfo, String path, Boolean isDirError)
+   at Microsoft.Win32.SafeHandles.SafeFileHandle.Open(String fullPath, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, UnixFileMode openPermissions, Int64&amp; fileLength, UnixFileMode&amp; filePermissions, Boolean failForSymlink, Boolean&amp; wasSymlink, Func`4 createOpenException)
+   at System.IO.Strategies.OSFileStreamStrategy..ctor(String path, FileMode mode, FileAccess access, FileShare share, FileOptions options, Int64 preallocationSize, Nullable`1 unixCreateMode)
+   at Kudu.Core.Infrastructure.ZipArchiveExtensions.AddFileAsync(ZipArchive zipArchive, FileInfoBase file, ITracer tracer, String directoryNameInArchive) in /tmp/KuduLite/Kudu.Core/Infrastructure/ZipArchiveExtensions.cs:line 165" /><!-- duration: 8ms -->
+  <step title="Outgoing response" date="2025-07-08T16:35:39.514" type="response" statusCode="200" statusText="OK" /><!-- duration: 8ms -->
+</step><!-- duration: 16455ms -->

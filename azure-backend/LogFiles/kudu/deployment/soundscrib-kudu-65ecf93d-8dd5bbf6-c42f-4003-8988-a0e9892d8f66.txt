@@ -1,0 +1,101 @@
+2025-07-09T09:48:40  Fetching changes.
+2025-07-09T09:48:40    Starting  LocalZipHandler
+2025-07-09T09:48:40    Cleaning up temp folders from previous zip deployments and extracting pushed zip file /tmp/zipdeploy/51077115-c4e4-4d51-8a05-b19c1cce6a42.zip (0.02 MB) to /tmp/zipdeploy/extracted
+2025-07-09T09:48:43  Updating submodules.
+2025-07-09T09:48:43  Preparing deployment for commit id 'd4fce368-c'.
+2025-07-09T09:48:44  PreDeployment: context.CleanOutputPath False
+2025-07-09T09:48:44  PreDeployment: context.OutputPath /home/site/wwwroot
+2025-07-09T09:48:44  Repository path is /tmp/zipdeploy/extracted
+2025-07-09T09:48:44  Running oryx build...
+2025-07-09T09:48:44    Command: oryx build /tmp/zipdeploy/extracted -o /home/site/wwwroot --platform nodejs --platform-version 18 -p virtualenv_name= --log-file /tmp/build-debug.log  -i /tmp/8ddbecdcb187179 -p compress_node_modules=tar-gz | tee /tmp/oryx-build.log
+2025-07-09T09:48:45    Operation performed by Microsoft Oryx, https://github.com/Microsoft/Oryx
+2025-07-09T09:48:45    You can report issues at https://github.com/Microsoft/Oryx/issues
+2025-07-09T09:48:45    
+2025-07-09T09:48:45    Oryx Version: 0.2.20250611.1+0649de32f1279969c9023dd41b389cce4bb94493, Commit: 0649de32f1279969c9023dd41b389cce4bb94493, ReleaseTagName: 20250611.1
+2025-07-09T09:48:45    
+2025-07-09T09:48:45    Build Operation ID: 5220df3dd170d105
+2025-07-09T09:48:45    Repository Commit : d4fce368-ca77-4c2c-af9a-405beed51ac4
+2025-07-09T09:48:45    OS Type           : bullseye
+2025-07-09T09:48:45    Image Type        : githubactions
+2025-07-09T09:48:45    
+2025-07-09T09:48:45    Primary SDK Storage URL: https://oryx-cdn.microsoft.io
+2025-07-09T09:48:45    Backup SDK Storage URL: https://oryxsdks-cdn.azureedge.net
+2025-07-09T09:48:45    Detecting platforms...
+2025-07-09T09:48:45    External SDK provider is enabled.
+2025-07-09T09:48:45    Requesting metadata for platform nodejs from external SDK provider
+2025-07-09T09:48:45    Requesting metadata for platform nodejs from external SDK provider
+2025-07-09T09:48:45    Detected following platforms:
+2025-07-09T09:48:45      nodejs: 18.20.8
+2025-07-09T09:48:45    Detected the following frameworks: Express
+2025-07-09T09:48:46    
+2025-07-09T09:48:46    Using intermediate directory '/tmp/8ddbecdcb187179'.
+2025-07-09T09:48:46    
+2025-07-09T09:48:46    Copying files to the intermediate directory...
+2025-07-09T09:48:46    Done in 0 sec(s).
+2025-07-09T09:48:46    
+2025-07-09T09:48:46    Source directory     : /tmp/8ddbecdcb187179
+2025-07-09T09:48:46    Destination directory: /home/site/wwwroot
+2025-07-09T09:48:46    
+2025-07-09T09:48:46    Removing existing manifest file
+2025-07-09T09:48:46    Creating directory for command manifest file if it does not exist
+2025-07-09T09:48:46    Creating a manifest file...
+2025-07-09T09:48:46    Node Build Command Manifest file created.
+2025-07-09T09:48:46    
+2025-07-09T09:48:46    Found npm version spec to follow in package.json: '>=8.0.0'
+2025-07-09T09:48:46    Updating version of npm installed to meet the above version spec.
+2025-07-09T09:48:50    
+2025-07-09T09:48:50    removed 14 packages, and changed 100 packages in 4s
+2025-07-09T09:48:50    
+2025-07-09T09:48:50    25 packages are looking for funding
+2025-07-09T09:48:50      run `npm fund` for details
+2025-07-09T09:48:50    
+2025-07-09T09:48:50    
+2025-07-09T09:48:50    Using Node version:
+2025-07-09T09:48:50    v18.20.8
+2025-07-09T09:48:50    
+2025-07-09T09:48:50    Using Npm version:
+2025-07-09T09:48:50    10.9.3
+2025-07-09T09:48:50    
+2025-07-09T09:48:50    Running 'npm install'...
+2025-07-09T09:48:50    
+2025-07-09T09:49:19    npm warn deprecated multer@1.4.5-lts.2: Multer 1.x is impacted by a number of vulnerabilities, which have been patched in 2.x. You should upgrade to the latest 2.x version.
+2025-07-09T09:49:19    npm warn deprecated fluent-ffmpeg@2.1.3: Package no longer supported. Contact Support at https://www.npmjs.com/support for more info.
+2025-07-09T09:49:21    
+2025-07-09T09:49:21    > soundscribe-azure-backend@1.0.0 postinstall
+2025-07-09T09:49:21    > echo 'Dependencies installed. Azure App Service deployment ready.'
+2025-07-09T09:49:21    
+2025-07-09T09:49:21    Dependencies installed. Azure App Service deployment ready.
+2025-07-09T09:49:21    
+2025-07-09T09:49:21    added 157 packages, and audited 158 packages in 31s
+2025-07-09T09:49:21    
+2025-07-09T09:49:21    26 packages are looking for funding
+2025-07-09T09:49:21      run `npm fund` for details
+2025-07-09T09:49:21    
+2025-07-09T09:49:21    found 0 vulnerabilities
+2025-07-09T09:49:21    
+2025-07-09T09:49:21    Zipping existing node_modules folder...
+2025-07-09T09:49:26    Done in 5 sec(s).
+2025-07-09T09:49:26    Preparing output...
+2025-07-09T09:49:26    
+2025-07-09T09:49:27    Copying files to destination directory '/home/site/wwwroot'...
+2025-07-09T09:49:29    Done in 3 sec(s).
+2025-07-09T09:49:29    
+2025-07-09T09:49:29    Removing existing manifest file
+2025-07-09T09:49:29    Creating a manifest file...
+2025-07-09T09:49:29    Manifest file created.
+2025-07-09T09:49:29    Copying .ostype to manifest output directory.
+2025-07-09T09:49:29    
+2025-07-09T09:49:30    Done in 43 sec(s).
+2025-07-09T09:49:30  Running post deployment command(s)...
+2025-07-09T09:49:30  
+2025-07-09T09:49:30  Generating summary of Oryx build
+2025-07-09T09:49:30  Parsing the build logs
+2025-07-09T09:49:30  Found 0 issue(s)
+2025-07-09T09:49:30  
+2025-07-09T09:49:30  Build Summary :
+2025-07-09T09:49:31  ===============
+2025-07-09T09:49:31  Errors (0)
+2025-07-09T09:49:31  Warnings (0)
+2025-07-09T09:49:31  
+2025-07-09T09:49:31  Triggering container recycle for OneDeploy by adding/updating restartTrigger.txt to the site root path
+2025-07-09T09:49:31  Deployment successful. deployer = OneDeploy deploymentPath = OneDeploy

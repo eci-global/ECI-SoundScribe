@@ -1,0 +1,1 @@
+ALTER PUBLICATION supabase_realtime ADD TABLE recordings; ALTER TABLE recordings REPLICA IDENTITY FULL;

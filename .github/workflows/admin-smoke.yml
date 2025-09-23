@@ -1,0 +1,26 @@
+name: Admin Cypress Smoke
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  cypress-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - name: Install deps
+        run: npm ci
+      - name: Build
+        run: npm run build
+      - name: Run Cypress smoke
+        uses: cypress-io/github-action@v6
+        with:
+          start: npx vite preview --port 5173
+          wait-on: 'http://localhost:5173'
+          spec: cypress/e2e/admin-smoke.cy.ts

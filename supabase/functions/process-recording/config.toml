@@ -1,0 +1,12 @@
+verify_jwt = false
+
+[function]
+# Maximum timeout for processing large files
+# Requires Pro plan and approval from Supabase support
+timeout = 150  # 150 seconds (2.5 minutes)
+
+# Increase memory limit for large file processing
+memory = 512  # 512MB (up from 256MB default)
+
+# Optional: Runtime configuration
+runtime_version = "edge-runtime"
