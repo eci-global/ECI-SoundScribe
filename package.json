@@ -16,7 +16,6 @@
     "supabase": "npx supabase"
   },
   "dependencies": {
-    "@esbuild/win32-x64": "^0.25.10",
     "@headlessui/react": "^2.2.4",
     "@hookform/resolvers": "^3.9.0",
     "@radix-ui/react-accordion": "^1.2.0",
@@ -89,7 +88,6 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.9.0",
-    "@rollup/rollup-win32-x64-msvc": "^4.50.1",
     "@tailwindcss/typography": "^0.5.15",
     "@testing-library/jest-dom": "^6.1.4",
     "@testing-library/react": "^14.0.0",
