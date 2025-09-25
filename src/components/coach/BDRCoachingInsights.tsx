@@ -15,10 +15,12 @@ import {
   Lightbulb,
   Play,
   User,
-  Bot
+  Bot,
+  Pencil,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
+import EditScorecardModal from './EditScorecardModal';
 import {
   BDRScorecardEvaluation,
   BDRTrainingProgram,
@@ -26,6 +28,7 @@ import {
   BDR_SCORING_THRESHOLDS
 } from '@/types/bdr-training';
 import type { Recording } from '@/types/recording';
+import { toast } from 'sonner';
 
 interface BDRCoachingInsightsProps {
   recording: Recording;
@@ -36,6 +39,12 @@ interface BDRData {
   evaluation: BDRScorecardEvaluation | null;
   program: BDRTrainingProgram | null;
   loading: boolean;
+}
+
+interface EditingCriterion {
+  id: string;
+  score: number;
+  feedback: string;
 }
 
 const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({ 
@@ -49,11 +58,67 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
   });
   const [requesting, setRequesting] = useState(false);
   const [autoAnalysisTrigger, setAutoAnalysisTrigger] = useState(false);
+  const [editingCriterion, setEditingCriterion] = useState<EditingCriterion | null>(null);
+  const [isSaving, setIsSaving] = useState(false);
 
 
   useEffect(() => {
     loadBDRData();
   }, [recording.id]);
+
+  const handleSaveScore = async (criterionId: string, newScore: number, newFeedback: string) => {
+    if (!bdrData.evaluation) return;
+
+    setIsSaving(true);
+
+    // Create a deep copy of the criteria scores to avoid direct state mutation
+    const updatedCriteriaScores = JSON.parse(JSON.stringify(bdrData.evaluation.criteria_scores || bdrData.evaluation.criteriaScores || {}));
+
+    // Update the specific criterion being edited
+    if (updatedCriteriaScores[criterionId]) {
+      updatedCriteriaScores[criterionId].score = newScore;
+      updatedCriteriaScores[criterionId].feedback = newFeedback;
+    } else {
+      // Fallback for a new criterion, though the UI only supports editing
+      updatedCriteriaScores[criterionId] = { score: newScore, feedback: newFeedback, maxScore: 4 };
+    }
+
+    // Recalculate the overall score
+    const scores = Object.values(updatedCriteriaScores).map((s: any) => s.score);
+    const newOverallScore = scores.length > 0 ? scores.reduce((acc, score) => acc + score, 0) / scores.length : 0;
+
+    // Prepend a note to indicate manager review
+    let currentNotes = bdrData.evaluation.coaching_notes || bdrData.evaluation.coachingNotes || '';
+    const managerPrefix = 'Manager Assessment:';
+    if (!currentNotes.startsWith(managerPrefix)) {
+      currentNotes = `${managerPrefix}\n${currentNotes}`;
+    }
+
+    try {
+      const { data, error } = await supabase
+        .from('bdr_scorecard_evaluations')
+        .update({
+          criteria_scores: updatedCriteriaScores,
+          overall_score: newOverallScore,
+          coaching_notes: currentNotes,
+          updated_at: new Date().toISOString(),
+        })
+        .eq('id', bdrData.evaluation.id)
+        .select()
+        .single();
+
+      if (error) throw error;
+      
+      toast.success('Scorecard updated successfully!');
+    } catch (error) {
+      console.error('Error updating scorecard:', error);
+      toast.error('Failed to update scorecard.');
+    } finally {
+      setIsSaving(false);
+      setEditingCriterion(null);
+      loadBDRData();
+    }
+  };
 
   // Smart logic to determine if we should auto-trigger BDR analysis
   const shouldAutoTriggerAnalysis = (): boolean => {
@@ -430,6 +495,7 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
             {Object.entries(evaluation.criteria_scores || evaluation.criteriaScores || {}).map(([criteriaId, score]) => {
               const scoreValue = (score as any)?.score || 0;
               const maxScore = (score as any)?.maxScore || 4;
+              const feedback = (score as any)?.feedback || '';
               return (
                 <div key={criteriaId} className="flex items-center justify-between p-3 bg-white rounded border">
                   <div className="flex-1">
@@ -450,6 +516,13 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
                         )}>
                           {getScoreLabel(scoreValue)}
                         </span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          onClick={() => setEditingCriterion({ id: criteriaId, score: scoreValue, feedback })}
+                        >
+                          <Pencil className="h-4 w-4" />
+                        </Button>
                       </div>
                     </div>
                     <div className="flex items-center gap-2">
@@ -467,6 +540,22 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
             })}
           </div>
         </div>
+
+        {/* Edit Scorecard Modal */}
+        {editingCriterion && (
+          <EditScorecardModal
+            isOpen={!!editingCriterion}
+            onClose={() => setEditingCriterion(null)}
+            onSave={handleSaveScore}
+            isSaving={isSaving}
+            criterion={{
+              id: editingCriterion.id,
+              name: getCriteriaDisplayName(editingCriterion.id),
+              score: editingCriterion.score,
+              feedback: editingCriterion.feedback,
+            }}
+          />
+        )}
 
         {/* Key Insights */}
         {(evaluation.bdr_insights || evaluation.bdrInsights) && (
