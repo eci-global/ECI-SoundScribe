@@ -102,7 +102,7 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
           overall_score: newOverallScore,
           coaching_notes: currentNotes,
           updated_at: new Date().toISOString(),
-        })
+        } as any)
         .eq('id', bdrData.evaluation.id)
         .select()
         .single();
@@ -134,13 +134,13 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
     }
 
     // Don't auto-trigger if recording is still processing
-    if (recording.status === 'processing' || recording.status === 'queued') {
+    if (['uploading', 'processing_large_file', 'transcribing'].includes(recording.status as any)) {
       console.log('⏭️ Skipping auto-analysis: Recording still processing');
       return false;
     }
 
     // Don't auto-trigger on failed recordings
-    if (recording.status === 'failed' || recording.status === 'error') {
+    if (recording.status === 'failed' || recording.status === 'transcription_failed') {
       console.log('⏭️ Skipping auto-analysis: Recording in error state');
       return false;
     }
@@ -173,8 +173,8 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
       if (evaluations && evaluations.length > 0) {
         const evaluation = evaluations[0];
         setBdrData({
-          evaluation: evaluation as BDRScorecardEvaluation,
-          program: evaluation.bdr_training_programs as BDRTrainingProgram,
+          evaluation: evaluation as any,
+          program: evaluation.bdr_training_programs as any,
           loading: false
         });
       } else {
@@ -212,11 +212,11 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
       setRequesting(true);
 
       // Get available training programs
-      const { data: programs, error: programsError } = await supabase
+      const { data: programs, error: programsError } = (await supabase
         .from('bdr_training_programs')
-        .select('*')
+        .select('id')
         .eq('is_active', true)
-        .limit(1);
+        .limit(1)) as any;
 
       if (programsError || !programs || programs.length === 0) {
         alert('No active BDR training programs found. Please contact your administrator.');
@@ -293,8 +293,8 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
 
   const getCriteriaDisplayName = (criteriaId: string) => {
     // Use dynamic criteria from training program if available
-    if (program?.scorecard_criteria) {
-      const criterion = program.scorecard_criteria.find(c => c.id === criteriaId);
+    if (program?.scorecardCriteria) {
+      const criterion = program.scorecardCriteria.find(c => c.id === criteriaId);
       if (criterion?.name) {
         return criterion.name;
       }
