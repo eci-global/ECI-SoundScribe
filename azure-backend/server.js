@@ -1,156 +1,151 @@
-const express = require('express');
-const cors = require('cors');
-const dotenv = require('dotenv');
-const axios = require('axios');
-const FormData = require('form-data');
+// server-with-video-support.js
+import express from 'express';
+import { FileProcessor } from './processor.js';
+import { updateRecordingStatus } from './supabase.js';
+import dotenv from 'dotenv';
 
-// Load environment variables
 dotenv.config();
-
-console.log('🚀 Emergency Fix Server Starting...');
-console.log('📊 Port:', process.env.PORT || 3001);
 
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Simple Azure OpenAI configuration
-const azureConfig = {
-  endpoint: process.env.AZURE_OPENAI_TRANSCRIBE_ENDPOINT || process.env.AZURE_OPENAI_ENDPOINT,
-  apiKey: process.env.AZURE_OPENAI_TRANSCRIBE_API_KEY || process.env.AZURE_OPENAI_API_KEY,
-  transcribeDeployment: process.env.AZURE_OPENAI_TRANSCRIBE_DEPLOYMENT || 'gpt-4o-transcribe',
-  apiVersion: process.env.AZURE_OPENAI_API_VERSION || '2024-10-01-preview'
-};
+console.log('🚀 Video-Enabled Azure Backend Starting...');
+console.log('📊 Node version:', process.version);
+console.log('📊 Platform:', process.platform);
+console.log('📊 PORT env:', process.env.PORT);
 
-console.log('🔧 Azure Config:', {
-  hasEndpoint: !!azureConfig.endpoint,
-  hasApiKey: !!azureConfig.apiKey,
-  transcribeDeployment: azureConfig.transcribeDeployment
+// CORS setup - Allow Vercel deployments and other frontends
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  // Allow requests from localhost, Lovable, and Vercel deployments
+  if (!origin ||
+      origin.includes('localhost') ||
+      origin.includes('.lovable') ||
+      origin.includes('.vercel.app') ||
+      process.env.NODE_ENV === 'development') {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
 });
-
-// CORS setup
-const allowedOrigins = [
-  'http://localhost:3000',
-  'https://preview--echo-ai-scribe-app.lovable.app',
-  'https://echo-ai-scribe-app.lovable.app',
-  'https://f9827dbd-5df6-4d40-9bdf-efa5c5236ea6.lovableproject.com'
-];
-
-app.use(cors({
-  origin: (origin, callback) => {
-    if (!origin) return callback(null, true);
-    if (allowedOrigins.includes(origin)) return callback(null, true);
-    if (origin && origin.includes('.lovable')) return callback(null, true);
-    if (process.env.NODE_ENV === 'development' && origin && origin.includes('localhost')) {
-      return callback(null, true);
-    }
-    return callback(new Error('Not allowed by CORS'), false);
-  },
-  credentials: true
-}));
 
 app.use(express.json({ limit: '50mb' }));
 
-// Health check
+// Initialize the full processor with video support
+let processor;
+try {
+  processor = new FileProcessor();
+  console.log('✅ Full processor initialized with video support');
+} catch (error) {
+  console.error('❌ Failed to initialize processor:', error);
+  process.exit(1);
+}
+
+// Health check endpoint
 app.get('/health', (req, res) => {
   res.json({
     status: 'healthy',
     timestamp: new Date().toISOString(),
-    version: 'emergency-fix-1.0.0',
     port: PORT,
-    azureConfig: {
-      hasEndpoint: !!azureConfig.endpoint,
-      hasApiKey: !!azureConfig.apiKey
-    }
+    uptime: process.uptime(),
+    version: 'video-processing-1.0.0',
+    features: ['video-support', 'audio-extraction', 'chunking', 'compression']
   });
 });
 
 // Root endpoint
 app.get('/', (req, res) => {
   res.json({
-    message: 'Emergency Fix Azure Backend',
-    status: 'running',
+    message: 'Video-Enabled Azure Backend',
     timestamp: new Date().toISOString(),
-    note: 'Simplified version for debugging'
+    port: PORT,
+    features: ['video-support', 'audio-extraction', 'chunking', 'compression']
   });
 });
 
-// Simple transcription endpoint
-async function simpleTranscribe(audioData, filename) {
-  try {
-    const formData = new FormData();
-    formData.append('file', audioData, filename);
-    formData.append('response_format', 'json');
-    formData.append('temperature', '0');
-    
-    const url = `${azureConfig.endpoint}/openai/deployments/${azureConfig.transcribeDeployment}/audio/transcriptions?api-version=${azureConfig.apiVersion}`;
-    
-    const response = await axios.post(url, formData, {
-      headers: {
-        'api-key': azureConfig.apiKey,
-        ...formData.getHeaders()
-      },
-      timeout: 300000
-    });
-    
-    return { success: true, data: response.data };
-  } catch (error) {
-    return {
-      success: false,
-      error: error.message,
-      details: error.response?.data
-    };
-  }
-}
-
-// Process endpoint
+// Process audio/video endpoint with full processor
 app.post('/api/process-audio', async (req, res) => {
-  console.log('🎯 Process request received');
-  
+  console.log('🎯 Process-audio request received');
+  console.log('📊 Request body:', req.body);
+
   try {
-    const { recording_id, file_url } = req.body;
-    
+    const { recording_id, file_url, file_size, file_type } = req.body;
+
     if (!recording_id) {
       return res.status(400).json({
         success: false,
         error: 'recording_id is required'
       });
     }
-    
+
+    if (!file_url) {
+      return res.status(400).json({
+        success: false,
+        error: 'file_url is required'
+      });
+    }
+
+    const fileSizeMB = file_size ? (file_size / (1024 * 1024)).toFixed(1) : 'unknown';
+    console.log(`📥 Processing: recording=${recording_id}, size=${fileSizeMB}MB, type=${file_type || 'unknown'}`);
+
     // Return immediate response
     res.json({
       success: true,
-      message: 'Emergency fix processing started',
+      message: 'Processing started with video support',
       recordingId: recording_id,
       status: 'processing_started',
-      note: 'Simplified processing without FFmpeg'
+      file_size_mb: fileSizeMB,
+      file_type: file_type,
+      timestamp: new Date().toISOString(),
+      features: ['video-support', 'audio-extraction', 'chunking', 'compression']
     });
-    
-    // Simple background processing
+
+    console.log(`✅ Process request accepted for recording: ${recording_id}`);
+
+    // Start background processing using the full processor
     setImmediate(async () => {
       try {
-        console.log(`📥 Emergency processing for recording: ${recording_id}`);
-        
-        // Download file
-        const response = await axios.get(file_url, { 
-          responseType: 'arraybuffer',
-          timeout: 60000
+        console.log(`🚀 Starting full processor for ${recording_id}`);
+
+        // Update status to processing
+        await updateRecordingStatus(recording_id, 'processing', 0);
+
+        // Process with full processor (handles video files automatically)
+        const result = await processor.processRecording(recording_id, {
+          processingStrategy: 'standard',
+          enableVideoProcessing: true,
+          enableCompression: true,
+          enableChunking: true
         });
-        const audioBuffer = Buffer.from(response.data);
-        
-        // Simple transcription (no chunking)
-        const result = await simpleTranscribe(audioBuffer, `recording_${recording_id}.mp3`);
-        
+
         if (result.success) {
-          console.log(`✅ Emergency processing SUCCESS for ${recording_id}`);
+          console.log(`🎉 Processing completed successfully for ${recording_id}`);
+          await updateRecordingStatus(recording_id, 'completed', 100);
         } else {
-          console.log(`❌ Emergency processing FAILED for ${recording_id}:`, result.error);
+          throw new Error(`Processing failed: ${result.error}`);
         }
-        
+
       } catch (error) {
-        console.error(`💥 Emergency processing ERROR for ${recording_id}:`, error.message);
+        console.error(`💥 Processing failed for ${recording_id}:`, error.message);
+
+        // Update status to failed
+        try {
+          await updateRecordingStatus(recording_id, 'failed', 0, error.message);
+        } catch (dbError) {
+          console.error('❌ Failed to update error status:', dbError.message);
+        }
       }
     });
-    
+
   } catch (error) {
     console.error('❌ Process endpoint error:', error.message);
     res.status(500).json({
@@ -161,9 +156,25 @@ app.post('/api/process-audio', async (req, res) => {
 });
 
 // Start server
-app.listen(PORT, () => {
-  console.log(`✅ Emergency Fix Server running on port ${PORT}`);
-  console.log(`🔗 Health: https://soundscribe-backend.azurewebsites.net/health`);
+app.listen(PORT, (err) => {
+  if (err) {
+    console.error('❌ Failed to start server:', err);
+    process.exit(1);
+  }
+  console.log(`✅ Video-enabled server running on port ${PORT}`);
+  console.log(`🎬 Features: Video processing, audio extraction, chunking, compression`);
+  console.log(` Health check: http://localhost:${PORT}/health`);
 });
 
-module.exports = app;
+// Error handling
+process.on('uncaughtException', (err) => {
+  console.error(' Uncaught Exception:', err);
+  process.exit(1);
+});
+
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('💥 Unhandled Rejection at:', promise, 'reason:', reason);
+  process.exit(1);
+});
+
+console.log('✅ Video-enabled server setup completed'); 
