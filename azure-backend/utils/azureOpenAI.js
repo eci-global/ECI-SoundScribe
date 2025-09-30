@@ -17,9 +17,9 @@ export class AzureOpenAIClient {
     this.apiKey = process.env.AZURE_OPENAI_API_KEY;
     
     // Separate deployments for different operations
-    this.whisperEndpoint = this.endpoint;
-    this.whisperApiKey = this.apiKey;
-    this.whisperDeployment = process.env.AZURE_OPENAI_TRANSCRIBE_DEPLOYMENT || 'gpt-4o-transcribe';
+    this.whisperEndpoint = process.env.AZURE_OPENAI_WHISPER_ENDPOINT || this.endpoint;
+    this.whisperApiKey = process.env.AZURE_OPENAI_WHISPER_API_KEY || this.apiKey;
+    this.whisperDeployment = process.env.AZURE_OPENAI_WHISPER_DEPLOYMENT || 'whisper-1';
     this.gptDeployment = process.env.AZURE_OPENAI_GPT4O_DEPLOYMENT || 'gpt-4o';
 
     // Rate limiting configuration
@@ -32,13 +32,14 @@ export class AzureOpenAIClient {
     };
 
     if (!this.endpoint || !this.apiKey || !this.whisperDeployment || !this.gptDeployment) {
-      throw new Error('Azure OpenAI configuration missing. Please set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_TRANSCRIBE_DEPLOYMENT, and AZURE_OPENAI_GPT4O_DEPLOYMENT');
+      throw new Error('Azure OpenAI configuration missing. Please set AZURE_OPENAI_ENDPOINT, AZURE_OPENAI_API_KEY, AZURE_OPENAI_WHISPER_DEPLOYMENT, and AZURE_OPENAI_GPT4O_DEPLOYMENT');
     }
     
     console.log(`🤖 Azure OpenAI Client initialized with dual deployment strategy:`);
     console.log(`   Endpoint: ${this.endpoint}`);
-    console.log(`   Transcription Deployment: ${this.whisperDeployment} (gpt-4o-transcribe for audio)`);
-    console.log(`   Chat Deployment: ${this.gptDeployment} (gpt-4o for completions)`);
+    console.log(`   Whisper Endpoint: ${this.whisperEndpoint}`);
+    console.log(`   Transcription Deployment: ${this.whisperDeployment} (Whisper for audio)`);
+    console.log(`   Chat Deployment: ${this.gptDeployment} (GPT for completions)`);
     console.log(`   API Version: ${this.apiVersion}`);
     console.log(`   Strategy: Separate specialized deployments for optimal compatibility`);
   }
