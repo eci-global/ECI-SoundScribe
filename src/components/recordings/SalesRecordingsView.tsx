@@ -8,6 +8,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Checkbox } from '@/components/ui/checkbox';
 import {
   Play,
   Pause,
@@ -31,7 +32,8 @@ import {
   AlertTriangle,
   Layers,
   ChevronRight,
-  Zap
+  Zap,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow, differenceInDays, format, isToday, isYesterday } from 'date-fns';
@@ -80,6 +82,8 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
   });
   const [playingRecording, setPlayingRecording] = useState<Recording | null>(null);
   const [chatRecording, setChatRecording] = useState<Recording | null>(null);
+  const [selectedRecordings, setSelectedRecordings] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   const { handleComprehensiveDelete, isDeleting } = useComprehensiveDelete({
     onDeleteCompleted: () => {
@@ -342,6 +346,64 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
     }
   };
 
+  const handleSelectRecording = (recordingId: string) => {
+    setSelectedRecordings(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(recordingId)) {
+        newSet.delete(recordingId);
+      } else {
+        newSet.add(recordingId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRecordings.size === sortedRecordings.length) {
+      setSelectedRecordings(new Set());
+    } else {
+      setSelectedRecordings(new Set(sortedRecordings.map(r => r.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (bulkDeleting || selectedRecordings.size === 0) return;
+
+    setBulkDeleting(true);
+    try {
+      const recordingsToDelete = Array.from(selectedRecordings);
+      let deletedCount = 0;
+      let failedCount = 0;
+
+      for (const recordingId of recordingsToDelete) {
+        try {
+          await handleComprehensiveDelete(recordingId);
+          deletedCount++;
+        } catch (error) {
+          console.error(`Failed to delete recording ${recordingId}:`, error);
+          failedCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk deletion completed",
+        description: `Successfully deleted ${deletedCount} recordings${failedCount > 0 ? `, ${failedCount} failed` : ''}`,
+        variant: failedCount > 0 ? 'destructive' : 'default'
+      });
+
+      setSelectedRecordings(new Set());
+    } catch (error) {
+      console.error('Bulk delete failed:', error);
+      toast({
+        title: "Bulk delete failed",
+        description: "An error occurred during bulk deletion",
+        variant: "destructive"
+      });
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
+
   const handleClearFilters = () => {
     setFilters({
       search: '',
@@ -534,6 +596,47 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
           )}
         </section>
 
+        {/* Bulk Actions Bar */}
+        {selectedRecordings.size > 0 && (
+          <section className="sticky top-4 z-50">
+            <Card className="border-blue-200 bg-blue-50/90 backdrop-blur-sm shadow-lg">
+              <CardContent className="flex items-center justify-between p-4">
+                <div className="flex items-center gap-4">
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => setSelectedRecordings(new Set())}
+                    className="h-8 w-8 p-0"
+                  >
+                    <X className="h-4 w-4" />
+                  </Button>
+                  <span className="text-sm font-medium text-blue-900">
+                    {selectedRecordings.size} recording{selectedRecordings.size === 1 ? '' : 's'} selected
+                  </span>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={handleSelectAll}
+                    className="text-blue-700 border-blue-200 hover:bg-blue-100"
+                  >
+                    {selectedRecordings.size === sortedRecordings.length ? 'Deselect all' : 'Select all'}
+                  </Button>
+                </div>
+                <Button
+                  variant="destructive"
+                  size="sm"
+                  onClick={handleBulkDelete}
+                  disabled={bulkDeleting}
+                  className="gap-2"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  {bulkDeleting ? `Deleting ${selectedRecordings.size}...` : `Delete ${selectedRecordings.size}`}
+                </Button>
+              </CardContent>
+            </Card>
+          </section>
+        )}
+
         {(inProgressRecordings.length > 0 || failedRecordings.length > 0) && (
           <section className="grid gap-4 lg:grid-cols-2">
             {inProgressRecordings.length > 0 && (
@@ -690,6 +793,8 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
                       onDeleteRecording={handleDeleteRecording}
                       playingRecording={playingRecording}
                       isDeleting={isDeleting}
+                      selectedRecordings={selectedRecordings}
+                      onSelectRecording={handleSelectRecording}
                     />
                   ))
                 )}
@@ -710,6 +815,8 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
                     onDeleteRecording={handleDeleteRecording}
                     playingRecording={playingRecording}
                     isDeleting={isDeleting}
+                    selectedRecordings={selectedRecordings}
+                    onSelectRecording={handleSelectRecording}
                   />
                 )}
               </TabsContent>
@@ -820,6 +927,8 @@ interface RecordingListSectionProps {
   onDeleteRecording: (recording: Recording) => void;
   playingRecording: Recording | null;
   isDeleting: boolean;
+  selectedRecordings: Set<string>;
+  onSelectRecording: (recordingId: string) => void;
 }
 
 function RecordingListSection({
@@ -832,6 +941,8 @@ function RecordingListSection({
   onDeleteRecording,
   playingRecording,
   isDeleting,
+  selectedRecordings,
+  onSelectRecording,
 }: RecordingListSectionProps) {
   return (
     <div className="space-y-4">
@@ -853,6 +964,8 @@ function RecordingListSection({
             onDeleteRecording={onDeleteRecording}
             isPlaying={playingRecording?.id === recording.id}
             isDeleting={isDeleting}
+            isSelected={selectedRecordings.has(recording.id)}
+            onSelectRecording={onSelectRecording}
           />
         ))}
       </div>
@@ -868,6 +981,8 @@ interface RecordingListItemProps {
   onDeleteRecording: (recording: Recording) => void;
   isPlaying: boolean;
   isDeleting: boolean;
+  isSelected: boolean;
+  onSelectRecording: (recordingId: string) => void;
 }
 
 function RecordingListItem({
@@ -879,6 +994,8 @@ function RecordingListItem({
   onDeleteRecording,
   isPlaying,
   isDeleting,
+  isSelected,
+  onSelectRecording,
 }: RecordingListItemProps) {
   const summary = recording.ai_summary || recording.summary;
   const framework = (recording as any).primary_framework as string | undefined;
@@ -886,39 +1003,49 @@ function RecordingListItem({
 
   return (
     <Card
-      className="group border-slate-200 bg-white/80 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md"
-      onClick={() => onRecordingClick(recording)}
+      className={cn(
+        "group border-slate-200 bg-white/80 shadow-sm transition hover:-translate-y-0.5 hover:border-blue-200 hover:shadow-md",
+        isSelected && "border-blue-500 bg-blue-50/50"
+      )}
     >
       <CardContent className="flex flex-col gap-4 p-5">
         <div className="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
-          <div className="space-y-2">
-            <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">
-              {recording.file_type === 'video' ? (
-                <FileVideo className="h-4 w-4 text-slate-500" />
-              ) : (
-                <FileAudio className="h-4 w-4 text-slate-500" />
-              )}
-              <span className="line-clamp-1">{recording.title || 'Untitled recording'}</span>
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <Badge className={cn('text-xs capitalize border', getStatusBadgeClasses(recording.status))}>
-                {recording.status}
-              </Badge>
-              {framework && (
-                <Badge className={cn('text-xs border', getFrameworkBadgeClasses(framework))}>
-                  {framework}
+          <div className="flex items-start gap-3">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelectRecording(recording.id)}
+              className="mt-1"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="space-y-2 flex-1" onClick={() => onRecordingClick(recording)}>
+              <div className="flex flex-wrap items-center gap-2 text-sm font-semibold text-slate-900">
+                {recording.file_type === 'video' ? (
+                  <FileVideo className="h-4 w-4 text-slate-500" />
+                ) : (
+                  <FileAudio className="h-4 w-4 text-slate-500" />
+                )}
+                <span className="line-clamp-1">{recording.title || 'Untitled recording'}</span>
+              </div>
+              <div className="flex flex-wrap items-center gap-2">
+                <Badge className={cn('text-xs capitalize border', getStatusBadgeClasses(recording.status))}>
+                  {recording.status}
                 </Badge>
-              )}
-              {coachingScore && (
-                <span className={cn('inline-flex items-center gap-1 text-xs font-medium', coachingScore.color)}>
-                  <Star className="h-3 w-3" />
-                  {coachingScore.value.toFixed(1)}
-                </span>
+                {framework && (
+                  <Badge className={cn('text-xs border', getFrameworkBadgeClasses(framework))}>
+                    {framework}
+                  </Badge>
+                )}
+                {coachingScore && (
+                  <span className={cn('inline-flex items-center gap-1 text-xs font-medium', coachingScore.color)}>
+                    <Star className="h-3 w-3" />
+                    {coachingScore.value.toFixed(1)}
+                  </span>
+                )}
+              </div>
+              {recording.description && (
+                <p className="text-sm text-slate-500 line-clamp-2">{recording.description}</p>
               )}
             </div>
-            {recording.description && (
-              <p className="text-sm text-slate-500 line-clamp-2">{recording.description}</p>
-            )}
           </div>
           <div className="flex flex-wrap items-center gap-2">
             {recording.status === 'completed' && (
@@ -1039,6 +1166,8 @@ interface RecordingsTableProps {
   onDeleteRecording: (recording: Recording) => void;
   playingRecording: Recording | null;
   isDeleting: boolean;
+  selectedRecordings: Set<string>;
+  onSelectRecording: (recordingId: string) => void;
 }
 
 function RecordingsTable({
@@ -1050,6 +1179,8 @@ function RecordingsTable({
   onDeleteRecording,
   playingRecording,
   isDeleting,
+  selectedRecordings,
+  onSelectRecording,
 }: RecordingsTableProps) {
   const isPlaying = (recording: Recording) => playingRecording?.id === recording.id;
 
@@ -1059,6 +1190,22 @@ function RecordingsTable({
         <Table>
           <TableHeader className="bg-slate-50/60">
             <TableRow className="hover:bg-transparent">
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedRecordings.size === recordings.length && recordings.length > 0}
+                  onCheckedChange={() => {
+                    if (selectedRecordings.size === recordings.length) {
+                      recordings.forEach(r => onSelectRecording(r.id));
+                    } else {
+                      recordings.forEach(r => {
+                        if (!selectedRecordings.has(r.id)) {
+                          onSelectRecording(r.id);
+                        }
+                      });
+                    }
+                  }}
+                />
+              </TableHead>
               <TableHead>Recording</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Framework</TableHead>
@@ -1076,10 +1223,19 @@ function RecordingsTable({
               return (
                 <TableRow
                   key={recording.id}
-                  className="cursor-pointer transition hover:bg-slate-50"
-                  onClick={() => onRecordingClick(recording)}
+                  className={cn(
+                    "cursor-pointer transition hover:bg-slate-50",
+                    selectedRecordings.has(recording.id) && "bg-blue-50/50"
+                  )}
                 >
                   <TableCell>
+                    <Checkbox
+                      checked={selectedRecordings.has(recording.id)}
+                      onCheckedChange={() => onSelectRecording(recording.id)}
+                      onClick={(e) => e.stopPropagation()}
+                    />
+                  </TableCell>
+                  <TableCell onClick={() => onRecordingClick(recording)}>
                     <div className="flex items-center gap-3">
                       {recording.file_type === 'video' ? (
                         <FileVideo className="h-4 w-4 text-slate-500" />
@@ -1096,12 +1252,12 @@ function RecordingsTable({
                       </div>
                     </div>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => onRecordingClick(recording)}>
                     <Badge className={cn('text-xs capitalize border', getStatusBadgeClasses(recording.status))}>
                       {recording.status}
                     </Badge>
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => onRecordingClick(recording)}>
                     {framework ? (
                       <Badge className={cn('text-xs border', getFrameworkBadgeClasses(framework))}>
                         {framework}
@@ -1110,7 +1266,7 @@ function RecordingsTable({
                       <span className="text-xs text-slate-400">-</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => onRecordingClick(recording)}>
                     {coachingScore ? (
                       <span className={cn('inline-flex items-center gap-1 text-sm font-medium', coachingScore.color)}>
                         <Star className="h-3 w-3" />
@@ -1120,7 +1276,7 @@ function RecordingsTable({
                       <span className="text-xs text-slate-400">-</span>
                     )}
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => onRecordingClick(recording)}>
                     <LiveDuration
                       recordingId={recording.id}
                       className="text-sm text-slate-600"
@@ -1128,7 +1284,7 @@ function RecordingsTable({
                       fallbackDuration={recording.duration}
                     />
                   </TableCell>
-                  <TableCell>
+                  <TableCell onClick={() => onRecordingClick(recording)}>
                     <span className="text-sm text-slate-600">
                       {formatDistanceToNow(new Date(recording.created_at), { addSuffix: true })}
                     </span>

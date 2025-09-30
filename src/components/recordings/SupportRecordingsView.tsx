@@ -5,12 +5,13 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
-import { 
-  Play, 
+import { Checkbox } from '@/components/ui/checkbox';
+import {
+  Play,
   Pause,
-  MessageSquare, 
-  Calendar, 
-  Clock, 
+  MessageSquare,
+  Calendar,
+  Clock,
   Search,
   Filter,
   Grid3X3,
@@ -31,7 +32,8 @@ import {
   AlertTriangle,
   Eye,
   FileDown,
-  Trash2
+  Trash2,
+  X
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { formatDistanceToNow } from 'date-fns';
@@ -71,6 +73,8 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
   const [playingRecording, setPlayingRecording] = useState<Recording | null>(null);
   const [chatRecording, setChatRecording] = useState<Recording | null>(null);
   const [showMenu, setShowMenu] = useState<string | null>(null);
+  const [selectedRecordings, setSelectedRecordings] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
 
   // Delete functionality
   const { handleComprehensiveDelete, isDeleting } = useComprehensiveDelete({
@@ -208,6 +212,64 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
     }
   };
 
+  const handleSelectRecording = (recordingId: string) => {
+    setSelectedRecordings(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(recordingId)) {
+        newSet.delete(recordingId);
+      } else {
+        newSet.add(recordingId);
+      }
+      return newSet;
+    });
+  };
+
+  const handleSelectAll = () => {
+    if (selectedRecordings.size === filteredRecordings.length) {
+      setSelectedRecordings(new Set());
+    } else {
+      setSelectedRecordings(new Set(filteredRecordings.map(r => r.id)));
+    }
+  };
+
+  const handleBulkDelete = async () => {
+    if (bulkDeleting || selectedRecordings.size === 0) return;
+
+    setBulkDeleting(true);
+    try {
+      const recordingsToDelete = Array.from(selectedRecordings);
+      let deletedCount = 0;
+      let failedCount = 0;
+
+      for (const recordingId of recordingsToDelete) {
+        try {
+          await handleComprehensiveDelete(recordingId);
+          deletedCount++;
+        } catch (error) {
+          console.error(`Failed to delete recording ${recordingId}:`, error);
+          failedCount++;
+        }
+      }
+
+      toast({
+        title: "Bulk deletion completed",
+        description: `Successfully deleted ${deletedCount} recordings${failedCount > 0 ? `, ${failedCount} failed` : ''}`,
+        variant: failedCount > 0 ? 'destructive' : 'default'
+      });
+
+      setSelectedRecordings(new Set());
+    } catch (error) {
+      console.error('Bulk delete failed:', error);
+      toast({
+        title: "Bulk delete failed",
+        description: "An error occurred during bulk deletion",
+        variant: "destructive"
+      });
+    } finally {
+      setBulkDeleting(false);
+    }
+  };
+
   if (loading) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 flex items-center justify-center">
@@ -330,12 +392,53 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
             </div>
           </div>
 
+          {/* Bulk Actions Bar */}
+          {selectedRecordings.size > 0 && (
+            <div className="sticky top-4 z-50">
+              <Card className="border-indigo-200 bg-indigo-50/90 backdrop-blur-sm shadow-lg">
+                <CardContent className="flex items-center justify-between p-4">
+                  <div className="flex items-center gap-4">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setSelectedRecordings(new Set())}
+                      className="h-8 w-8 p-0"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                    <span className="text-sm font-medium text-indigo-900">
+                      {selectedRecordings.size} recording{selectedRecordings.size === 1 ? '' : 's'} selected
+                    </span>
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={handleSelectAll}
+                      className="text-indigo-700 border-indigo-200 hover:bg-indigo-100"
+                    >
+                      {selectedRecordings.size === filteredRecordings.length ? 'Deselect all' : 'Select all'}
+                    </Button>
+                  </div>
+                  <Button
+                    variant="destructive"
+                    size="sm"
+                    onClick={handleBulkDelete}
+                    disabled={bulkDeleting}
+                    className="gap-2"
+                  >
+                    <Trash2 className="h-4 w-4" />
+                    {bulkDeleting ? `Deleting ${selectedRecordings.size}...` : `Delete ${selectedRecordings.size}`}
+                  </Button>
+                </CardContent>
+              </Card>
+            </div>
+          )}
+
           {/* Recordings Content */}
           {filteredRecordings.length === 0 ? (
             <EmptyState onUploadClick={handleUploadClick} hasRecordings={supportRecordings.length > 0} />
           ) : viewMode === 'grid' ? (
-            <RecordingsGrid 
-              recordings={filteredRecordings} 
+            <RecordingsGrid
+              recordings={filteredRecordings}
               onRecordingClick={handleRecordingClick}
               onPlayRecording={handlePlayRecording}
               onChatWithRecording={handleChatWithRecording}
@@ -345,10 +448,12 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
               showMenu={showMenu}
               setShowMenu={setShowMenu}
               isDeleting={isDeleting}
+              selectedRecordings={selectedRecordings}
+              onSelectRecording={handleSelectRecording}
             />
           ) : (
-            <SupportRecordingsTable 
-              recordings={filteredRecordings} 
+            <SupportRecordingsTable
+              recordings={filteredRecordings}
               onRecordingClick={handleRecordingClick}
               onPlayRecording={handlePlayRecording}
               onChatWithRecording={handleChatWithRecording}
@@ -358,6 +463,8 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
               showMenu={showMenu}
               setShowMenu={setShowMenu}
               isDeleting={isDeleting}
+              selectedRecordings={selectedRecordings}
+              onSelectRecording={handleSelectRecording}
             />
           )}
       </div>
@@ -401,10 +508,12 @@ interface SupportRecordingsTableProps {
   showMenu: string | null;
   setShowMenu: (id: string | null) => void;
   isDeleting: boolean;
+  selectedRecordings: Set<string>;
+  onSelectRecording: (recordingId: string) => void;
 }
 
-function SupportRecordingsTable({ 
-  recordings, 
+function SupportRecordingsTable({
+  recordings,
   onRecordingClick,
   onPlayRecording,
   onChatWithRecording,
@@ -413,7 +522,9 @@ function SupportRecordingsTable({
   playingRecording,
   showMenu,
   setShowMenu,
-  isDeleting
+  isDeleting,
+  selectedRecordings,
+  onSelectRecording
 }: SupportRecordingsTableProps) {
   const getStatusColor = (status: string) => {
     switch (status) {
@@ -501,6 +612,22 @@ function SupportRecordingsTable({
         <Table>
           <TableHeader>
             <TableRow>
+              <TableHead className="w-[50px]">
+                <Checkbox
+                  checked={selectedRecordings.size === recordings.length && recordings.length > 0}
+                  onCheckedChange={() => {
+                    if (selectedRecordings.size === recordings.length) {
+                      recordings.forEach(r => onSelectRecording(r.id));
+                    } else {
+                      recordings.forEach(r => {
+                        if (!selectedRecordings.has(r.id)) {
+                          onSelectRecording(r.id);
+                        }
+                      });
+                    }
+                  }}
+                />
+              </TableHead>
               <TableHead>Recording</TableHead>
               <TableHead>Status</TableHead>
               <TableHead>Satisfaction</TableHead>
@@ -512,12 +639,21 @@ function SupportRecordingsTable({
           </TableHeader>
           <TableBody>
             {recordings.map((recording) => (
-              <TableRow 
+              <TableRow
                 key={recording.id}
-                className="cursor-pointer hover:bg-gray-50"
-                onClick={() => onRecordingClick(recording)}
+                className={cn(
+                  "cursor-pointer hover:bg-gray-50",
+                  selectedRecordings.has(recording.id) && "bg-indigo-50/50"
+                )}
               >
                 <TableCell>
+                  <Checkbox
+                    checked={selectedRecordings.has(recording.id)}
+                    onCheckedChange={() => onSelectRecording(recording.id)}
+                    onClick={(e) => e.stopPropagation()}
+                  />
+                </TableCell>
+                <TableCell onClick={() => onRecordingClick(recording)}>
                   <div className="flex items-center gap-3">
                     {recording.file_type === 'video' ? (
                       <FileVideo className="w-4 h-4 text-gray-500 flex-shrink-0" />
@@ -536,22 +672,22 @@ function SupportRecordingsTable({
                     </div>
                   </div>
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => onRecordingClick(recording)}>
                   <Badge className={cn('text-xs border', getStatusColor(recording.status))}>
                     {recording.status}
                   </Badge>
                 </TableCell>
-                <TableCell>{getSatisfactionCell(recording)}</TableCell>
-                <TableCell>{getEscalationCell(recording)}</TableCell>
-                <TableCell>
-                  <LiveDuration 
+                <TableCell onClick={() => onRecordingClick(recording)}>{getSatisfactionCell(recording)}</TableCell>
+                <TableCell onClick={() => onRecordingClick(recording)}>{getEscalationCell(recording)}</TableCell>
+                <TableCell onClick={() => onRecordingClick(recording)}>
+                  <LiveDuration
                     recordingId={recording.id}
                     className="text-sm text-gray-600"
                     showIcon={false}
                     fallbackDuration={recording.duration}
                   />
                 </TableCell>
-                <TableCell>
+                <TableCell onClick={() => onRecordingClick(recording)}>
                   <span className="text-sm text-gray-600">
                     {formatDistanceToNow(new Date(recording.created_at), { addSuffix: true })}
                   </span>
@@ -711,10 +847,12 @@ interface RecordingsGridProps {
   showMenu: string | null;
   setShowMenu: (id: string | null) => void;
   isDeleting: boolean;
+  selectedRecordings: Set<string>;
+  onSelectRecording: (recordingId: string) => void;
 }
 
-function RecordingsGrid({ 
-  recordings, 
+function RecordingsGrid({
+  recordings,
   onRecordingClick,
   onPlayRecording,
   onChatWithRecording,
@@ -723,7 +861,9 @@ function RecordingsGrid({
   playingRecording,
   showMenu,
   setShowMenu,
-  isDeleting
+  isDeleting,
+  selectedRecordings,
+  onSelectRecording
 }: RecordingsGridProps) {
   return (
     <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
@@ -740,6 +880,8 @@ function RecordingsGrid({
           showMenu={showMenu === recording.id}
           setShowMenu={setShowMenu}
           isDeleting={isDeleting}
+          isSelected={selectedRecordings.has(recording.id)}
+          onSelectRecording={onSelectRecording}
         />
       ))}
     </div>
@@ -758,10 +900,12 @@ interface SupportRecordingCardProps {
   showMenu: boolean;
   setShowMenu: (id: string | null) => void;
   isDeleting: boolean;
+  isSelected: boolean;
+  onSelectRecording: (recordingId: string) => void;
 }
 
-function SupportRecordingCard({ 
-  recording, 
+function SupportRecordingCard({
+  recording,
   onClick,
   onPlayRecording,
   onChatWithRecording,
@@ -770,7 +914,9 @@ function SupportRecordingCard({
   isPlaying,
   showMenu,
   setShowMenu,
-  isDeleting
+  isDeleting,
+  isSelected,
+  onSelectRecording
 }: SupportRecordingCardProps) {
   // Get support analysis
   const getSupportAnalysis = () => {
@@ -876,14 +1022,14 @@ function SupportRecordingCard({
   };
 
   return (
-    <Card 
+    <Card
       className={cn(
         'group relative overflow-hidden transition-all duration-300 cursor-pointer',
         'bg-white hover:bg-gray-50/50',
         'border border-gray-200 hover:border-indigo-300',
-        'hover:shadow-lg hover:-translate-y-0.5'
+        'hover:shadow-lg hover:-translate-y-0.5',
+        isSelected && "border-indigo-500 bg-indigo-50/50"
       )}
-      onClick={onClick}
     >
       {/* Status indicator */}
       <div className={cn(
@@ -896,17 +1042,24 @@ function SupportRecordingCard({
 
       <CardHeader className="pb-3">
         <div className="flex items-start justify-between gap-3">
-          <div className="flex-1 min-w-0">
-            <div className="flex items-center gap-2 mb-2">
-              {recording.file_type === 'video' ? (
-                <FileVideo className="w-4 h-4 text-gray-500" />
-              ) : (
-                <FileAudio className="w-4 h-4 text-gray-500" />
-              )}
-              <CardTitle className="text-base font-semibold line-clamp-1">
-                {recording.title || 'Untitled Recording'}
-              </CardTitle>
-            </div>
+          <div className="flex items-start gap-3 flex-1 min-w-0">
+            <Checkbox
+              checked={isSelected}
+              onCheckedChange={() => onSelectRecording(recording.id)}
+              className="mt-1"
+              onClick={(e) => e.stopPropagation()}
+            />
+            <div className="flex-1 min-w-0" onClick={onClick}>
+              <div className="flex items-center gap-2 mb-2">
+                {recording.file_type === 'video' ? (
+                  <FileVideo className="w-4 h-4 text-gray-500" />
+                ) : (
+                  <FileAudio className="w-4 h-4 text-gray-500" />
+                )}
+                <CardTitle className="text-base font-semibold line-clamp-1">
+                  {recording.title || 'Untitled Recording'}
+                </CardTitle>
+              </div>
             
             {/* Badges */}
             <div className="flex items-center gap-2 mb-2 flex-wrap">
@@ -916,10 +1069,11 @@ function SupportRecordingCard({
               {getSatisfactionBadge()}
             </div>
 
-            {/* Support Metrics */}
-            <div className="flex items-center gap-3 text-xs">
-              {getEscalationRisk()}
-              {getSERVQUALScore()}
+              {/* Support Metrics */}
+              <div className="flex items-center gap-3 text-xs">
+                {getEscalationRisk()}
+                {getSERVQUALScore()}
+              </div>
             </div>
           </div>
 
