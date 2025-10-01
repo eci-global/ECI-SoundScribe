@@ -14,6 +14,30 @@ console.log('📊 Node version:', process.version);
 console.log('📊 Platform:', process.platform);
 console.log('📊 PORT env:', process.env.PORT);
 
+// CORS setup - Allow Vercel deployments and other frontends
+app.use((req, res, next) => {
+  const origin = req.headers.origin;
+
+  // Allow requests from localhost, Lovable, and Vercel deployments
+  if (!origin ||
+      origin.includes('localhost') ||
+      origin.includes('.lovable') ||
+      origin.includes('.vercel.app') ||
+      process.env.NODE_ENV === 'development') {
+    res.header('Access-Control-Allow-Origin', origin || '*');
+  }
+
+  res.header('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+  res.header('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept, Authorization');
+  res.header('Access-Control-Allow-Credentials', 'true');
+
+  if (req.method === 'OPTIONS') {
+    return res.sendStatus(200);
+  }
+
+  next();
+});
+
 app.use(express.json({ limit: '50mb' }));
 
 // Initialize the full processor with video support

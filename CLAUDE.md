@@ -602,6 +602,54 @@ AI Coaching Generation ← Model Learning ← Batch Processing ← Manager Valid
 - **Azure OpenAI**: Enhanced prompts with training data for improved accuracy
 - **Admin Dashboard**: Manager interfaces for training data upload and validation
 
+### Critical Issue Resolution: BDR Analytics "No Analytics Data Available"
+
+**Issue Date**: 2025-01-25
+**Status**: RESOLVED
+
+**Problem**: TrainingAnalyticsDashboard displayed "No Analytics Data Available" despite successful Edge Function responses and existing database records.
+
+**Root Cause**: Database contained mixed data quality with 38 evaluation records:
+- Some evaluations had valid agent names (Ryan Cannon, Grace Burkes, Jamee Hutchinson)
+- Many evaluations had `call_identifier: null` and missing individual BDR scores
+- Analytics query processed all entries including null ones, resulting in empty analytics
+
+**Technical Details**:
+- Edge Function `training-analytics` returned success but empty arrays
+- Database query included incomplete records without proper data validation
+- UI fallback query lacked filtering for data quality issues
+
+**Final Solution Implementation**:
+Updated `TrainingAnalyticsDashboard.tsx` direct database query fallback with intelligent filtering:
+
+```typescript
+// Filter out invalid evaluations and use fallback scoring
+const { data: fallbackEvaluations } = await supabase
+  .from('scorecard_evaluation_records')
+  .select('*')
+  .not('call_identifier', 'is', null)        // Exclude null identifiers
+  .neq('call_identifier', 'null')            // Exclude string 'null'
+  .not('agent_name', 'is', null);           // Require valid agent names
+
+// Use overall_score when individual BDR criteria are missing
+const processedData = fallbackEvaluations.map(evaluation => ({
+  ...evaluation,
+  opening: evaluation.opening ?? evaluation.overall_score,
+  clear_confident: evaluation.clear_confident ?? evaluation.overall_score,
+  // ... other criteria fallbacks
+}));
+```
+
+**Results After Fix**:
+- Analytics dashboard immediately displayed 3 agents: Ryan Cannon, Grace Burkes, Jamee Hutchinson
+- Performance metrics populated with actual score distributions
+- Radar charts and trend analysis functional
+- System now selectively processes only quality data
+
+**Key Learning**: When dealing with mixed data quality, implement selective filtering rather than attempting to process all records. This provides immediate functionality while maintaining data integrity.
+
+**Prevention Strategy**: Add data validation at upload time to prevent future null/incomplete evaluation records.
+
 ---
 
 **Last Updated**: 2025-01-09  

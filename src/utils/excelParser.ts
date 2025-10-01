@@ -103,6 +103,7 @@ export interface ParsedScorecardData {
   callDate: string;
   durationMinutes?: number;
   overallScore?: number; // Overall/average score (critical for coaching template format)
+  agentName?: string; // Agent name from scorecard B2 cell
 
   // Individual scores (for backward compatibility)
   openingScore: number;
@@ -509,6 +510,11 @@ async function detectFieldsWithContentAnalysis(data: any[][], spatial: SpatialAn
       keywords: ['notes', 'comments', 'feedback', 'manager'],
       contentPattern: /.{10,}/,
       priority: 3
+    },
+    agentName: {
+      keywords: ['agent', 'name', 'rep', 'representative', 'user', 'employee'],
+      contentPattern: /^[A-Za-z\s]{2,50}$/,
+      priority: 1
     }
   };
 
@@ -722,6 +728,22 @@ async function detectCoachingTemplateFields(data: any[][], filename: string): Pr
     }
   }
 
+  // Extract agent name from B2 cell (Row 2, Column B)
+  if (data.length >= 2 && data[1] && data[1].length >= 2) {
+    const agentNameCell = data[1][1]; // Row 2 (index 1), Column B (index 1)
+    if (agentNameCell && String(agentNameCell).trim().length > 0) {
+      const agentName = String(agentNameCell).trim();
+      fields.agentName = {
+        row: 1, // Row 2 (0-indexed)
+        col: 1, // Column B (0-indexed)
+        value: agentName,
+        confidence: 0.95,
+        detectionMethod: 'spatial_inference'
+      };
+      console.log(`✅ Found agent name in B2: "${agentName}"`);
+    }
+  }
+
   // Extract call identifier from filename
   const callIdentifier = filename.replace(/\.(xlsx|xls|csv)$/i, '');
   fields.callIdentifier = {
@@ -800,6 +822,9 @@ async function extractDataFromScanResult(
       callDate: new Date().toISOString().split('T')[0],
       overallScore, // Include the detected overall score (e.g., 1.8 from row 45 column D)
 
+      // Agent name from B2 cell
+      agentName: scanResult.fieldMappings.agentName?.value as string,
+
       // Individual scores (for backward compatibility)
       openingScore: getIndividualScore('openingScore'),
       objectionHandlingScore: getIndividualScore('objectionHandlingScore'),
@@ -860,6 +885,13 @@ async function extractDataFromScanResult(
         // Extract call identifier
         const callIdentifier = extractFieldValue('callIdentifier') || `Call_${row + 1}`;
 
+        // Extract agent name from data export format
+        const agentName = extractFieldValue('agentName') ||
+                         extractFieldValue('agent_name') ||
+                         extractFieldValue('name') ||
+                         extractFieldValue('rep_name') ||
+                         null;
+
         // Extract and validate scores (0-4 scale)
         const parseScoreValue = (value: any, fieldName: string): number => {
           if (value === null || value === undefined || value === '') return 0;
@@ -875,6 +907,7 @@ async function extractDataFromScanResult(
           callIdentifier: String(callIdentifier).trim(),
           callDate: extractFieldValue('callDate') ? parseDate(extractFieldValue('callDate')) : new Date().toISOString().split('T')[0],
           durationMinutes: extractFieldValue('duration') ? parseDuration(extractFieldValue('duration')) : undefined,
+          agentName: agentName ? String(agentName).trim() : undefined,
           openingScore: parseScoreValue(extractFieldValue('openingScore'), 'Opening'),
           objectionHandlingScore: parseScoreValue(extractFieldValue('objectionHandlingScore'), 'Objection Handling'),
           qualificationScore: parseScoreValue(extractFieldValue('qualificationScore'), 'Qualification'),
