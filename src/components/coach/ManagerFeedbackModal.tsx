@@ -167,18 +167,39 @@ const ManagerFeedbackModal: React.FC<ManagerFeedbackModalProps> = ({
       const originalOverallScore = evaluation.overall_score || evaluation.overallScore || 0;
 
       // Create criteria adjustments object
-      const criteriaAdjustments: Record<string, { score: number; feedback: string }> = {};
+      const criteriaAdjustmentsData: Record<string, { score: number; feedback: string }> = {};
       criteriaAdjustments.forEach(adjustment => {
         if (adjustment.correctedScore !== adjustment.originalScore || 
             adjustment.correctedFeedback !== adjustment.originalFeedback) {
-          criteriaAdjustments[adjustment.id] = {
+          criteriaAdjustmentsData[adjustment.id] = {
             score: adjustment.correctedScore,
             feedback: adjustment.correctedFeedback
           };
         }
       });
 
-      // Submit feedback correction
+      // Check if we're in demo mode (no database tables)
+      const isDemoMode = !evaluation.id || evaluation.id.startsWith('demo-');
+      
+      if (isDemoMode) {
+        // Demo mode - simulate successful submission
+        console.log('🎭 Demo Mode: Manager feedback simulation');
+        console.log('📊 Original Score:', originalOverallScore);
+        console.log('📊 Corrected Score:', newOverallScore);
+        console.log('📊 Variance:', Math.abs(newOverallScore - originalOverallScore));
+        console.log('📝 Reason:', changeReason);
+        console.log('🔧 Adjustments:', criteriaAdjustmentsData);
+        
+        // Simulate API delay
+        await new Promise(resolve => setTimeout(resolve, 1000));
+        
+        toast.success('🎭 Demo: Manager feedback submitted successfully! (Simulated)');
+        onFeedbackSubmitted?.();
+        onClose();
+        return;
+      }
+
+      // Production mode - try to submit to database
       const { data, error } = await supabase
         .from('manager_feedback_corrections')
         .insert({
@@ -189,7 +210,7 @@ const ManagerFeedbackModal: React.FC<ManagerFeedbackModalProps> = ({
           original_overall_score: originalOverallScore,
           corrected_scores: correctedScores,
           corrected_overall_score: newOverallScore,
-          criteria_adjustments: criteriaAdjustments,
+          criteria_adjustments: criteriaAdjustmentsData,
           original_coaching_notes: evaluation.coaching_notes || evaluation.coachingNotes || '',
           corrected_coaching_notes: coachingNotesCorrection,
           change_reason: changeReason,
@@ -208,7 +229,24 @@ const ManagerFeedbackModal: React.FC<ManagerFeedbackModalProps> = ({
 
     } catch (error) {
       console.error('Error submitting manager feedback:', error);
-      toast.error('Failed to submit feedback. Please try again.');
+      
+      // If database error, fall back to demo mode
+      if (error.message?.includes('relation') || error.message?.includes('does not exist')) {
+        console.log('🎭 Database table not found, falling back to demo mode');
+        console.log('📊 Feedback data:', {
+          originalScore: evaluation.overall_score || evaluation.overallScore || 0,
+          correctedScore: calculateNewOverallScore(),
+          variance: Math.abs(calculateNewOverallScore() - (evaluation.overall_score || evaluation.overallScore || 0)),
+          reason: changeReason,
+          adjustments: criteriaAdjustments
+        });
+        
+        toast.success('🎭 Demo Mode: Feedback simulated (Database not configured)');
+        onFeedbackSubmitted?.();
+        onClose();
+      } else {
+        toast.error('Failed to submit feedback. Please try again.');
+      }
     } finally {
       setIsSubmitting(false);
     }

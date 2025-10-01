@@ -1,5 +1,16 @@
 import { supabase } from '@/integrations/supabase/client';
 
+interface ManagerCorrectionRecord {
+  id: string;
+  created_at: string;
+  change_reason: string;
+  score_variance: number;
+  corrected_overall_score?: number;
+  original_overall_score?: number;
+  criteria_adjustments?: Record<string, { score: number; feedback?: string }>;
+  original_ai_scores?: Record<string, { score: number }>;
+}
+
 export interface CalibrationConstraint {
   criteria: string;
   adjustmentFactor: number;
@@ -34,37 +45,50 @@ export class AICalibrationService {
    */
   static async getCalibrationConstraints(): Promise<CalibrationConstraint[]> {
     try {
-      const { data, error } = await supabase
-        .from('manager_feedback_corrections')
-        .select('*')
-        .eq('status', 'applied')
-        .gte('created_at', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString()); // Last 90 days
-
-      if (error) throw error;
+      const corrections = await this.fetchRecentCorrections();
 
       // Calculate constraints for each criteria
       const constraintsMap = new Map<string, {
         adjustments: number[];
+        originalScores: number[];
         variances: number[];
         reasons: string[];
+        lastUpdated: string;
       }>();
 
-      data.forEach(correction => {
+      corrections.forEach(correction => {
         const criteriaAdjustments = correction.criteria_adjustments || {};
         
         Object.entries(criteriaAdjustments).forEach(([criteria, adjustment]: [string, any]) => {
+          if (typeof adjustment?.score !== 'number') {
+            return;
+          }
+
           if (!constraintsMap.has(criteria)) {
             constraintsMap.set(criteria, {
               adjustments: [],
+              originalScores: [],
               variances: [],
-              reasons: []
+              reasons: [],
+              lastUpdated: correction.created_at
             });
           }
 
           const constraint = constraintsMap.get(criteria)!;
-          constraint.adjustments.push(adjustment.score);
-          constraint.variances.push(Math.abs(adjustment.score - (correction.original_ai_scores[criteria]?.score || 0)));
+          const appliedScore = adjustment.score;
+          constraint.adjustments.push(appliedScore);
+
+          const originalScore = correction.original_ai_scores?.[criteria]?.score ?? correction.original_overall_score;
+          if (typeof originalScore === 'number') {
+            constraint.originalScores.push(originalScore);
+            constraint.variances.push(Math.abs(appliedScore - originalScore));
+          } else if (typeof correction.score_variance === 'number') {
+            constraint.variances.push(correction.score_variance);
+          }
           constraint.reasons.push(correction.change_reason);
+          if (!constraint.lastUpdated || correction.created_at > constraint.lastUpdated) {
+            constraint.lastUpdated = correction.created_at;
+          }
         });
       });
 
@@ -73,18 +97,23 @@ export class AICalibrationService {
       
       constraintsMap.forEach((data, criteria) => {
         const averageAdjustment = data.adjustments.reduce((sum, adj) => sum + adj, 0) / data.adjustments.length;
-        const averageVariance = data.variances.reduce((sum, var) => sum + var, 0) / data.variances.length;
+        const averageOriginal = data.originalScores.length > 0
+          ? data.originalScores.reduce((sum, score) => sum + score, 0) / data.originalScores.length
+          : 0;
+        const averageVariance = data.variances.length > 0
+          ? data.variances.reduce((sum, variance) => sum + variance, 0) / data.variances.length
+          : 0;
         const confidence = Math.min(1, data.adjustments.length / 10); // Confidence based on sample size
         
         // Calculate adjustment factor (negative means AI is too high, positive means too low)
-        const adjustmentFactor = averageAdjustment - (data.adjustments[0] || 0); // Compare to original AI score
+        const adjustmentFactor = averageAdjustment - averageOriginal;
         
         constraints.push({
           criteria,
           adjustmentFactor: Math.max(-0.5, Math.min(0.5, adjustmentFactor)), // Cap at ±0.5
           confidence,
           sampleSize: data.adjustments.length,
-          lastUpdated: new Date().toISOString()
+          lastUpdated: data.lastUpdated || new Date().toISOString()
         });
       });
 
@@ -101,13 +130,7 @@ export class AICalibrationService {
    */
   static async getManagerCorrectionPatterns(): Promise<ManagerCorrectionPattern[]> {
     try {
-      const { data, error } = await supabase
-        .from('manager_feedback_corrections')
-        .select('*')
-        .eq('status', 'applied')
-        .gte('created_at', new Date(Date.now() - 90 * 24 * 60 * 60 * 1000).toISOString());
-
-      if (error) throw error;
+      const corrections = await this.fetchRecentCorrections();
 
       const patternsMap = new Map<string, {
         reasons: string[];
@@ -115,10 +138,14 @@ export class AICalibrationService {
         adjustments: number[];
       }>();
 
-      data.forEach(correction => {
+      corrections.forEach(correction => {
         const criteriaAdjustments = correction.criteria_adjustments || {};
         
         Object.entries(criteriaAdjustments).forEach(([criteria, adjustment]: [string, any]) => {
+          if (typeof adjustment?.score !== 'number') {
+            return;
+          }
+
           if (!patternsMap.has(criteria)) {
             patternsMap.set(criteria, {
               reasons: [],
@@ -129,7 +156,15 @@ export class AICalibrationService {
 
           const pattern = patternsMap.get(criteria)!;
           pattern.reasons.push(correction.change_reason);
-          pattern.variances.push(correction.score_variance);
+          const variance = typeof correction.score_variance === 'number'
+            ? correction.score_variance
+            : (() => {
+                const originalScore = correction.original_ai_scores?.[criteria]?.score ?? correction.original_overall_score;
+                return typeof originalScore === 'number'
+                  ? Math.abs(adjustment.score - originalScore)
+                  : 0;
+              })();
+          pattern.variances.push(variance);
           pattern.adjustments.push(adjustment.score);
         });
       });
@@ -148,7 +183,9 @@ export class AICalibrationService {
           .slice(0, 3)
           .map(([reason]) => reason);
 
-        const averageVariance = data.variances.reduce((sum, var) => sum + var, 0) / data.variances.length;
+        const averageVariance = data.variances.length > 0
+          ? data.variances.reduce((sum, variance) => sum + variance, 0) / data.variances.length
+          : 0;
         
         // Calculate adjustment trend (positive = managers consistently increase scores)
         const adjustmentTrend = data.adjustments.reduce((sum, adj, i) => {
@@ -245,7 +282,7 @@ export class AICalibrationService {
         .from('ai_calibration_constraints')
         .upsert({
           id: 'current',
-          constraints: constraints,
+          constraints,
           updated_at: new Date().toISOString()
         });
 
@@ -308,6 +345,35 @@ export class AICalibrationService {
 
     } catch (error) {
       console.error('Error triggering constraint update:', error);
+    }
+  }
+
+  /**
+   * Fetch recent manager corrections with only required fields
+   */
+  private static async fetchRecentCorrections(days = 90): Promise<ManagerCorrectionRecord[]> {
+    try {
+      const since = new Date(Date.now() - days * 24 * 60 * 60 * 1000).toISOString();
+
+      const { data, error } = await supabase
+        .from('manager_feedback_corrections')
+        .select('id, created_at, change_reason, score_variance, corrected_overall_score, original_overall_score, criteria_adjustments, original_ai_scores')
+        .eq('status', 'applied')
+        .gte('created_at', since)
+        .order('created_at', { ascending: false });
+
+      if (error || !data) {
+        if (error) {
+          console.error('Error fetching manager corrections:', error);
+        }
+        return [];
+      }
+
+      return data as ManagerCorrectionRecord[];
+
+    } catch (error) {
+      console.error('Unexpected error fetching manager corrections:', error);
+      return [];
     }
   }
 }

@@ -61,21 +61,67 @@ export class ManagerValidationWorkflow {
 
       if (error) throw error;
 
+      if (!evaluations || evaluations.length === 0) {
+        return [];
+      }
+
+      const userIds = Array.from(new Set(
+        evaluations
+          .map((evaluation: any) => evaluation.user_id)
+          .filter((userId: string | null | undefined): userId is string => Boolean(userId))
+      ));
+
+      const historyMap = new Map<string, Array<{ recording_id: string; overall_score: number; evaluated_at: string }>>();
+
+      if (userIds.length > 0) {
+        const historySince = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+        const { data: history, error: historyError } = await supabase
+          .from('bdr_scorecard_evaluations')
+          .select('user_id, recording_id, overall_score, evaluated_at')
+          .in('user_id', userIds)
+          .gte('evaluated_at', historySince);
+
+        if (historyError) throw historyError;
+
+        (history || []).forEach((entry: any) => {
+          if (typeof entry.overall_score !== 'number') {
+            return;
+          }
+
+          if (!historyMap.has(entry.user_id)) {
+            historyMap.set(entry.user_id, []);
+          }
+
+          historyMap.get(entry.user_id)!.push({
+            recording_id: entry.recording_id,
+            overall_score: entry.overall_score,
+            evaluated_at: entry.evaluated_at
+          });
+        });
+      }
+
       const validationItems: ValidationQueueItem[] = [];
 
       for (const evaluation of evaluations) {
-        const aiScore = evaluation.overall_score || 0;
-        
-        // Calculate historical average for this user/context
-        const historicalAverage = await this.calculateHistoricalAverage(evaluation.user_id, evaluation.recording_id);
-        
-        // Calculate variance
+        const aiScore = typeof evaluation.overall_score === 'number' ? evaluation.overall_score : 0;
+
+        const historicalAverage = (() => {
+          const userHistory = historyMap.get(evaluation.user_id) || [];
+          const relevantHistory = userHistory.filter(entry => entry.recording_id !== evaluation.recording_id);
+
+          if (relevantHistory.length === 0) {
+            return 2.5;
+          }
+
+          const total = relevantHistory.reduce((sum, entry) => sum + entry.overall_score, 0);
+          return total / relevantHistory.length;
+        })();
+
         const variance = Math.abs(aiScore - historicalAverage);
-        
-        // Determine if validation is needed
+
         if (variance > 1.0 || this.detectPatternAnomaly(evaluation)) {
           const priority = this.calculatePriority(variance, evaluation);
-          
+
           validationItems.push({
             id: `validation_${evaluation.id}`,
             recordingId: evaluation.recording_id,
@@ -96,32 +142,6 @@ export class ManagerValidationWorkflow {
     } catch (error) {
       console.error('Error detecting high-variance scores:', error);
       return [];
-    }
-  }
-
-  /**
-   * Calculate historical average score for context
-   */
-  private static async calculateHistoricalAverage(userId: string, recordingId: string): Promise<number> {
-    try {
-      const { data, error } = await supabase
-        .from('bdr_scorecard_evaluations')
-        .select('overall_score')
-        .eq('user_id', userId)
-        .neq('recording_id', recordingId) // Exclude current recording
-        .gte('evaluated_at', new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString()) // Last 30 days
-        .order('evaluated_at', { ascending: false })
-        .limit(10);
-
-      if (error) throw error;
-
-      if (data.length === 0) return 2.5; // Default average
-
-      return data.reduce((sum, eval) => sum + (eval.overall_score || 0), 0) / data.length;
-
-    } catch (error) {
-      console.error('Error calculating historical average:', error);
-      return 2.5;
     }
   }
 
@@ -195,35 +215,44 @@ export class ManagerValidationWorkflow {
 
       if (managersError) throw managersError;
 
-      if (managers.length === 0) {
+      if (!managers || managers.length === 0) {
         console.warn('No active managers found for validation assignment');
         return;
       }
 
-      // Distribute validation items among managers
-      const itemsPerManager = Math.ceil(validationItems.length / managers.length);
-      
-      for (let i = 0; i < validationItems.length; i++) {
-        const managerIndex = i % managers.length;
-        const manager = managers[managerIndex];
-        
-        // Insert into validation queue
-        await supabase
-          .from('validation_queue')
-          .insert({
-            id: validationItems[i].id,
-            recording_id: validationItems[i].recordingId,
-            evaluation_id: validationItems[i].evaluationId,
-            ai_score: validationItems[i].aiScore,
-            historical_average: validationItems[i].historicalAverage,
-            variance: validationItems[i].variance,
-            priority: validationItems[i].priority,
-            criteria: validationItems[i].criteria,
-            assigned_manager: manager.id,
-            status: 'pending',
-            created_at: validationItems[i].createdAt
-          });
+      if (validationItems.length === 0) {
+        return;
       }
+
+      const queueEntries = validationItems.map((item, index) => {
+        const manager = managers[index % managers.length];
+        if (!manager) return null;
+
+        return {
+          id: item.id,
+          recording_id: item.recordingId,
+          evaluation_id: item.evaluationId,
+          ai_score: item.aiScore,
+          historical_average: item.historicalAverage,
+          variance: item.variance,
+          priority: item.priority,
+          criteria: item.criteria,
+          assigned_manager: manager.id,
+          assigned_manager_name: manager.name,
+          status: 'pending',
+          created_at: item.createdAt
+        };
+      }).filter(Boolean) as Array<Record<string, unknown>>;
+
+      if (queueEntries.length === 0) {
+        return;
+      }
+
+      const { error: insertError } = await supabase
+        .from('validation_queue')
+        .upsert(queueEntries, { onConflict: 'id' });
+
+      if (insertError) throw insertError;
 
     } catch (error) {
       console.error('Error assigning validation items:', error);

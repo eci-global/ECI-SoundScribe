@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
@@ -20,6 +20,18 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 
+interface FeedbackCorrection {
+  id: string;
+  recordingId: string;
+  managerName: string;
+  originalScore: number;
+  correctedScore: number;
+  variance: number;
+  reason: string;
+  createdAt: string;
+  highVariance: boolean;
+}
+
 interface FeedbackAnalyticsData {
   totalCorrections: number;
   highVarianceCorrections: number;
@@ -30,16 +42,7 @@ interface FeedbackAnalyticsData {
     averageVariance: number;
     mostCommonReason: string;
   }>;
-  recentCorrections: Array<{
-    id: string;
-    recordingId: string;
-    managerName: string;
-    originalScore: number;
-    correctedScore: number;
-    variance: number;
-    reason: string;
-    createdAt: string;
-  }>;
+  corrections: FeedbackCorrection[];
   managerPerformance: Array<{
     managerId: string;
     managerName: string;
@@ -54,9 +57,14 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30d');
   const [selectedManager, setSelectedManager] = useState('all');
+  const [recentPage, setRecentPage] = useState(0);
+
+  const RECENT_PAGE_SIZE = 10;
+  const MAX_ANALYTICS_RECORDS = 500;
 
   useEffect(() => {
     loadAnalyticsData();
+    setRecentPage(0);
   }, [timeRange, selectedManager]);
 
   const loadAnalyticsData = async () => {
@@ -72,37 +80,56 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
       let query = supabase
         .from('manager_feedback_corrections')
         .select(`
-          *,
-          profiles!manager_feedback_corrections_manager_id_fkey(name, email)
-        `)
-        .gte('created_at', startDate.toISOString());
+          id,
+          recording_id,
+          manager_id,
+          change_reason,
+          score_variance,
+          high_variance,
+          corrected_overall_score,
+          original_overall_score,
+          criteria_adjustments,
+          original_ai_scores,
+          created_at,
+          profiles!manager_feedback_corrections_manager_id_fkey(name)
+        `, { count: 'exact' })
+        .gte('created_at', startDate.toISOString())
+        .order('created_at', { ascending: false })
+        .range(0, MAX_ANALYTICS_RECORDS - 1);
 
       if (selectedManager !== 'all') {
         query = query.eq('manager_id', selectedManager);
       }
 
-      const { data: corrections, error } = await query;
+      const { data: corrections, error, count } = await query;
 
       if (error) throw error;
 
       // Process analytics data
+      const normalizedCorrections: FeedbackCorrection[] = (corrections || []).map((c: any) => ({
+        id: c.id,
+        recordingId: c.recording_id,
+        managerName: c.profiles?.name || 'Unknown',
+        originalScore: c.original_overall_score ?? 0,
+        correctedScore: c.corrected_overall_score ?? 0,
+        variance: c.score_variance ?? Math.abs((c.corrected_overall_score ?? 0) - (c.original_overall_score ?? 0)),
+        reason: c.change_reason,
+        createdAt: c.created_at,
+        highVariance: Boolean(c.high_variance)
+      }));
+
+      const totalCorrections = typeof count === 'number' ? count : normalizedCorrections.length;
+
       const analyticsData: FeedbackAnalyticsData = {
-        totalCorrections: corrections.length,
-        highVarianceCorrections: corrections.filter(c => c.high_variance).length,
-        averageVariance: corrections.reduce((sum, c) => sum + c.score_variance, 0) / corrections.length || 0,
-        alignmentTrend: calculateAlignmentTrend(corrections),
-        criteriaBreakdown: calculateCriteriaBreakdown(corrections),
-        recentCorrections: corrections.slice(0, 10).map(c => ({
-          id: c.id,
-          recordingId: c.recording_id,
-          managerName: c.profiles?.name || 'Unknown',
-          originalScore: c.original_overall_score,
-          correctedScore: c.corrected_overall_score,
-          variance: c.score_variance,
-          reason: c.change_reason,
-          createdAt: c.created_at
-        })),
-        managerPerformance: calculateManagerPerformance(corrections)
+        totalCorrections,
+        highVarianceCorrections: normalizedCorrections.filter(c => c.highVariance).length,
+        averageVariance: normalizedCorrections.length > 0
+          ? normalizedCorrections.reduce((sum, c) => sum + c.variance, 0) / normalizedCorrections.length
+          : 0,
+        alignmentTrend: calculateAlignmentTrend(normalizedCorrections),
+        criteriaBreakdown: calculateCriteriaBreakdown(corrections || []),
+        corrections: normalizedCorrections,
+        managerPerformance: calculateManagerPerformance(corrections || [])
       };
 
       setData(analyticsData);
@@ -115,14 +142,14 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
     }
   };
 
-  const calculateAlignmentTrend = (corrections: any[]) => {
+  const calculateAlignmentTrend = (corrections: FeedbackCorrection[]) => {
     if (corrections.length < 2) return 0;
     
     const recent = corrections.slice(0, Math.floor(corrections.length / 2));
     const older = corrections.slice(Math.floor(corrections.length / 2));
     
-    const recentAvg = recent.reduce((sum, c) => sum + c.score_variance, 0) / recent.length;
-    const olderAvg = older.reduce((sum, c) => sum + c.score_variance, 0) / older.length;
+    const recentAvg = recent.reduce((sum, c) => sum + c.variance, 0) / recent.length;
+    const olderAvg = older.reduce((sum, c) => sum + c.variance, 0) / older.length;
     
     return ((olderAvg - recentAvg) / olderAvg) * 100;
   };
@@ -248,6 +275,14 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
       </div>
     );
   }
+
+  const pagedCorrections = useMemo(() => {
+    const start = recentPage * RECENT_PAGE_SIZE;
+    const end = start + RECENT_PAGE_SIZE;
+    return data.corrections.slice(start, end);
+  }, [data, recentPage]);
+
+  const totalPages = Math.max(1, Math.ceil(data.corrections.length / RECENT_PAGE_SIZE));
 
   return (
     <div className="space-y-6">
@@ -381,7 +416,7 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            {data.recentCorrections.map((correction) => (
+            {pagedCorrections.map((correction) => (
               <div key={correction.id} className="flex items-center justify-between p-3 border rounded-lg">
                 <div className="flex-1">
                   <div className="flex items-center gap-2">
@@ -404,6 +439,33 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
                 </div>
               </div>
             ))}
+          </div>
+          <div className="flex items-center justify-between mt-4">
+            <span className="text-xs text-gray-500">
+              Showing {pagedCorrections.length === 0 ? 0 : recentPage * RECENT_PAGE_SIZE + 1} -
+              {recentPage * RECENT_PAGE_SIZE + pagedCorrections.length} of {data.corrections.length} (latest {MAX_ANALYTICS_RECORDS} records)
+            </span>
+            <div className="flex items-center gap-2">
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setRecentPage(prev => Math.max(0, prev - 1))}
+                disabled={recentPage === 0}
+              >
+                Previous
+              </Button>
+              <span className="text-sm text-gray-600">
+                Page {recentPage + 1} of {totalPages}
+              </span>
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setRecentPage(prev => Math.min(totalPages - 1, prev + 1))}
+                disabled={recentPage >= totalPages - 1}
+              >
+                Next
+              </Button>
+            </div>
           </div>
         </CardContent>
       </Card>

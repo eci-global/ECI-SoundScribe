@@ -62,7 +62,8 @@ const FeedbackSystemDemo: React.FC = () => {
 
   const handleFeedbackSubmitted = () => {
     // Simulate feedback submission
-    console.log('Feedback submitted successfully!');
+    console.log('🎭 Demo: Manager feedback submitted successfully!');
+    console.log('📊 Feedback simulation complete - check browser console for details');
     setShowFeedbackModal(false);
     
     // Simulate updated evaluation

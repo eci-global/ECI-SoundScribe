@@ -49,6 +49,24 @@ interface EditingCriterion {
   feedback: string;
 }
 
+type CriteriaScore = {
+  score: number;
+  feedback?: string;
+  maxScore?: number;
+  [key: string]: unknown;
+};
+
+type CriteriaScoreRecord = Record<string, CriteriaScore>;
+
+const cloneCriteriaScores = (scores: CriteriaScoreRecord | null | undefined): CriteriaScoreRecord => {
+  if (!scores) return {};
+
+  return Object.entries(scores).reduce((acc, [key, value]) => {
+    acc[key] = { ...value };
+    return acc;
+  }, {} as CriteriaScoreRecord);
+};
+
 const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({ 
   recording, 
   className 
@@ -74,8 +92,9 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
 
     setIsSaving(true);
 
-    // Create a deep copy of the criteria scores to avoid direct state mutation
-    const updatedCriteriaScores = JSON.parse(JSON.stringify(bdrData.evaluation.criteria_scores || bdrData.evaluation.criteriaScores || {}));
+    // Create a shallow copy of the criteria scores keyed by criteria id to avoid state mutation
+    const sourceScores = (bdrData.evaluation.criteria_scores || bdrData.evaluation.criteriaScores || {}) as CriteriaScoreRecord;
+    const updatedCriteriaScores = cloneCriteriaScores(sourceScores);
 
     // Update the specific criterion being edited
     if (updatedCriteriaScores[criterionId]) {
