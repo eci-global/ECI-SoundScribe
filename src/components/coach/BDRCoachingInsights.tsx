@@ -17,10 +17,12 @@ import {
   User,
   Bot,
   Pencil,
+  MessageCircle,
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import EditScorecardModal from './EditScorecardModal';
+import ManagerFeedbackModal from './ManagerFeedbackModal';
 import {
   BDRScorecardEvaluation,
   BDRTrainingProgram,
@@ -60,6 +62,7 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
   const [autoAnalysisTrigger, setAutoAnalysisTrigger] = useState(false);
   const [editingCriterion, setEditingCriterion] = useState<EditingCriterion | null>(null);
   const [isSaving, setIsSaving] = useState(false);
+  const [showFeedbackModal, setShowFeedbackModal] = useState(false);
 
 
   useEffect(() => {
@@ -426,6 +429,17 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
             <Badge variant="outline" className="bg-white">
               {program?.name || 'BDR Training'}
             </Badge>
+            {evaluationSource.type === 'ai' && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={() => setShowFeedbackModal(true)}
+                className="bg-blue-50 hover:bg-blue-100 border-blue-200 text-blue-700"
+              >
+                <MessageCircle className="h-4 w-4 mr-2" />
+                Provide Feedback
+              </Button>
+            )}
           </div>
         </div>
       </CardHeader>
@@ -553,6 +567,20 @@ const BDRCoachingInsights: React.FC<BDRCoachingInsightsProps> = ({
               name: getCriteriaDisplayName(editingCriterion.id),
               score: editingCriterion.score,
               feedback: editingCriterion.feedback,
+            }}
+          />
+        )}
+
+        {/* Manager Feedback Modal */}
+        {showFeedbackModal && evaluation && (
+          <ManagerFeedbackModal
+            isOpen={showFeedbackModal}
+            onClose={() => setShowFeedbackModal(false)}
+            evaluation={evaluation}
+            recordingId={recording.id}
+            onFeedbackSubmitted={() => {
+              loadBDRData(); // Reload data to show updated evaluation
+              setShowFeedbackModal(false);
             }}
           />
         )}
