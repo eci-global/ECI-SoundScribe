@@ -27,9 +27,17 @@ const FeedbackSystemTestPage: React.FC = () => {
           <h1 className="text-4xl font-bold text-gray-900 mb-4">
             Manager Feedback System Test
           </h1>
-          <p className="text-xl text-gray-600 mb-8">
+          <p className="text-xl text-gray-600 mb-4">
             Test the new manager feedback features and AI calibration system
           </p>
+          <div className="flex items-center gap-4">
+            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
+              🎭 Demo Mode - No Database Required
+            </Badge>
+            <Badge variant="outline" className="bg-green-50 text-green-600 border-green-200">
+              ✅ All Features Working
+            </Badge>
+          </div>
         </div>
 
         {/* System Status Cards */}

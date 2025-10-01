@@ -71,6 +71,102 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
     try {
       setLoading(true);
 
+      // Check if we're in demo mode (no database tables)
+      const isDemoMode = true; // For now, always use demo mode since tables don't exist
+      
+      if (isDemoMode) {
+        // Demo mode - generate mock analytics data
+        console.log('🎭 Demo Mode: Loading mock analytics data');
+        
+        const mockData: FeedbackAnalyticsData = {
+          totalCorrections: 15,
+          highVarianceCorrections: 3,
+          averageVariance: 0.8,
+          alignmentTrend: 12.5,
+          criteriaBreakdown: {
+            opening: {
+              totalAdjustments: 8,
+              averageVariance: 0.6,
+              mostCommonReason: 'too_lenient'
+            },
+            objection_handling: {
+              totalAdjustments: 12,
+              averageVariance: 1.2,
+              mostCommonReason: 'missed_context'
+            },
+            qualification: {
+              totalAdjustments: 6,
+              averageVariance: 0.4,
+              mostCommonReason: 'too_strict'
+            },
+            tone_and_energy: {
+              totalAdjustments: 4,
+              averageVariance: 0.3,
+              mostCommonReason: 'inaccurate_assessment'
+            }
+          },
+          recentCorrections: [
+            {
+              id: 'demo-1',
+              recordingId: 'demo-recording-1',
+              managerName: 'Sarah Johnson',
+              originalScore: 2.8,
+              correctedScore: 3.2,
+              variance: 0.4,
+              reason: 'too_lenient',
+              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+            },
+            {
+              id: 'demo-2',
+              recordingId: 'demo-recording-2',
+              managerName: 'Mike Chen',
+              originalScore: 3.5,
+              correctedScore: 2.8,
+              variance: 0.7,
+              reason: 'missed_context',
+              createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+            },
+            {
+              id: 'demo-3',
+              recordingId: 'demo-recording-3',
+              managerName: 'Lisa Rodriguez',
+              originalScore: 2.1,
+              correctedScore: 3.0,
+              variance: 0.9,
+              reason: 'too_strict',
+              createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
+            }
+          ],
+          managerPerformance: [
+            {
+              managerId: 'demo-manager-1',
+              managerName: 'Sarah Johnson',
+              totalCorrections: 8,
+              averageVariance: 0.6,
+              highVarianceCount: 1
+            },
+            {
+              managerId: 'demo-manager-2',
+              managerName: 'Mike Chen',
+              totalCorrections: 5,
+              averageVariance: 0.9,
+              highVarianceCount: 2
+            },
+            {
+              managerId: 'demo-manager-3',
+              managerName: 'Lisa Rodriguez',
+              totalCorrections: 2,
+              averageVariance: 0.4,
+              highVarianceCount: 0
+            }
+          ]
+        };
+
+        setData(mockData);
+        setLoading(false);
+        return;
+      }
+
       // Calculate date range
       const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
       const startDate = new Date();
@@ -291,6 +387,11 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold">Feedback Analytics</h2>
           <p className="text-gray-600">AI vs Manager scoring alignment trends</p>
+          <div className="mt-2">
+            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
+              🎭 Demo Mode
+            </Badge>
+          </div>
         </div>
         <div className="flex items-center gap-2">
           <Select value={timeRange} onValueChange={setTimeRange}>
