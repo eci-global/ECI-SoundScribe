@@ -45,6 +45,7 @@ import AIPromptManagement from '@/pages/admin/AIPromptManagement';
 import AIModelConfiguration from '@/pages/admin/AIModelConfiguration';
 import AIScoringRubrics from '@/pages/admin/AIScoringRubrics';
 import AIExperiments from '@/pages/admin/AIExperiments';
+import FeedbackAnalytics from '@/pages/admin/FeedbackAnalytics';
 
 export interface AdminNavItem {
   title: string;
@@ -84,7 +85,8 @@ export const adminNav: AdminNavItem[] = [
     icon: GraduationCap,
     children: [
       { title: 'Settings & Programs', path: '/admin/bdr-training' },
-      { title: 'Upload History', path: '/admin/bdr-scorecard-history' }
+      { title: 'Upload History', path: '/admin/bdr-scorecard-history' },
+      { title: 'Feedback Analytics', path: '/admin/feedback-analytics' }
     ]
   },
   {

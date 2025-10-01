@@ -31,6 +31,7 @@ import DurationDebug from "./pages/DurationDebug";
 import Recordings from "./pages/Recordings";
 import BDRTrainingSettings from "./pages/admin/BDRTrainingSettings";
 import FeedbackSystemTest from "./pages/FeedbackSystemTest";
+import FeedbackAnalytics from "./pages/admin/FeedbackAnalytics";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
 
@@ -114,6 +115,7 @@ const App = () => {
                   <Route path="/admin/ai-models" element={<AdminDashboard />} />
                   <Route path="/admin/ai-scoring" element={<AdminDashboard />} />
                   <Route path="/admin/ai-experiments" element={<AdminDashboard />} />
+                  <Route path="/admin/feedback-analytics" element={<FeedbackAnalytics />} />
                   <Route path="/feedback-test" element={<FeedbackSystemTest />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
