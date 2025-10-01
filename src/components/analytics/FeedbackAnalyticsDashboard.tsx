@@ -105,7 +105,7 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
               mostCommonReason: 'inaccurate_assessment'
             }
           },
-          recentCorrections: [
+          corrections: [
             {
               id: 'demo-1',
               recordingId: 'demo-recording-1',
@@ -114,7 +114,8 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
               correctedScore: 3.2,
               variance: 0.4,
               reason: 'too_lenient',
-              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString()
+              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
+              highVariance: false
             },
             {
               id: 'demo-2',
@@ -124,7 +125,8 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
               correctedScore: 2.8,
               variance: 0.7,
               reason: 'missed_context',
-              createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString()
+              createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
+              highVariance: false
             },
             {
               id: 'demo-3',
@@ -134,7 +136,8 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
               correctedScore: 3.0,
               variance: 0.9,
               reason: 'too_strict',
-              createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString()
+              createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
+              highVariance: false
             }
           ],
           managerPerformance: [
@@ -172,63 +175,63 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
       const startDate = new Date();
       startDate.setDate(startDate.getDate() - days);
 
-      // Build query filters
-      let query = supabase
-        .from('manager_feedback_corrections')
-        .select(`
-          id,
-          recording_id,
-          manager_id,
-          change_reason,
-          score_variance,
-          high_variance,
-          corrected_overall_score,
-          original_overall_score,
-          criteria_adjustments,
-          original_ai_scores,
-          created_at,
-          profiles!manager_feedback_corrections_manager_id_fkey(name)
-        `, { count: 'exact' })
-        .gte('created_at', startDate.toISOString())
-        .order('created_at', { ascending: false })
-        .range(0, MAX_ANALYTICS_RECORDS - 1);
+      // Build query filters (commented out since we're in demo mode)
+      // let query = supabase
+      //   .from('manager_feedback_corrections')
+      //   .select(`
+      //     id,
+      //     recording_id,
+      //     manager_id,
+      //     change_reason,
+      //     score_variance,
+      //     high_variance,
+      //     corrected_overall_score,
+      //     original_overall_score,
+      //     criteria_adjustments,
+      //     original_ai_scores,
+      //     created_at,
+      //     profiles!manager_feedback_corrections_manager_id_fkey(name)
+      //   `, { count: 'exact' })
+      //   .gte('created_at', startDate.toISOString())
+      //   .order('created_at', { ascending: false })
+      //   .range(0, MAX_ANALYTICS_RECORDS - 1);
 
-      if (selectedManager !== 'all') {
-        query = query.eq('manager_id', selectedManager);
-      }
+      // if (selectedManager !== 'all') {
+      //   query = query.eq('manager_id', selectedManager);
+      // }
 
-      const { data: corrections, error, count } = await query;
+      // const { data: corrections, error, count } = await query;
 
-      if (error) throw error;
+      // if (error) throw error;
 
-      // Process analytics data
-      const normalizedCorrections: FeedbackCorrection[] = (corrections || []).map((c: any) => ({
-        id: c.id,
-        recordingId: c.recording_id,
-        managerName: c.profiles?.name || 'Unknown',
-        originalScore: c.original_overall_score ?? 0,
-        correctedScore: c.corrected_overall_score ?? 0,
-        variance: c.score_variance ?? Math.abs((c.corrected_overall_score ?? 0) - (c.original_overall_score ?? 0)),
-        reason: c.change_reason,
-        createdAt: c.created_at,
-        highVariance: Boolean(c.high_variance)
-      }));
+      // Process analytics data (commented out since we're in demo mode)
+      // const normalizedCorrections: FeedbackCorrection[] = (corrections || []).map((c: any) => ({
+      //   id: c.id,
+      //   recordingId: c.recording_id,
+      //   managerName: c.profiles?.name || 'Unknown',
+      //   originalScore: c.original_overall_score ?? 0,
+      //   correctedScore: c.corrected_overall_score ?? 0,
+      //   variance: c.score_variance ?? Math.abs((c.corrected_overall_score ?? 0) - (c.original_overall_score ?? 0)),
+      //   reason: c.change_reason,
+      //   createdAt: c.created_at,
+      //   highVariance: Boolean(c.high_variance)
+      // }));
 
-      const totalCorrections = typeof count === 'number' ? count : normalizedCorrections.length;
+      // const totalCorrections = typeof count === 'number' ? count : normalizedCorrections.length;
 
-      const analyticsData: FeedbackAnalyticsData = {
-        totalCorrections,
-        highVarianceCorrections: normalizedCorrections.filter(c => c.highVariance).length,
-        averageVariance: normalizedCorrections.length > 0
-          ? normalizedCorrections.reduce((sum, c) => sum + c.variance, 0) / normalizedCorrections.length
-          : 0,
-        alignmentTrend: calculateAlignmentTrend(normalizedCorrections),
-        criteriaBreakdown: calculateCriteriaBreakdown(corrections || []),
-        corrections: normalizedCorrections,
-        managerPerformance: calculateManagerPerformance(corrections || [])
-      };
+      // const analyticsData: FeedbackAnalyticsData = {
+      //   totalCorrections,
+      //   highVarianceCorrections: normalizedCorrections.filter(c => c.highVariance).length,
+      //   averageVariance: normalizedCorrections.length > 0
+      //     ? normalizedCorrections.reduce((sum, c) => sum + c.variance, 0) / normalizedCorrections.length
+      //     : 0,
+      //   alignmentTrend: calculateAlignmentTrend(normalizedCorrections),
+      //   criteriaBreakdown: calculateCriteriaBreakdown(corrections || []),
+      //   corrections: normalizedCorrections,
+      //   managerPerformance: calculateManagerPerformance(corrections || [])
+      // };
 
-      setData(analyticsData);
+      // setData(analyticsData);
 
     } catch (error) {
       console.error('Error loading analytics data:', error);
@@ -339,6 +342,19 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
     return labels[reason] || reason;
   };
 
+  // Move useMemo hooks to the top to avoid conditional hook calls
+  const pagedCorrections = useMemo(() => {
+    if (!data) return [];
+    const start = recentPage * RECENT_PAGE_SIZE;
+    const end = start + RECENT_PAGE_SIZE;
+    return data.corrections.slice(start, end);
+  }, [data, recentPage]);
+
+  const totalPages = useMemo(() => {
+    if (!data) return 1;
+    return Math.max(1, Math.ceil(data.corrections.length / RECENT_PAGE_SIZE));
+  }, [data]);
+
   if (loading) {
     return (
       <div className="space-y-6">
@@ -371,14 +387,6 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
       </div>
     );
   }
-
-  const pagedCorrections = useMemo(() => {
-    const start = recentPage * RECENT_PAGE_SIZE;
-    const end = start + RECENT_PAGE_SIZE;
-    return data.corrections.slice(start, end);
-  }, [data, recentPage]);
-
-  const totalPages = Math.max(1, Math.ceil(data.corrections.length / RECENT_PAGE_SIZE));
 
   return (
     <div className="space-y-6">
