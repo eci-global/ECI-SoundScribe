@@ -179,7 +179,7 @@ const ManagerFeedbackModal: React.FC<ManagerFeedbackModalProps> = ({
       });
 
       // Check if we're in demo mode (no database tables)
-      const isDemoMode = !evaluation.id || evaluation.id.startsWith('demo-');
+      const isDemoMode = false; // Database tables exist, so we can use real data
       
       if (isDemoMode) {
         // Demo mode - simulate successful submission

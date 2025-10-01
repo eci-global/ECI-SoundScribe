@@ -9,9 +9,9 @@
 
 import { createClient } from '@supabase/supabase-js';
 
-// You'll need to replace these with your actual Supabase credentials
-const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'your-supabase-url';
-const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'your-supabase-anon-key';
+// Your Supabase credentials (from your existing config)
+const SUPABASE_URL = process.env.VITE_SUPABASE_URL || 'https://qinkldgvejheppheykfl.supabase.co';
+const SUPABASE_ANON_KEY = process.env.VITE_SUPABASE_ANON_KEY || 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmtsZGd2ZWpoZXBwaGV5a2ZsIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDk1OTA0NDcsImV4cCI6MjA2NTE2NjQ0N30.xn9c-6Sr_kEbETzafRrlaWMHgbUIoqifsCQBrqYT7u4';
 
 const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -19,25 +19,8 @@ async function testMigrations() {
   console.log('🧪 Testing Database Migrations\n');
   
   try {
-    // Test 1: Check if all tables exist
+    // Test 1: Check if all tables exist by trying to query them
     console.log('1️⃣ Checking if all tables exist...');
-    const { data: tables, error: tablesError } = await supabase
-      .from('information_schema.tables')
-      .select('table_name')
-      .eq('table_schema', 'public')
-      .in('table_name', [
-        'manager_feedback_corrections',
-        'ai_calibration_constraints',
-        'constraint_updates',
-        'validation_queue',
-        'validation_alerts',
-        'ai_calibration_logs'
-      ]);
-    
-    if (tablesError) {
-      console.log('❌ Error checking tables:', tablesError.message);
-      return;
-    }
     
     const expectedTables = [
       'manager_feedback_corrections',
@@ -48,12 +31,29 @@ async function testMigrations() {
       'ai_calibration_logs'
     ];
     
-    const foundTables = tables.map(t => t.table_name);
-    const missingTables = expectedTables.filter(table => !foundTables.includes(table));
+    const tableChecks = await Promise.allSettled(
+      expectedTables.map(table => 
+        supabase.from(table).select('*').limit(1)
+      )
+    );
+    
+    const existingTables = tableChecks
+      .map((result, index) => ({ 
+        table: expectedTables[index], 
+        exists: result.status === 'fulfilled' && !result.value.error 
+      }))
+      .filter(check => check.exists)
+      .map(check => check.table);
+    
+    const missingTables = expectedTables.filter(table => !existingTables.includes(table));
     
     if (missingTables.length > 0) {
       console.log('❌ Missing tables:', missingTables);
       console.log('Please apply the migrations first.');
+      console.log('\nTo apply migrations:');
+      console.log('1. Go to your Supabase dashboard: https://supabase.com/dashboard/project/qinkldgvejheppheykfl');
+      console.log('2. Navigate to SQL Editor');
+      console.log('3. Run the migration files from supabase/migrations/');
       return;
     }
     
@@ -120,14 +120,8 @@ async function testMigrations() {
   }
 }
 
-// Check if credentials are provided
-if (SUPABASE_URL === 'your-supabase-url' || SUPABASE_ANON_KEY === 'your-supabase-anon-key') {
-  console.log('❌ Please set your Supabase credentials:');
-  console.log('export VITE_SUPABASE_URL="your-supabase-url"');
-  console.log('export VITE_SUPABASE_ANON_KEY="your-supabase-anon-key"');
-  console.log('\nOr update the script with your actual credentials.');
-  process.exit(1);
-}
+// Credentials are already set from your existing config
+console.log('🔧 Using Supabase credentials from your existing configuration');
 
 // Run the test
 testMigrations();

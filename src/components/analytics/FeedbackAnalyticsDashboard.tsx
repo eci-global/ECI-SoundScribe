@@ -72,7 +72,7 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
       setLoading(true);
 
       // Check if we're in demo mode (no database tables)
-      const isDemoMode = true; // For now, always use demo mode since tables don't exist
+      const isDemoMode = false; // Tables exist, so we can use real data
       
       if (isDemoMode) {
         // Demo mode - generate mock analytics data
