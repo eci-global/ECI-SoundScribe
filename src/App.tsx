@@ -32,6 +32,10 @@ import Recordings from "./pages/Recordings";
 import BDRTrainingSettings from "./pages/admin/BDRTrainingSettings";
 import FeedbackSystemTest from "./pages/FeedbackSystemTest";
 import FeedbackAnalytics from "./pages/admin/FeedbackAnalytics";
+import EmployeeManagement from "./components/employee/EmployeeManagement";
+import EmployeeDirectory from "./pages/EmployeeDirectory";
+import EmployeeProfile from "./pages/EmployeeProfile";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
 
@@ -117,6 +121,11 @@ const App = () => {
                   <Route path="/admin/ai-experiments" element={<AdminDashboard />} />
                   <Route path="/admin/feedback-analytics" element={<FeedbackAnalytics />} />
                   <Route path="/feedback-test" element={<FeedbackSystemTest />} />
+                  {/* Employee Management Routes */}
+                  <Route path="/employees" element={<EmployeeManagement />} />
+                  <Route path="/employees/directory" element={<EmployeeDirectory />} />
+                  <Route path="/employees/dashboard" element={<EmployeeDashboard />} />
+                  <Route path="/employees/profile/:id" element={<EmployeeProfile />} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>
