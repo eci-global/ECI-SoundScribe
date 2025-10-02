@@ -32,7 +32,7 @@ import Recordings from "./pages/Recordings";
 import BDRTrainingSettings from "./pages/admin/BDRTrainingSettings";
 import FeedbackSystemTest from "./pages/FeedbackSystemTest";
 import FeedbackAnalytics from "./pages/admin/FeedbackAnalytics";
-import EmployeeManagement from "./components/employee/EmployeeManagement";
+import EmployeeManagement from "./components/employee/EmployeeManagementTest";
 import EmployeeDirectory from "./pages/EmployeeDirectory";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployeeDashboard from "./pages/EmployeeDashboard";

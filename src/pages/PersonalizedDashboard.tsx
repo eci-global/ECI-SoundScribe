@@ -17,7 +17,8 @@ import {
   Sparkles,
   Phone,
   UserCheck,
-  AlertTriangle
+  AlertTriangle,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -500,6 +501,10 @@ export function PersonalizedDashboard() {
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/analytics')}>
                       <TrendingUp className="w-3 h-3 mr-2" />
                       Analytics
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/employees')}>
+                      <Users className="w-3 h-3 mr-2" />
+                      Employee Management
                     </Button>
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/library')}>
                       <BookOpen className="w-3 h-3 mr-2" />
