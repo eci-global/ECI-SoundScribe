@@ -11,7 +11,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignIn from "./pages/admin/AdminSignIn";
-import AdminLibrary from "./pages/admin/AdminLibrary";
 import CreateUsers from "./pages/admin/CreateUsers";
 import NotFound from "./pages/NotFound";
 import UploadsImport from "./pages/UploadsImport";
@@ -30,6 +29,7 @@ import AssistantCoach from "./pages/AssistantCoach";
 import DurationDebug from "./pages/DurationDebug";
 import Recordings from "./pages/Recordings";
 import BDRTrainingSettings from "./pages/admin/BDRTrainingSettings";
+import AllRecordings from "./pages/admin/AllRecordings";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
 
@@ -89,7 +89,7 @@ const App = () => {
                   <Route path="/debug/duration" element={<DurationDebug />} />
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/sign-in" element={<AdminSignIn />} />
-                  <Route path="/admin/library" element={<AdminLibrary />} />
+                  <Route path="/admin/library" element={<AllRecordings />} />
                   <Route path="/admin/create-users" element={<CreateUsers />} />
                   <Route path="/admin/recordings" element={<AdminDashboard />} />
                   <Route path="/admin/files" element={<AdminDashboard />} />
@@ -105,6 +105,7 @@ const App = () => {
                   <Route path="/admin/organization-outreach" element={<AdminDashboard />} />
                   <Route path="/admin/analytics" element={<AdminDashboard />} />
                   <Route path="/admin/bdr-training" element={<BDRTrainingSettings />} />
+                  <Route path="/admin/all-recordings" element={<AllRecordings />} />
                   <Route path="/admin/bdr-scorecard-history" element={<AdminDashboard />} />
                   <Route path="/admin/privacy" element={<AdminDashboard />} />
                   <Route path="/admin/activity" element={<AdminDashboard />} />

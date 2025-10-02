@@ -1,8 +1,9 @@
 import React, { useMemo } from 'react';
 import { useSpotlight } from '@/contexts/SpotlightContext';
-import { Clock, Star, AlertCircle, CheckCircle, TrendingUp, MessageCircle, Users, Sparkles, RefreshCw } from 'lucide-react';
+import { Clock, Star, AlertCircle, CheckCircle, TrendingUp, MessageCircle, Users, Sparkles, RefreshCw, Heart, Shield } from 'lucide-react';
 import { useAIMoments } from '@/hooks/useAIMoments';
 import { useRecordingDetail } from '@/hooks/useRecordingDetail';
+import { useSupportMode } from '@/contexts/SupportContext';
 import type { Recording } from '@/types/recording';
 
 interface MomentsPanelProps {
@@ -30,6 +31,9 @@ export default function MomentsPanel({ recording }: MomentsPanelProps) {
   const { bookmarks, transcriptLines, seek } = useSpotlight();
   const { generateAIMoments, isGenerating, error } = useAIMoments();
   const { data: recordingDetail } = useRecordingDetail(recording?.id || '');
+  const supportMode = useSupportMode();
+
+  const isSupport = recording?.content_type === 'customer_support' || recording?.content_type === 'support_call' || supportMode.supportMode;
 
   // Helper function to assess transcript data quality
   const assessTranscriptQuality = (lines: typeof transcriptLines) => {
@@ -188,6 +192,38 @@ export default function MomentsPanel({ recording }: MomentsPanelProps) {
     
     // Enhanced pattern matching with more sophisticated rules for better fallback
     const patterns = [
+      // ECI-Specific Patterns for Support Recordings
+      ...(isSupport ? [
+        // ECI Care for Customer behaviors
+        {
+          regex: /\b(appreciate|thank you|understand|empathy|sorry|apologize|feel|frustration|concern)\b/i,
+          type: 'emotional' as const,
+          label: 'Care for Customer',
+          severity: 'high' as const
+        },
+        // ECI Call Resolution behaviors
+        {
+          regex: /\b(solution|resolve|fix|repair|troubleshoot|investigate|root cause|follow up)\b/i,
+          type: 'action' as const,
+          label: 'Problem Resolution',
+          severity: 'high' as const
+        },
+        // ECI Call Flow behaviors
+        {
+          regex: /\b(opening|greeting|closing|wrap up|next steps|summary|recap|anything else)\b/i,
+          type: 'action' as const,
+          label: 'Call Structure',
+          severity: 'medium' as const
+        },
+        // Quality assurance moments
+        {
+          regex: /\b(quality|satisfaction|rating|feedback|experience|service|manager|escalate)\b/i,
+          type: 'decision' as const,
+          label: 'Service Quality',
+          severity: 'high' as const
+        }
+      ] : []),
+
       // Questions and clarifications (expanded patterns)
       {
         regex: /\b(question|clarification|understand|help me|explain|how does|what if|can you|would you|could you|do you|are you|will you|might you)\b/i,
@@ -313,7 +349,7 @@ export default function MomentsPanel({ recording }: MomentsPanelProps) {
       case 'competitive': return TrendingUp;
       case 'pricing': return Star;
       case 'action': return Clock;
-      case 'emotional': return Users;
+      case 'emotional': return isSupport ? Heart : Users; // Use heart icon for ECI emotional moments
       default: return Star;
     }
   };

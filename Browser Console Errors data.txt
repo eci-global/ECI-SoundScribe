@@ -1,0 +1,389 @@
+Download the React DevTools for a better development experience: https://reactjs.org/link/react-devtools
+client.ts:77 Supabase client initialized: https://qinkldgvejheppheykfl.supabase.co
+client.ts:79 Using default Supabase URL/key. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for local dev.
+(anonymous) @ client.ts:79Understand this warning
+main.tsx:6 main.tsx - Starting application initialization
+main.tsx:12 main.tsx - Root element found: true
+main.tsx:17 main.tsx - Creating React root and rendering App
+main.tsx:21 main.tsx - App rendered successfully
+App.tsx:51 App.tsx - App component initializing
+App.tsx:59 App.tsx - Rendering App component
+Summaries.tsx:24 Fetching recording with ID: 8a91a777-a039-4685-a069-67e7410555a5
+react-router-dom.js?v=d3ce914c:4393 ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
+warnOnce @ react-router-dom.js?v=d3ce914c:4393
+logDeprecation @ react-router-dom.js?v=d3ce914c:4396
+logV6DeprecationWarnings @ react-router-dom.js?v=d3ce914c:4399
+(anonymous) @ react-router-dom.js?v=d3ce914c:5271
+commitHookEffectListMount @ chunk-YQ5BCTVV.js?v=d3ce914c:16963
+commitPassiveMountOnFiber @ chunk-YQ5BCTVV.js?v=d3ce914c:18206
+commitPassiveMountEffects_complete @ chunk-YQ5BCTVV.js?v=d3ce914c:18179
+commitPassiveMountEffects_begin @ chunk-YQ5BCTVV.js?v=d3ce914c:18169
+commitPassiveMountEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:18159
+flushPassiveEffectsImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19543
+flushPassiveEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:19500
+performSyncWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18921
+flushSyncCallbacks @ chunk-YQ5BCTVV.js?v=d3ce914c:9166
+commitRootImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19485
+commitRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:19330
+finishConcurrentRender @ chunk-YQ5BCTVV.js?v=d3ce914c:18858
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18768
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this warning
+react-router-dom.js?v=d3ce914c:4393 ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
+warnOnce @ react-router-dom.js?v=d3ce914c:4393
+logDeprecation @ react-router-dom.js?v=d3ce914c:4396
+logV6DeprecationWarnings @ react-router-dom.js?v=d3ce914c:4402
+(anonymous) @ react-router-dom.js?v=d3ce914c:5271
+commitHookEffectListMount @ chunk-YQ5BCTVV.js?v=d3ce914c:16963
+commitPassiveMountOnFiber @ chunk-YQ5BCTVV.js?v=d3ce914c:18206
+commitPassiveMountEffects_complete @ chunk-YQ5BCTVV.js?v=d3ce914c:18179
+commitPassiveMountEffects_begin @ chunk-YQ5BCTVV.js?v=d3ce914c:18169
+commitPassiveMountEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:18159
+flushPassiveEffectsImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19543
+flushPassiveEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:19500
+performSyncWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18921
+flushSyncCallbacks @ chunk-YQ5BCTVV.js?v=d3ce914c:9166
+commitRootImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19485
+commitRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:19330
+finishConcurrentRender @ chunk-YQ5BCTVV.js?v=d3ce914c:18858
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18768
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this warning
+App.tsx:54 App.tsx - useEffect running, setting up global error handler
+useAuth.tsx:26 Auth state changed: SIGNED_IN {hasSession: true, userId: '1fd13984-3457-40ea-9220-20447a1ff9ae', email: 'admin@soundscribe.com'}
+client.ts:84 Supabase connection test - Session data: {session: {…}}
+client.ts:88 Supabase connection test - Success!
+useAuth.tsx:26 Auth state changed: INITIAL_SESSION {hasSession: true, userId: '1fd13984-3457-40ea-9220-20447a1ff9ae', email: 'admin@soundscribe.com'}
+useAuth.tsx:42 Initial session loaded: {hasSession: true, userId: '1fd13984-3457-40ea-9220-20447a1ff9ae', email: 'admin@soundscribe.com'}
+Summaries.tsx:57 Recording loaded: {id: '8a91a777-a039-4685-a069-67e7410555a5', created_at: '2025-10-02T16:43:33.439877+00:00', updated_at: '2025-10-02T20:30:18.37+00:00', user_id: '1fd13984-3457-40ea-9220-20447a1ff9ae', title: '0198519d-4fec-e7b1-d1b7-31d3d105e12f', …}
+SpotlightPage.tsx:137 📊 Using actual recording duration: 449s
+SpotlightPage.tsx:149 Speaker track parsing disabled to prevent memory crashes
+SpotlightPage.tsx:157 📝 SpotlightPage: Using simplified transcript parsing
+speakerResolution.ts:40 🎭 SpeakerResolver: Starting speaker resolution for recording: 8a91a777-a039-4685-a069-67e7410555a5
+speakerResolution.ts:145 ⚠️ Using conservative fallback method: {speakers: Array(2), totalCount: 2, method: 'fallback', confidence: 0.4}
+CallBriefCard.tsx:67 🔍 CallBriefCard debug: {hasAiSummary: true, hasAiInsights: true, hasSummary: false, aiSummaryType: 'string', aiInsightsType: 'string'}
+useRecordingDetail.ts:327 🔄 Polling: Invalid or missing data, stopping polling
+MomentIconRail.tsx:24 🎯 MomentIconRail - Complete Debug: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', recordingDetail: false, aiMomentsRaw: undefined, aiMomentsCount: 0, hasAIMoments: false, …}
+SpeakerTimeline.tsx:81 🎭 Enhanced SpeakerTimeline: Processing recording for detailed analysis: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasAISpeakerAnalysis: false, hasWhisperSegments: false, hasSpeakerSegments: false, hasTranscript: true}
+SpeakerTimeline.tsx:154 ⚠️ Using SpeakerResolver fallback...
+memoizedSpeakerResolution.ts:41 🧹 Speaker resolution cleanup monitoring started
+memoizedSpeakerResolution.ts:170 🔄 Computing new speaker resolution for: 8a91a777-a039-4685-a069-67e7410555a5
+speakerResolution.ts:40 🎭 SpeakerResolver: Starting speaker resolution for recording: 8a91a777-a039-4685-a069-67e7410555a5
+speakerResolution.ts:145 ⚠️ Using conservative fallback method: {speakers: Array(2), totalCount: 2, method: 'fallback', confidence: 0.4}
+memoizedSpeakerResolution.ts:208 💾 Cached speaker resolution for 8a91a777-a039-4685-a069-67e7410555a5, total memory: 552 bytes
+SpeakerTimeline.tsx:157 🎯 SpeakerResolver found speakers: (2) ['My', 'Hi']
+SpeakerTimeline.tsx:251 ✅ Enhanced SpeakerTimeline: Created detailed analysis: {speakerCount: 2, totalSegments: 2, analysisMethod: 'basic_detection', overallConfidence: 0.4, duration: 449}
+SpeakerTracks.tsx:16 🎭 SpeakerTracks: Component state: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasRecording: true, hasTranscript: true}
+speakerResolution.ts:40 🎭 SpeakerResolver: Starting speaker resolution for recording: 8a91a777-a039-4685-a069-67e7410555a5
+speakerResolution.ts:145 ⚠️ Using conservative fallback method: {speakers: Array(2), totalCount: 2, method: 'fallback', confidence: 0.4}
+SpeakerTracks.tsx:37 🎭 SpeakerTracks: Speaker names from SpeakerResolver: {speakerCount: 2, speakers: Array(2)}
+SpeakerTracks.tsx:72 ✅ SpeakerTracks: Simple speaker tracks created: (2) [{…}, {…}]
+debugFormatting.ts:2 === TEXT FORMATTING DEBUG ===
+debugFormatting.ts:3 Original text: **Conversation Summary:**
+The conversation involves Reginald from DTI support assisting Sue with a login issue related to a Windows environment. They discuss a potential network conflict caused by a Netgear appliance that is affecting authentication, rather than an issue with the application itself.
+
+**Key Points:**
+• **Support Connection Established:** Reginald guides Sue to establish a support connection through a specific website and provides a session key for assistance.  
+• **Authentication Issue Identified:** Sue experiences a new sign-in requirement that has not occurred before, prompting Reginald to investigate the issue further.  
+• **Network Conflict Suspected:** The IT technician suggests that a Netgear appliance is conflicting with the domain server, indicating the issue is likely network-related rather than application-related.
+debugFormatting.ts:4 Text length: 852
+debugFormatting.ts:11 Contains \r (carriage return): false
+debugFormatting.ts:12 Contains \n (newline): true
+debugFormatting.ts:13 Contains \t (tab): false
+debugFormatting.ts:17 First 100 chars with char codes:
+debugFormatting.ts:22   [25]: '
+' (code: 10)
+debugFormatting.ts:28 Number of lines: 7
+debugFormatting.ts:29 Line lengths: (7) [25, 274, 0, 15, 163, 165, 204]
+debugFormatting.ts:32 First 5 lines:
+debugFormatting.ts:34   Line 0: "**Conversation Summary:**"
+debugFormatting.ts:34   Line 1: "The conversation involves Reginald from DTI support assisting Sue with a login issue related to a Windows environment. They discuss a potential network conflict caused by a Netgear appliance that is affecting authentication, rather than an issue with the application itself."
+debugFormatting.ts:34   Line 2: ""
+debugFormatting.ts:34   Line 3: "**Key Points:**"
+debugFormatting.ts:34   Line 4: "• **Support Connection Established:** Reginald guides Sue to establish a support connection through a specific website and provides a session key for assistance.  "
+debugFormatting.ts:37 === END DEBUG ===
+VideoPlayer.tsx:33 Media source detected: {src: 'https://qinkldgvejheppheykfl.supabase.co/storage/v…23412060_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav', isAudio: true}
+useRecordingDetail.ts:327 🔄 Polling: Invalid or missing data, stopping polling
+useRecordingDetail.ts:78 useRecordingDetail: Fetching recording: 8a91a777-a039-4685-a069-67e7410555a5
+useRecordingDetail.ts:327 🔄 Polling: Invalid or missing data, stopping polling
+useRecordingDetail.ts:327 🔄 Polling: Invalid or missing data, stopping polling
+CallMediaPaneSimple.tsx:41 📊 CallMediaPaneSimple: Using recording duration: 449s
+CallMediaPaneSimple.tsx:52 Setting duration: 449
+ECICoachingInsights.tsx:86 ⏭️ Skipping auto-analysis: ECI analysis already exists
+CallBriefCard.tsx:67 🔍 CallBriefCard debug: {hasAiSummary: true, hasAiInsights: true, hasSummary: false, aiSummaryType: 'string', aiInsightsType: 'string'}
+MomentIconRail.tsx:24 🎯 MomentIconRail - Complete Debug: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', recordingDetail: false, aiMomentsRaw: undefined, aiMomentsCount: 0, hasAIMoments: false, …}
+SpeakerTimeline.tsx:81 🎭 Enhanced SpeakerTimeline: Processing recording for detailed analysis: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasAISpeakerAnalysis: false, hasWhisperSegments: false, hasSpeakerSegments: false, hasTranscript: true}
+SpeakerTimeline.tsx:154 ⚠️ Using SpeakerResolver fallback...
+memoizedSpeakerResolution.ts:160 🎯 Using cached speaker resolution for: 8a91a777-a039-4685-a069-67e7410555a5
+SpeakerTimeline.tsx:157 🎯 SpeakerResolver found speakers: (2) ['My', 'Hi']
+SpeakerTimeline.tsx:251 ✅ Enhanced SpeakerTimeline: Created detailed analysis: {speakerCount: 2, totalSegments: 2, analysisMethod: 'basic_detection', overallConfidence: 0.4, duration: 449}
+SpeakerTracks.tsx:16 🎭 SpeakerTracks: Component state: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasRecording: true, hasTranscript: true}
+useRecordingDetail.ts:327 🔄 Polling: Invalid or missing data, stopping polling
+VideoPlayer.tsx:47 📊 Video metadata loaded, duration: 449.2
+VideoPlayer.tsx:49 ✅ Setting accurate video duration: 449.2s
+CallBriefCard.tsx:67 🔍 CallBriefCard debug: {hasAiSummary: true, hasAiInsights: true, hasSummary: false, aiSummaryType: 'string', aiInsightsType: 'string'}
+MomentIconRail.tsx:24 🎯 MomentIconRail - Complete Debug: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', recordingDetail: false, aiMomentsRaw: undefined, aiMomentsCount: 0, hasAIMoments: false, …}
+SpeakerTimeline.tsx:81 🎭 Enhanced SpeakerTimeline: Processing recording for detailed analysis: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasAISpeakerAnalysis: false, hasWhisperSegments: false, hasSpeakerSegments: false, hasTranscript: true}
+SpeakerTimeline.tsx:154 ⚠️ Using SpeakerResolver fallback...
+memoizedSpeakerResolution.ts:160 🎯 Using cached speaker resolution for: 8a91a777-a039-4685-a069-67e7410555a5
+SpeakerTimeline.tsx:157 🎯 SpeakerResolver found speakers: (2) ['My', 'Hi']
+SpeakerTimeline.tsx:251 ✅ Enhanced SpeakerTimeline: Created detailed analysis: {speakerCount: 2, totalSegments: 2, analysisMethod: 'basic_detection', overallConfidence: 0.4, duration: 449}
+SpeakerTracks.tsx:16 🎭 SpeakerTracks: Component state: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasRecording: true, hasTranscript: true}
+useRecordingDetail.ts:327 🔄 Polling: Invalid or missing data, stopping polling
+useRecordingDetail.ts:106 useRecordingDetail: Recording found: {id: '8a91a777-a039-4685-a069-67e7410555a5', created_at: '2025-10-02T16:43:33.439877+00:00', updated_at: '2025-10-02T20:30:18.37+00:00', user_id: '1fd13984-3457-40ea-9220-20447a1ff9ae', title: '0198519d-4fec-e7b1-d1b7-31d3d105e12f', …}
+useRecordingDetail.ts:203 🔄 Transforming AI moments: null
+useRecordingDetail.ts:207 ❌ No AI moments data provided
+useRecordingDetail.ts:305 useRecordingDetail: Transformed data: {id: '8a91a777-a039-4685-a069-67e7410555a5', user_id: '1fd13984-3457-40ea-9220-20447a1ff9ae', title: '0198519d-4fec-e7b1-d1b7-31d3d105e12f', description: undefined, file_url: 'https://qinkldgvejheppheykfl.supabase.co/storage/v…23412060_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav', …}
+useRecordingDetail.ts:431 🔄 Polling: Recording completed with AI data: true, stopping
+MomentIconRail.tsx:24 🎯 MomentIconRail - Complete Debug: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', recordingDetail: true, aiMomentsRaw: null, aiMomentsCount: 0, hasAIMoments: false, …}
+useRecordingDetail.ts:431 🔄 Polling: Recording completed with AI data: true, stopping
+CallBriefCard.tsx:67 🔍 CallBriefCard debug: {hasAiSummary: true, hasAiInsights: true, hasSummary: false, aiSummaryType: 'string', aiInsightsType: 'string'}
+MomentIconRail.tsx:24 🎯 MomentIconRail - Complete Debug: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', recordingDetail: true, aiMomentsRaw: null, aiMomentsCount: 0, hasAIMoments: false, …}
+SpeakerTracks.tsx:16 🎭 SpeakerTracks: Component state: {recordingId: '8a91a777-a039-4685-a069-67e7410555a5', hasRecording: true, hasTranscript: true}
+AnalyticsPanel.tsx:370 📊 Sentiment Analytics Debug: {hasRealSentimentData: false, originalSentimentMomentsCount: 0, consolidatedMomentsCount: 8, positiveMoments: 4, negativeMoments: 4, …}
+AnalyticsPanel.tsx:392 ✅ Sentiment counts validation passed - metrics match filtered moments
+AnalyticsPanel.tsx:646 🔍 Risk Analysis Debug: {insights: null, hasInsights: false, riskFlags: undefined, riskFlagsLength: 0, overallTone: undefined, …}
+useRecordingDetail.ts:431 🔄 Polling: Recording completed with AI data: true, stopping
+useSentimentAnalysisV2.ts:220 🔄 useSentimentAnalysisV2: Creating safe channel for recording 8a91a777-a039-4685-a069-67e7410555a5
+realtimeUtils.ts:112 🔄 Attempting to create safe channel: recording_8a91a777-a039-4685-a069-67e7410555a5
+realtimeUtils.ts:117 ✅ Successfully created safe channel: recording_8a91a777-a039-4685-a069-67e7410555a5
+realtimeUtils.ts:60 ✅ Connection success recorded, resetting failure count
+useSentimentAnalysisV2.ts:249 ✅ useSentimentAnalysisV2: All safety checks passed, setting up subscription
+useSentimentAnalysisV2.ts:274 ✅ useSentimentAnalysisV2: Subscription created successfully
+AnalyticsPanel.tsx:804 Uncaught ReferenceError: RefreshCw is not defined
+    at AnalyticsPanel (AnalyticsPanel.tsx:804:14)
+    at renderWithHooks (chunk-YQ5BCTVV.js?v=d3ce914c:11596:26)
+    at updateFunctionComponent (chunk-YQ5BCTVV.js?v=d3ce914c:14630:28)
+    at beginWork (chunk-YQ5BCTVV.js?v=d3ce914c:15972:22)
+    at HTMLUnknownElement.callCallback2 (chunk-YQ5BCTVV.js?v=d3ce914c:3680:22)
+    at Object.invokeGuardedCallbackDev (chunk-YQ5BCTVV.js?v=d3ce914c:3705:24)
+    at invokeGuardedCallback (chunk-YQ5BCTVV.js?v=d3ce914c:3739:39)
+    at beginWork$1 (chunk-YQ5BCTVV.js?v=d3ce914c:19818:15)
+    at performUnitOfWork (chunk-YQ5BCTVV.js?v=d3ce914c:19251:20)
+    at workLoopSync (chunk-YQ5BCTVV.js?v=d3ce914c:19190:13)
+AnalyticsPanel @ AnalyticsPanel.tsx:804
+renderWithHooks @ chunk-YQ5BCTVV.js?v=d3ce914c:11596
+updateFunctionComponent @ chunk-YQ5BCTVV.js?v=d3ce914c:14630
+beginWork @ chunk-YQ5BCTVV.js?v=d3ce914c:15972
+callCallback2 @ chunk-YQ5BCTVV.js?v=d3ce914c:3680
+invokeGuardedCallbackDev @ chunk-YQ5BCTVV.js?v=d3ce914c:3705
+invokeGuardedCallback @ chunk-YQ5BCTVV.js?v=d3ce914c:3739
+beginWork$1 @ chunk-YQ5BCTVV.js?v=d3ce914c:19818
+performUnitOfWork @ chunk-YQ5BCTVV.js?v=d3ce914c:19251
+workLoopSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19190
+renderRootSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19169
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18728
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+suppressExtensionErrors.ts:28 🔥 ErrorBoundary caught error: ReferenceError: RefreshCw is not defined
+    at AnalyticsPanel (AnalyticsPanel.tsx:804:14)
+    at renderWithHooks (chunk-YQ5BCTVV.js?v=d3ce914c:11596:26)
+    at updateFunctionComponent (chunk-YQ5BCTVV.js?v=d3ce914c:14630:28)
+    at beginWork (chunk-YQ5BCTVV.js?v=d3ce914c:15972:22)
+    at beginWork$1 (chunk-YQ5BCTVV.js?v=d3ce914c:19806:22)
+    at performUnitOfWork (chunk-YQ5BCTVV.js?v=d3ce914c:19251:20)
+    at workLoopSync (chunk-YQ5BCTVV.js?v=d3ce914c:19190:13)
+    at renderRootSync (chunk-YQ5BCTVV.js?v=d3ce914c:19169:15)
+    at performConcurrentWorkOnRoot (chunk-YQ5BCTVV.js?v=d3ce914c:18728:83)
+    at workLoop (chunk-YQ5BCTVV.js?v=d3ce914c:197:42)
+console.error @ suppressExtensionErrors.ts:28
+getDerivedStateFromError @ ErrorBoundary.tsx:36
+update.payload @ chunk-YQ5BCTVV.js?v=d3ce914c:14111
+getStateFromUpdate @ chunk-YQ5BCTVV.js?v=d3ce914c:11137
+processUpdateQueue @ chunk-YQ5BCTVV.js?v=d3ce914c:11239
+updateClassInstance @ chunk-YQ5BCTVV.js?v=d3ce914c:13976
+updateClassComponent @ chunk-YQ5BCTVV.js?v=d3ce914c:14710
+beginWork @ chunk-YQ5BCTVV.js?v=d3ce914c:15978
+beginWork$1 @ chunk-YQ5BCTVV.js?v=d3ce914c:19806
+performUnitOfWork @ chunk-YQ5BCTVV.js?v=d3ce914c:19251
+workLoopSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19190
+renderRootSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19169
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18728
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+AnalyticsPanel.tsx:804 Uncaught ReferenceError: RefreshCw is not defined
+    at AnalyticsPanel (AnalyticsPanel.tsx:804:14)
+    at renderWithHooks (chunk-YQ5BCTVV.js?v=d3ce914c:11596:26)
+    at updateFunctionComponent (chunk-YQ5BCTVV.js?v=d3ce914c:14630:28)
+    at beginWork (chunk-YQ5BCTVV.js?v=d3ce914c:15972:22)
+    at HTMLUnknownElement.callCallback2 (chunk-YQ5BCTVV.js?v=d3ce914c:3680:22)
+    at Object.invokeGuardedCallbackDev (chunk-YQ5BCTVV.js?v=d3ce914c:3705:24)
+    at invokeGuardedCallback (chunk-YQ5BCTVV.js?v=d3ce914c:3739:39)
+    at beginWork$1 (chunk-YQ5BCTVV.js?v=d3ce914c:19818:15)
+    at performUnitOfWork (chunk-YQ5BCTVV.js?v=d3ce914c:19251:20)
+    at workLoopSync (chunk-YQ5BCTVV.js?v=d3ce914c:19190:13)
+AnalyticsPanel @ AnalyticsPanel.tsx:804
+renderWithHooks @ chunk-YQ5BCTVV.js?v=d3ce914c:11596
+updateFunctionComponent @ chunk-YQ5BCTVV.js?v=d3ce914c:14630
+beginWork @ chunk-YQ5BCTVV.js?v=d3ce914c:15972
+callCallback2 @ chunk-YQ5BCTVV.js?v=d3ce914c:3680
+invokeGuardedCallbackDev @ chunk-YQ5BCTVV.js?v=d3ce914c:3705
+invokeGuardedCallback @ chunk-YQ5BCTVV.js?v=d3ce914c:3739
+beginWork$1 @ chunk-YQ5BCTVV.js?v=d3ce914c:19818
+performUnitOfWork @ chunk-YQ5BCTVV.js?v=d3ce914c:19251
+workLoopSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19190
+renderRootSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19169
+recoverFromConcurrentError @ chunk-YQ5BCTVV.js?v=d3ce914c:18786
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18734
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+suppressExtensionErrors.ts:28 🔥 ErrorBoundary caught error: ReferenceError: RefreshCw is not defined
+    at AnalyticsPanel (AnalyticsPanel.tsx:804:14)
+    at renderWithHooks (chunk-YQ5BCTVV.js?v=d3ce914c:11596:26)
+    at updateFunctionComponent (chunk-YQ5BCTVV.js?v=d3ce914c:14630:28)
+    at beginWork (chunk-YQ5BCTVV.js?v=d3ce914c:15972:22)
+    at beginWork$1 (chunk-YQ5BCTVV.js?v=d3ce914c:19806:22)
+    at performUnitOfWork (chunk-YQ5BCTVV.js?v=d3ce914c:19251:20)
+    at workLoopSync (chunk-YQ5BCTVV.js?v=d3ce914c:19190:13)
+    at renderRootSync (chunk-YQ5BCTVV.js?v=d3ce914c:19169:15)
+    at recoverFromConcurrentError (chunk-YQ5BCTVV.js?v=d3ce914c:18786:28)
+    at performConcurrentWorkOnRoot (chunk-YQ5BCTVV.js?v=d3ce914c:18734:30)
+console.error @ suppressExtensionErrors.ts:28
+getDerivedStateFromError @ ErrorBoundary.tsx:36
+update.payload @ chunk-YQ5BCTVV.js?v=d3ce914c:14111
+getStateFromUpdate @ chunk-YQ5BCTVV.js?v=d3ce914c:11137
+processUpdateQueue @ chunk-YQ5BCTVV.js?v=d3ce914c:11239
+updateClassInstance @ chunk-YQ5BCTVV.js?v=d3ce914c:13976
+updateClassComponent @ chunk-YQ5BCTVV.js?v=d3ce914c:14710
+beginWork @ chunk-YQ5BCTVV.js?v=d3ce914c:15978
+beginWork$1 @ chunk-YQ5BCTVV.js?v=d3ce914c:19806
+performUnitOfWork @ chunk-YQ5BCTVV.js?v=d3ce914c:19251
+workLoopSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19190
+renderRootSync @ chunk-YQ5BCTVV.js?v=d3ce914c:19169
+recoverFromConcurrentError @ chunk-YQ5BCTVV.js?v=d3ce914c:18786
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18734
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+suppressExtensionErrors.ts:28 The above error occurred in the <AnalyticsPanel> component:
+
+    at AnalyticsPanel (http://localhost:8080/src/components/spotlight/panels/AnalyticsPanel.tsx?t=1759441892820:37:42)
+    at div
+    at div
+    at div
+    at div
+    at SpotlightProvider (http://localhost:8080/src/contexts/SpotlightContext.tsx:5:37)
+    at SpotlightPage (http://localhost:8080/src/components/spotlight/SpotlightPage.tsx?t=1759441892820:127:41)
+    at div
+    at div
+    at div
+    at GongLayout (http://localhost:8080/src/components/layout/GongLayout.tsx:14:3)
+    at Summaries (http://localhost:8080/src/pages/Summaries.tsx?t=1759441892820:10:18)
+    at RenderedRoute (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:4088:5)
+    at Routes (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:4558:5)
+    at Router (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:4501:15)
+    at BrowserRouter (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:5247:5)
+    at SidebarProvider (http://localhost:8080/src/contexts/SidebarContext.tsx:14:35)
+    at SupportProvider (http://localhost:8080/src/contexts/SupportContext.tsx:6:35)
+    at AuthProvider (http://localhost:8080/src/hooks/useAuth.tsx:6:32)
+    at Provider (http://localhost:8080/node_modules/.vite/deps/chunk-36WGJFHK.js?v=d3ce914c:37:15)
+    at TooltipProvider (http://localhost:8080/node_modules/.vite/deps/@radix-ui_react-tooltip.js?v=d3ce914c:64:5)
+    at QueryClientProvider (http://localhost:8080/node_modules/.vite/deps/@tanstack_react-query.js?v=d3ce914c:3016:3)
+    at ErrorBoundary (http://localhost:8080/src/components/ErrorBoundary.tsx:10:5)
+    at App (http://localhost:8080/src/App.tsx?t=1759441892820:50:3)
+
+React will try to recreate this component tree from scratch using the error boundary you provided, ErrorBoundary.
+console.error @ suppressExtensionErrors.ts:28
+logCapturedError @ chunk-YQ5BCTVV.js?v=d3ce914c:14080
+callback @ chunk-YQ5BCTVV.js?v=d3ce914c:14126
+callCallback @ chunk-YQ5BCTVV.js?v=d3ce914c:11296
+commitUpdateQueue @ chunk-YQ5BCTVV.js?v=d3ce914c:11313
+commitLayoutEffectOnFiber @ chunk-YQ5BCTVV.js?v=d3ce914c:17123
+commitLayoutMountEffects_complete @ chunk-YQ5BCTVV.js?v=d3ce914c:18030
+commitLayoutEffects_begin @ chunk-YQ5BCTVV.js?v=d3ce914c:18019
+commitLayoutEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:17970
+commitRootImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19406
+commitRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:19330
+finishConcurrentRender @ chunk-YQ5BCTVV.js?v=d3ce914c:18813
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18768
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+suppressExtensionErrors.ts:28 🔥 ErrorBoundary componentDidCatch: ReferenceError: RefreshCw is not defined
+    at AnalyticsPanel (AnalyticsPanel.tsx:804:14)
+    at renderWithHooks (chunk-YQ5BCTVV.js?v=d3ce914c:11596:26)
+    at updateFunctionComponent (chunk-YQ5BCTVV.js?v=d3ce914c:14630:28)
+    at beginWork (chunk-YQ5BCTVV.js?v=d3ce914c:15972:22)
+    at beginWork$1 (chunk-YQ5BCTVV.js?v=d3ce914c:19806:22)
+    at performUnitOfWork (chunk-YQ5BCTVV.js?v=d3ce914c:19251:20)
+    at workLoopSync (chunk-YQ5BCTVV.js?v=d3ce914c:19190:13)
+    at renderRootSync (chunk-YQ5BCTVV.js?v=d3ce914c:19169:15)
+    at recoverFromConcurrentError (chunk-YQ5BCTVV.js?v=d3ce914c:18786:28)
+    at performConcurrentWorkOnRoot (chunk-YQ5BCTVV.js?v=d3ce914c:18734:30) {componentStack: '\n    at AnalyticsPanel (http://localhost:8080/src/…/localhost:8080/src/App.tsx?t=1759441892820:50:3)'}
+console.error @ suppressExtensionErrors.ts:28
+componentDidCatch @ ErrorBoundary.tsx:46
+callback @ chunk-YQ5BCTVV.js?v=d3ce914c:14132
+callCallback @ chunk-YQ5BCTVV.js?v=d3ce914c:11296
+commitUpdateQueue @ chunk-YQ5BCTVV.js?v=d3ce914c:11313
+commitLayoutEffectOnFiber @ chunk-YQ5BCTVV.js?v=d3ce914c:17123
+commitLayoutMountEffects_complete @ chunk-YQ5BCTVV.js?v=d3ce914c:18030
+commitLayoutEffects_begin @ chunk-YQ5BCTVV.js?v=d3ce914c:18019
+commitLayoutEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:17970
+commitRootImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19406
+commitRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:19330
+finishConcurrentRender @ chunk-YQ5BCTVV.js?v=d3ce914c:18813
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18768
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+suppressExtensionErrors.ts:28 🔥 Error Context: {errorId: 'error_1759442106623_c3bmwdjni', url: 'http://localhost:8080/summaries/8a91a777-a039-4685-a069-67e7410555a5', userAgent: 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWeb…KHTML, like Gecko) Chrome/141.0.0.0 Safari/537.36', timestamp: '2025-10-02T21:55:06.627Z', errorType: {…}}
+console.error @ suppressExtensionErrors.ts:28
+componentDidCatch @ ErrorBoundary.tsx:106
+callback @ chunk-YQ5BCTVV.js?v=d3ce914c:14132
+callCallback @ chunk-YQ5BCTVV.js?v=d3ce914c:11296
+commitUpdateQueue @ chunk-YQ5BCTVV.js?v=d3ce914c:11313
+commitLayoutEffectOnFiber @ chunk-YQ5BCTVV.js?v=d3ce914c:17123
+commitLayoutMountEffects_complete @ chunk-YQ5BCTVV.js?v=d3ce914c:18030
+commitLayoutEffects_begin @ chunk-YQ5BCTVV.js?v=d3ce914c:18019
+commitLayoutEffects @ chunk-YQ5BCTVV.js?v=d3ce914c:17970
+commitRootImpl @ chunk-YQ5BCTVV.js?v=d3ce914c:19406
+commitRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:19330
+finishConcurrentRender @ chunk-YQ5BCTVV.js?v=d3ce914c:18813
+performConcurrentWorkOnRoot @ chunk-YQ5BCTVV.js?v=d3ce914c:18768
+workLoop @ chunk-YQ5BCTVV.js?v=d3ce914c:197
+flushWork @ chunk-YQ5BCTVV.js?v=d3ce914c:176
+performWorkUntilDeadline @ chunk-YQ5BCTVV.js?v=d3ce914c:384Understand this error
+useSentimentAnalysisV2.ts:289 🧹 useSentimentAnalysisV2: Cleaning up channel
+
+
+
+Technical Details (Development)
+Error ID: error_1759442062010_what53j4f
+Message: RefreshCw is not defined
+Stack:
+ReferenceError: RefreshCw is not defined
+    at AnalyticsPanel (http://localhost:8080/src/components/spotlight/panels/AnalyticsPanel.tsx?t=1759441892820:622:28)
+    at renderWithHooks (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:11596:26)
+    at updateFunctionComponent (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:14630:28)
+    at beginWork (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:15972:22)
+    at beginWork$1 (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:19806:22)
+    at performUnitOfWork (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:19251:20)
+    at workLoopSync (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:19190:13)
+    at renderRootSync (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:19169:15)
+    at recoverFromConcurrentError (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:18786:28)
+    at performConcurrentWorkOnRoot (http://localhost:8080/node_modules/.vite/deps/chunk-YQ5BCTVV.js?v=d3ce914c:18734:30)
+Component Stack:
+
+    at AnalyticsPanel (http://localhost:8080/src/components/spotlight/panels/AnalyticsPanel.tsx?t=1759441892820:37:42)
+    at div
+    at div
+    at div
+    at div
+    at SpotlightProvider (http://localhost:8080/src/contexts/SpotlightContext.tsx:5:37)
+    at SpotlightPage (http://localhost:8080/src/components/spotlight/SpotlightPage.tsx?t=1759441892820:127:41)
+    at div
+    at div
+    at div
+    at GongLayout (http://localhost:8080/src/components/layout/GongLayout.tsx:14:3)
+    at Summaries (http://localhost:8080/src/pages/Summaries.tsx?t=1759441892820:10:18)
+    at RenderedRoute (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:4088:5)
+    at Routes (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:4558:5)
+    at Router (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:4501:15)
+    at BrowserRouter (http://localhost:8080/node_modules/.vite/deps/react-router-dom.js?v=d3ce914c:5247:5)
+    at SidebarProvider (http://localhost:8080/src/contexts/SidebarContext.tsx:14:35)
+    at SupportProvider (http://localhost:8080/src

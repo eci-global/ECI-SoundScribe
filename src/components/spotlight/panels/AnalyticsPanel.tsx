@@ -1,15 +1,60 @@
 import * as React from 'react';
-import { BarChart3, Clock, Users, MessageSquare, Target, TrendingUp, TrendingDown, Minus, Brain, Zap, BarChart2, Heart, Shield, AlertTriangle, CheckCircle, Activity, Users2, TrendingUp as Growth, RefreshCw, Smile, Frown, Mic, Volume2, Timer, Play, User, ChevronDown, ChevronRight, Phone, UserCheck, Star } from 'lucide-react';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import {
+  BarChart3,
+  Clock,
+  Users,
+  MessageSquare,
+  Target,
+  TrendingUp,
+  TrendingDown,
+  Brain,
+  Activity,
+  Timer,
+  User,
+  Phone,
+  UserCheck,
+  Star,
+  Zap,
+  Shield,
+  CheckCircle,
+  AlertTriangle,
+  LineChart,
+  PieChart,
+  BarChart2,
+  Gauge,
+  ArrowUp,
+  ArrowDown,
+  Minus,
+  Signal,
+  Headphones,
+  Volume2,
+  Mic,
+  Lightbulb,
+  Heart,
+  RefreshCw,
+  Smile,
+  Frown
+} from 'lucide-react';
 import { Badge } from '@/components/ui/badge';
+import { Progress } from '@/components/ui/progress';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { formatDuration } from '@/utils/mediaDuration';
 import { useSentimentAnalysisV2 } from '@/hooks/useSentimentAnalysisV2';
 import { useSpotlight } from '@/contexts/SpotlightContext';
 import { useSupportMode } from '@/contexts/SupportContext';
-import { analyzeAllSupportSignals, extractSupportMoments } from '@/utils/supportSignals';
-import { useSupportAnalytics } from '@/hooks/useSupportAnalytics';
+import {
+  parseECIAnalysis,
+  getECIOverallScore,
+  getECIEscalationRisk,
+  hasECIAnalysis,
+  type ECIAnalysisResult
+} from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
+
+interface AnalyticsPanelProps {
+  recording?: Recording | null;
+}
 
 interface SpeakerCharacteristics {
   speaking_time?: number;
@@ -24,14 +69,28 @@ interface AISpeakerAnalysis {
   talk_ratio?: number;
 }
 
-interface AnalyticsPanelProps {
-  recording?: Recording | null;
+interface PerformanceMetrics {
+  duration: number;
+  wordCount: number;
+  wordsPerMinute: number;
+  speakers: number;
+  talkRatio: number;
+  averageResponseTime: number;
+  sentimentScore: number;
+  engagementScore: number;
+}
+
+interface PredictiveInsights {
+  successProbability: number;
+  riskFactors: string[];
+  recommendations: string[];
+  confidenceLevel: number;
 }
 
 export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
   // HOOKS MUST BE CALLED UNCONDITIONALLY - Always call hooks before any conditional logic
-  const { 
-    moments: sentimentMoments, 
+  const {
+    moments: sentimentMoments,
     insights,
     isLoading: sentimentLoading,
     error: sentimentError,
@@ -40,37 +99,151 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
 
   const { seek } = useSpotlight();
   const supportMode = useSupportMode();
-  
-  // Use real support analytics data when recording is available
-  const { 
-    supportAnalysis, 
-    isLoading: supportLoading, 
-    error: supportError, 
-    triggerAnalysis,
-    hasAnalysis,
-    useLocalFallback 
-  } = useSupportAnalytics(recording?.id || '');
 
-  // State for expandable sentiment sections
-  const [showPositiveMoments, setShowPositiveMoments] = React.useState(false);
-  const [showNegativeMoments, setShowNegativeMoments] = React.useState(false);
-  const [showNeutralMoments, setShowNeutralMoments] = React.useState(false);
+  // Mode detection logic
+  const isSupport = React.useMemo(() => {
+    return supportMode.supportMode ||
+      recording?.content_type === 'customer_support' ||
+      recording?.content_type === 'support_call';
+  }, [supportMode.supportMode, recording?.content_type]);
+
+  const isSales = React.useMemo(() => {
+    return !supportMode.supportMode && recording?.content_type === 'sales_call';
+  }, [supportMode.supportMode, recording?.content_type]);
+
+  // ECI analysis for support mode
+  const eciAnalysis: ECIAnalysisResult | null = React.useMemo(() => {
+    if (!isSupport || !recording) return null;
+    return parseECIAnalysis(recording);
+  }, [recording, isSupport]);
   
-  // State for support sections
-  const [showSatisfactionMoments, setShowSatisfactionMoments] = React.useState(false);
-  const [showEscalationMoments, setShowEscalationMoments] = React.useState(false);
-  
-  // Generate local support analysis as fallback
-  const localSupportAnalysis = React.useMemo(() => {
-    if (!recording || !supportMode.supportMode) return null;
-    return analyzeAllSupportSignals(recording);
-  }, [recording, supportMode.supportMode]);
-  
-  // Get support moments for display
-  const supportMoments = React.useMemo(() => {
-    if (!recording || !supportMode.supportMode) return [];
-    return extractSupportMoments(recording);
-  }, [recording, supportMode.supportMode]);
+
+  // Performance metrics calculation
+  const performanceMetrics: PerformanceMetrics = React.useMemo(() => {
+    if (!recording) {
+      return {
+        duration: 0,
+        wordCount: 0,
+        wordsPerMinute: 0,
+        speakers: 0,
+        talkRatio: 0,
+        averageResponseTime: 0,
+        sentimentScore: 50,
+        engagementScore: 0
+      };
+    }
+
+    const speakerAnalysis = recording.ai_speaker_analysis as AISpeakerAnalysis;
+    const wordCount = recording.transcript?.split(/\s+/).length || 0;
+    const duration = recording.duration || 0;
+    const talkRatio = speakerAnalysis?.talk_ratio || 0;
+    const speakers = speakerAnalysis?.identified_speakers?.length || 0;
+    const wordsPerMinute = duration > 0 ? Math.round(wordCount / (duration / 60)) : 0;
+
+    // Calculate sentiment score from sentiment moments
+    const positiveMoments = sentimentMoments.filter(m => m.sentiment === 'positive').length;
+    const negativeMoments = sentimentMoments.filter(m => m.sentiment === 'negative').length;
+    const totalMoments = sentimentMoments.length;
+    const sentimentScore = totalMoments > 0 ? Math.round((positiveMoments / totalMoments) * 100) : 50;
+
+    // Calculate engagement score
+    let engagementScore = 0;
+    if (speakers > 1) engagementScore += 30;
+    if (wordsPerMinute > 120) engagementScore += 25;
+    if (positiveMoments > negativeMoments) engagementScore += 25;
+    if (insights?.emotionalVolatility && insights.emotionalVolatility < 0.3) engagementScore += 20;
+    engagementScore = Math.min(engagementScore, 100);
+
+    // Estimate average response time (simple calculation based on turn-taking)
+    const averageResponseTime = duration > 0 && speakers > 1 ? duration / (speakers * 10) : 0;
+
+    return {
+      duration,
+      wordCount,
+      wordsPerMinute,
+      speakers,
+      talkRatio: Math.round(talkRatio * 100),
+      averageResponseTime,
+      sentimentScore,
+      engagementScore
+    };
+  }, [recording, sentimentMoments, insights]);
+  // Predictive insights calculation
+  const predictiveInsights: PredictiveInsights = React.useMemo(() => {
+    if (!recording) {
+      return {
+        successProbability: 0,
+        riskFactors: [],
+        recommendations: [],
+        confidenceLevel: 0
+      };
+    }
+
+    let successProbability = 50; // Base probability
+    const riskFactors: string[] = [];
+    const recommendations: string[] = [];
+
+    // Adjust probability based on metrics
+    if (performanceMetrics.sentimentScore > 70) {
+      successProbability += 20;
+    } else if (performanceMetrics.sentimentScore < 40) {
+      successProbability -= 20;
+      riskFactors.push('Low customer sentiment detected');
+    }
+
+    if (performanceMetrics.engagementScore > 80) {
+      successProbability += 15;
+    } else if (performanceMetrics.engagementScore < 50) {
+      successProbability -= 15;
+      riskFactors.push('Low engagement levels');
+    }
+
+    if (performanceMetrics.duration < 300) {
+      riskFactors.push('Very short call duration');
+      recommendations.push('Consider extending future conversations');
+    } else if (performanceMetrics.duration > 3600) {
+      riskFactors.push('Extremely long call duration');
+      recommendations.push('Focus on more efficient problem resolution');
+    }
+
+    if (performanceMetrics.talkRatio > 80) {
+      riskFactors.push('Rep dominated conversation');
+      recommendations.push('Encourage more customer participation');
+    } else if (performanceMetrics.talkRatio < 20) {
+      riskFactors.push('Very low rep participation');
+      recommendations.push('Increase active participation in conversation');
+    }
+
+    // ECI-specific adjustments for support calls
+    if (isSupport && eciAnalysis) {
+      const eciScore = getECIOverallScore(eciAnalysis);
+      successProbability = Math.round((successProbability + eciScore) / 2);
+
+      if (getECIEscalationRisk(eciAnalysis) === 'high') {
+        riskFactors.push('High escalation risk identified');
+        recommendations.push('Review ECI behaviors for improvement areas');
+      }
+    }
+
+    // Sales-specific adjustments
+    if (isSales) {
+      if (performanceMetrics.wordsPerMinute > 200) {
+        riskFactors.push('Speaking too fast for sales context');
+        recommendations.push('Slow down pace to improve customer comprehension');
+      }
+    }
+
+    successProbability = Math.max(0, Math.min(100, successProbability));
+    const confidenceLevel = Math.round(Math.random() * 30 + 70); // Simulated confidence for now
+
+    return {
+      successProbability: Math.round(successProbability),
+      riskFactors,
+      recommendations,
+      confidenceLevel
+    };
+  }, [recording, performanceMetrics, isSupport, isSales, eciAnalysis]);
+
 
   // Generate consolidated sentiment moments that match metrics
   const consolidatedSentimentMoments = React.useMemo(() => {
@@ -373,7 +546,7 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
             moments.push({
               id: 'opportunity',
               category: 'Sales Opportunity',
-              icon: React.createElement(Growth, { className: "w-4 h-4 text-green-500" }),
+              icon: React.createElement(TrendingUp, { className: "w-4 h-4 text-green-500" }),
               title: 'Business Opportunity',
               description: insights.opportunities[0],
               impact: 'high',
@@ -511,7 +684,8 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
     const negativeMoments = stats.consolidatedMoments.filter(m => m.sentiment === 'negative').length;
     const totalMoments = stats.consolidatedMoments.length;
     if (totalMoments > 0 && (negativeMoments / totalMoments) > 0.4) {
-      risks.push(`High negative sentiment concentration (${Math.round((negativeMoments/totalMoments)*100)}%)`);
+      const negativePercentage = Math.round((negativeMoments / totalMoments) * 100);
+      risks.push(`High negative sentiment concentration (${negativePercentage}%)`);
     }
     
     // 4. Talk ratio risks
@@ -564,7 +738,8 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
     // 3. High engagement indicators
     const positiveRatio = stats.consolidatedMoments.filter(m => m.sentiment === 'positive').length / Math.max(stats.consolidatedMoments.length, 1);
     if (positiveRatio > 0.6) {
-      opps.push(`High customer satisfaction (${Math.round(positiveRatio*100)}% positive sentiment)`);
+      const satisfactionPercentage = Math.round(positiveRatio * 100);
+      opps.push(`High customer satisfaction (${satisfactionPercentage}% positive sentiment)`);
     }
     
     // 4. Duration-based opportunities
@@ -742,1108 +917,527 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
         </div>
       ) : (
         <>
-          {/* Header */}
-          <div className="flex items-center gap-2 mb-6">
-            {supportMode.supportMode ? (
-              <UserCheck className="w-5 h-5 text-blue-500" />
-            ) : (
-              <Brain className="w-5 h-5 text-primary" />
-            )}
-            <h2 className="text-lg font-semibold text-foreground">
-              {supportMode.supportMode ? 'Customer Support Analytics' : 'Sales Intelligence Dashboard'}
-            </h2>
-            <span className="px-2 py-1 text-xs font-medium bg-primary/10 text-primary rounded-md">AI Powered</span>
-            {supportMode.supportMode && (
-              <span className="px-2 py-1 text-xs font-medium bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md">
-                Support Mode
-              </span>
-            )}
-          </div>
-
-          {/* Sentiment Analysis (Sales) / Customer Interaction Analysis (Support) */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              {supportMode.supportMode ? (
-                <>
-                  <UserCheck className="w-4 h-4 text-blue-500" />
-                  <h3 className="font-semibold text-foreground">Customer Interaction Analysis</h3>
-                </>
+          {/* Performance Intelligence Dashboard Header */}
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              {isSupport ? (
+                <Shield className="w-6 h-6 text-blue-600" />
               ) : (
-                <>
-                  <Heart className="w-4 h-4 text-emerald-500" />
-                  <h3 className="font-semibold text-foreground">Sentiment Analysis</h3>
-                </>
+                <BarChart3 className="w-6 h-6 text-emerald-600" />
               )}
-              {supportMode.supportMode ? (
-                <span className="px-2 py-1 text-xs bg-blue-100 dark:bg-blue-900/20 text-blue-700 dark:text-blue-300 rounded-md">
-                  Support Framework
-                </span>
-              ) : stats.hasRealSentimentData ? (
-                <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-md">
-                  AI Generated
-                </span>
-              ) : (
-                <span className="px-2 py-1 text-xs bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 rounded-md">
-                  Keyword Analysis
-                </span>
+              <div>
+                <h2 className="text-xl font-bold text-foreground">
+                  {isSupport ? 'Service Performance Dashboard' : 'Sales Performance Analytics'}
+                </h2>
+                <p className="text-sm text-muted-foreground">
+                  {isSupport ? 'Customer service delivery intelligence' : 'Deal progression and engagement metrics'}
+                </p>
+              </div>
+            </div>
+            <div className="flex items-center gap-2">
+              <Badge variant="outline" className="bg-gradient-to-r from-blue-50 to-emerald-50 border-blue-200">
+                <LineChart className="w-3 h-3 mr-1" />
+                Performance Intelligence
+              </Badge>
+              {isSupport && (
+                <Badge variant="secondary" className="bg-blue-100 text-blue-800">
+                  Support Mode
+                </Badge>
+              )}
+              {isSales && (
+                <Badge variant="secondary" className="bg-emerald-100 text-emerald-800">
+                  Sales Mode
+                </Badge>
               )}
             </div>
-            <div className="bg-card rounded-lg border border-border p-4">
-              {supportMode.supportMode ? (
-                /* Customer Interaction Analysis for Support Mode */
-                <div className="space-y-4">
-              {localSupportAnalysis && (
-                <>
-                  {/* Customer Satisfaction Overview */}
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg">
-                      <div className="text-2xl font-bold text-blue-600">{localSupportAnalysis.customerSatisfaction}%</div>
-                      <div className="text-xs text-muted-foreground">Customer Satisfaction</div>
-                    </div>
-                    <div className="text-center p-3 bg-orange-50 dark:bg-orange-950/20 rounded-lg">
-                      <div className={`text-2xl font-bold ${localSupportAnalysis.escalationRisk === 'low' ? 'text-green-600' : localSupportAnalysis.escalationRisk === 'medium' ? 'text-orange-600' : 'text-red-600'}`}>
-                        {localSupportAnalysis.escalationRisk.toUpperCase()}
-                      </div>
-                      <div className="text-xs text-muted-foreground">Escalation Risk</div>
-                    </div>
-                    <div className="text-center p-3 bg-green-50 dark:bg-green-950/20 rounded-lg">
-                      <div className="text-2xl font-bold text-green-600">{localSupportAnalysis.resolutionEffectiveness}%</div>
-                      <div className="text-xs text-muted-foreground">Resolution Effectiveness</div>
-                    </div>
-                  </div>
+          </div>
 
-                  {/* Satisfaction and Escalation Moments */}
-                  <div className="space-y-2">
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between text-sm h-auto p-3 hover:bg-green-50 dark:hover:bg-green-950/20"
-                      onClick={() => setShowSatisfactionMoments(!showSatisfactionMoments)}
-                      disabled={supportMoments.filter(m => m.type === 'satisfaction').length === 0}
-                    >
+          {/* Support Mode Analytics Sections */}
+          {isSupport && (
+            <>
+              {/* Service Delivery Intelligence */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Shield className="w-5 h-5 text-blue-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Service Delivery Intelligence</h3>
+                  <Badge variant="outline" className="text-xs">
+                    ECI Framework
+                  </Badge>
+                </div>
+
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Service Quality Score */}
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                    <CardContent className="p-4">
                       <div className="flex items-center gap-3">
-                        <CheckCircle className="w-5 h-5 text-green-500" />
-                        <div className="text-left">
-                          <div className="text-2xl font-bold text-foreground">{supportMoments.filter(m => m.type === 'satisfaction').length}</div>
-                          <div className="text-xs text-muted-foreground">Satisfaction signals</div>
+                        <div className="p-2 bg-blue-600 rounded-lg">
+                          <Star className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-blue-900">
+                            {eciAnalysis ? getECIOverallScore(eciAnalysis) : performanceMetrics.sentimentScore}%
+                          </div>
+                          <div className="text-sm text-blue-700">Service Quality</div>
                         </div>
                       </div>
-                      {supportMoments.filter(m => m.type === 'satisfaction').length > 0 && (
-                        showSatisfactionMoments ? 
-                          <ChevronDown className="w-4 h-4 text-muted-foreground" /> : 
-                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </Button>
+                    </CardContent>
+                  </Card>
 
-                    <Button
-                      variant="ghost"
-                      className="w-full justify-between text-sm h-auto p-3 hover:bg-red-50 dark:hover:bg-red-950/20"
-                      onClick={() => setShowEscalationMoments(!showEscalationMoments)}
-                      disabled={supportMoments.filter(m => m.type === 'escalation').length === 0}
-                    >
+                  {/* Escalation Risk */}
+                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
+                    <CardContent className="p-4">
                       <div className="flex items-center gap-3">
-                        <AlertTriangle className="w-5 h-5 text-red-500" />
-                        <div className="text-left">
-                          <div className="text-2xl font-bold text-foreground">{supportMoments.filter(m => m.type === 'escalation').length}</div>
-                          <div className="text-xs text-muted-foreground">Escalation indicators</div>
+                        <div className="p-2 bg-orange-600 rounded-lg">
+                          <AlertTriangle className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-orange-900 capitalize">
+                            {eciAnalysis ? getECIEscalationRisk(eciAnalysis) : 'Low'}
+                          </div>
+                          <div className="text-sm text-orange-700">Escalation Risk</div>
                         </div>
                       </div>
-                      {supportMoments.filter(m => m.type === 'escalation').length > 0 && (
-                        showEscalationMoments ? 
-                          <ChevronDown className="w-4 h-4 text-muted-foreground" /> : 
-                          <ChevronRight className="w-4 h-4 text-muted-foreground" />
-                      )}
-                    </Button>
-                  </div>
+                    </CardContent>
+                  </Card>
 
-                  {/* Expandable Satisfaction Moments */}
-                  {showSatisfactionMoments && supportMoments.filter(m => m.type === 'satisfaction').length > 0 && (
-                    <div className="mt-4 border-t border-border pt-4">
-                      <h4 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
-                        <CheckCircle className="w-3 h-3 text-green-500" />
-                        Satisfaction Signals ({supportMoments.filter(m => m.type === 'satisfaction').length})
-                      </h4>
-                      <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {supportMoments.filter(m => m.type === 'satisfaction').map((moment, index) => (
-                          <div key={moment.id || `satisfaction-${index}`} className="bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900 rounded-lg p-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm text-foreground mb-1">
-                                  {moment.description}
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <Clock className="w-3 h-3" />
-                                  <span>{formatTime(moment.timestamp)}</span>
-                                  <span>•</span>
-                                  <span>{moment.speaker}</span>
-                                  <span>•</span>
-                                  <span>{Math.round(moment.confidence * 100)}% confidence</span>
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleSeekTo(moment.timestamp)}
-                                className="flex-shrink-0 h-6 w-6 p-0 hover:bg-green-100 dark:hover:bg-green-900/30"
-                                title="Jump to this moment"
-                              >
-                                <Play className="w-3 h-3" />
-                              </Button>
-                            </div>
+                  {/* Resolution Efficiency */}
+                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-green-600 rounded-lg">
+                          <CheckCircle className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-green-900">
+                            {Math.round((performanceMetrics.duration / 60) / (performanceMetrics.wordsPerMinute / 150))}m
                           </div>
-                        ))}
+                          <div className="text-sm text-green-700">Avg Resolution</div>
+                        </div>
                       </div>
-                    </div>
-                  )}
+                    </CardContent>
+                  </Card>
+                </div>
+              </section>
 
-                  {/* Expandable Escalation Moments */}
-                  {showEscalationMoments && supportMoments.filter(m => m.type === 'escalation').length > 0 && (
-                    <div className="mt-4 border-t border-border pt-4">
-                      <h4 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
-                        <AlertTriangle className="w-3 h-3 text-red-500" />
-                        Escalation Indicators ({supportMoments.filter(m => m.type === 'escalation').length})
-                      </h4>
-                      <div className="space-y-2 max-h-48 overflow-y-auto">
-                        {supportMoments.filter(m => m.type === 'escalation').map((moment, index) => (
-                          <div key={moment.id || `escalation-${index}`} className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg p-3">
-                            <div className="flex items-start justify-between gap-2">
-                              <div className="flex-1 min-w-0">
-                                <div className="text-sm text-foreground mb-1">
-                                  {moment.description}
-                                </div>
-                                <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                  <Clock className="w-3 h-3" />
-                                  <span>{formatTime(moment.timestamp)}</span>
-                                  <span>•</span>
-                                  <span>{moment.speaker}</span>
-                                  <span>•</span>
-                                  <span className={`font-medium ${moment.severity === 'high' ? 'text-red-600' : moment.severity === 'medium' ? 'text-orange-600' : 'text-yellow-600'}`}>
-                                    {moment.severity.toUpperCase()}
-                                  </span>
-                                </div>
-                              </div>
-                              <Button
-                                size="sm"
-                                variant="ghost"
-                                onClick={() => handleSeekTo(moment.timestamp)}
-                                className="flex-shrink-0 h-6 w-6 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
-                                title="Jump to this moment"
-                              >
-                                <Play className="w-3 h-3" />
-                              </Button>
-                            </div>
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </>
-              )}
-            </div>
-          ) : (
-            /* Original Sentiment Analysis for Sales Mode */
-            <div>
-              {isGenerating && (
-                <div className="mb-4 p-3 bg-blue-50 dark:bg-blue-950/20 border border-blue-200 dark:border-blue-800 rounded-lg">
-                  <div className="flex items-center gap-2">
-                    <RefreshCw className="w-4 h-4 text-blue-600 animate-spin" />
-                    <div className="text-sm text-blue-800 dark:text-blue-200">
-                      <div className="font-medium">Generating deeper sentiment analysis...</div>
-                      <div className="text-xs mt-1">This will provide more accurate insights from your conversation</div>
+              {/* Customer Experience Metrics */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Users className="w-5 h-5 text-purple-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Customer Experience Metrics</h3>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-purple-600">{performanceMetrics.sentimentScore}%</div>
+                    <div className="text-sm text-muted-foreground">Satisfaction Score</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {stats.positiveMoments}P / {stats.negativeMoments}N
                     </div>
                   </div>
-                </div>
-              )}
-              <div className="space-y-2">
-                <Button
-                  variant="ghost"
-                  className="w-full justify-between text-sm h-auto p-3 hover:bg-emerald-50 dark:hover:bg-emerald-950/20"
-                  onClick={() => setShowPositiveMoments(!showPositiveMoments)}
-              disabled={stats.positiveMoments === 0}
-            >
-              <div className="flex items-center gap-3">
-                <Smile className="w-5 h-5 text-emerald-500" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-foreground">{stats.positiveMoments}</div>
-                  <div className="text-xs text-muted-foreground">Positive moments</div>
-                </div>
-              </div>
-              {stats.positiveMoments > 0 && (
-                showPositiveMoments ? 
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" /> : 
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              )}
-            </Button>
-            
-            <Button
-              variant="ghost"
-              className="w-full justify-between text-sm h-auto p-3 hover:bg-muted/50"
-              onClick={() => setShowNeutralMoments(!showNeutralMoments)}
-              disabled={stats.neutralMoments === 0}
-            >
-              <div className="flex items-center gap-3">
-                <Minus className="w-5 h-5 text-muted-foreground" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-foreground">{stats.neutralMoments}</div>
-                  <div className="text-xs text-muted-foreground">Neutral moments</div>
-                </div>
-              </div>
-              {stats.neutralMoments > 0 && (
-                showNeutralMoments ? 
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" /> : 
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              )}
-            </Button>
-            
-            <Button
-              variant="ghost"
-              className="w-full justify-between text-sm h-auto p-3 hover:bg-red-50 dark:hover:bg-red-950/20"
-              onClick={() => setShowNegativeMoments(!showNegativeMoments)}
-              disabled={stats.negativeMoments === 0}
-            >
-              <div className="flex items-center gap-3">
-                <Frown className="w-5 h-5 text-red-500" />
-                <div className="text-left">
-                  <div className="text-2xl font-bold text-foreground">{stats.negativeMoments}</div>
-                  <div className="text-xs text-muted-foreground">Negative moments</div>
-                </div>
-              </div>
-              {stats.negativeMoments > 0 && (
-                showNegativeMoments ? 
-                  <ChevronDown className="w-4 h-4 text-muted-foreground" /> : 
-                  <ChevronRight className="w-4 h-4 text-muted-foreground" />
-              )}
-            </Button>
-          </div>
-          
-          {/* Expandable Positive Moments */}
-          {showPositiveMoments && stats.consolidatedMoments.filter(m => m.sentiment === 'positive').length > 0 && (
-            <div className="mt-4 border-t border-border pt-4">
-              <h4 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
-                <Heart className="w-3 h-3 text-emerald-500" />
-                Positive Moments ({stats.consolidatedMoments.filter(m => m.sentiment === 'positive').length})
-              </h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {stats.consolidatedMoments.filter(m => m.sentiment === 'positive').map((moment, index) => (
-                  <div key={moment.id || `positive-${index}`} className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-foreground mb-1">
-                          {moment.text ? `"${moment.text}"` : 'Positive sentiment detected'}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTime(moment.timestamp)}</span>
-                          {moment.speaker && (
-                            <>
-                              <span>•</span>
-                              <span>{moment.speaker}</span>
-                            </>
-                          )}
-                          {moment.confidence && (
-                            <>
-                              <span>•</span>
-                              <span>{Math.round(moment.confidence * 100)}% confidence</span>
-                            </>
-                          )}
-                          <span className={`px-1.5 py-0.5 rounded text-xs ml-2 ${
-                            moment.source === 'ai' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
-                            {moment.source === 'ai' ? 'AI' : 'Pattern'}
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleSeekTo(moment.timestamp)}
-                        className="flex-shrink-0 h-6 w-6 p-0 hover:bg-emerald-100 dark:hover:bg-emerald-900/30"
-                        title="Jump to this moment"
-                      >
-                        <Play className="w-3 h-3" />
-                      </Button>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-indigo-600">{formatTime(performanceMetrics.averageResponseTime)}</div>
+                    <div className="text-sm text-muted-foreground">Response Time</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Average per exchange
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {/* Expandable Neutral Moments */}
-          {showNeutralMoments && stats.consolidatedMoments.filter(m => m.sentiment === 'neutral').length > 0 && (
-            <div className="mt-4 border-t border-border pt-4">
-              <h4 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
-                <Minus className="w-3 h-3 text-muted-foreground" />
-                Neutral Moments ({stats.consolidatedMoments.filter(m => m.sentiment === 'neutral').length})
-              </h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {stats.consolidatedMoments.filter(m => m.sentiment === 'neutral').map((moment, index) => (
-                  <div key={moment.id || `neutral-${index}`} className="bg-muted/20 border border-border rounded-lg p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-foreground mb-1">
-                          {moment.text ? `"${moment.text}"` : 'Neutral sentiment detected'}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTime(moment.timestamp)}</span>
-                          {moment.speaker && (
-                            <>
-                              <span>•</span>
-                              <span>{moment.speaker}</span>
-                            </>
-                          )}
-                          {moment.confidence && (
-                            <>
-                              <span>•</span>
-                              <span>{Math.round(moment.confidence * 100)}% confidence</span>
-                            </>
-                          )}
-                          <span className={`px-1.5 py-0.5 rounded text-xs ml-2 ${
-                            moment.source === 'ai' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
-                            {moment.source === 'ai' ? 'AI' : 'Pattern'}
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleSeekTo(moment.timestamp)}
-                        className="flex-shrink-0 h-6 w-6 p-0 hover:bg-muted"
-                        title="Jump to this moment"
-                      >
-                        <Play className="w-3 h-3" />
-                      </Button>
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-cyan-600">{performanceMetrics.engagementScore}%</div>
+                    <div className="text-sm text-muted-foreground">Engagement Level</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Customer participation
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
-          )}
 
-          {/* Expandable Negative Moments */}
-          {showNegativeMoments && stats.consolidatedMoments.filter(m => m.sentiment === 'negative').length > 0 && (
-            <div className="mt-4 border-t border-border pt-4">
-              <h4 className="text-xs font-medium text-muted-foreground mb-3 flex items-center gap-1">
-                <AlertTriangle className="w-3 h-3 text-red-500" />
-                Negative Moments ({stats.consolidatedMoments.filter(m => m.sentiment === 'negative').length})
-              </h4>
-              <div className="space-y-2 max-h-48 overflow-y-auto">
-                {stats.consolidatedMoments.filter(m => m.sentiment === 'negative').map((moment, index) => (
-                  <div key={moment.id || `negative-${index}`} className="bg-red-50 dark:bg-red-950/20 border border-red-200 dark:border-red-900 rounded-lg p-3">
-                    <div className="flex items-start justify-between gap-2">
-                      <div className="flex-1 min-w-0">
-                        <div className="text-sm text-foreground mb-1">
-                          {moment.text ? `"${moment.text}"` : 'Negative sentiment detected'}
-                        </div>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                          <Clock className="w-3 h-3" />
-                          <span>{formatTime(moment.timestamp)}</span>
-                          {moment.speaker && (
-                            <>
-                              <span>•</span>
-                              <span>{moment.speaker}</span>
-                            </>
-                          )}
-                          {moment.confidence && (
-                            <>
-                              <span>•</span>
-                              <span>{Math.round(moment.confidence * 100)}% confidence</span>
-                            </>
-                          )}
-                          <span className={`px-1.5 py-0.5 rounded text-xs ml-2 ${
-                            moment.source === 'ai' ? 'bg-green-100 text-green-700' : 'bg-amber-100 text-amber-700'
-                          }`}>
-                            {moment.source === 'ai' ? 'AI' : 'Pattern'}
-                          </span>
-                        </div>
-                      </div>
-                      <Button
-                        size="sm"
-                        variant="ghost"
-                        onClick={() => handleSeekTo(moment.timestamp)}
-                        className="flex-shrink-0 h-6 w-6 p-0 hover:bg-red-100 dark:hover:bg-red-900/30"
-                        title="Jump to this moment"
-                      >
-                        <Play className="w-3 h-3" />
-                      </Button>
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-teal-600">{performanceMetrics.talkRatio}%</div>
+                    <div className="text-sm text-muted-foreground">Agent Talk Time</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      vs Customer: {100 - performanceMetrics.talkRatio}%
                     </div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          )}
-          
-          <div className="mt-4">
-            <div className="flex items-center justify-between mb-2">
-              <span className="text-sm text-muted-foreground">Overall Sentiment</span>
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium text-foreground">{stats.sentimentScore}%</span>
-                {!stats.hasRealSentimentData && (
-                  <span className="text-xs text-muted-foreground">(Estimated)</span>
-                )}
-              </div>
-            </div>
-            <div className="w-full bg-muted rounded-full h-2">
-              <div 
-                className={`h-2 rounded-full transition-all duration-300 ${
-                  stats.hasRealSentimentData ? 'bg-emerald-500' : 'bg-amber-400'
-                }`}
-                style={{ width: `${stats.sentimentScore}%` }}
-              />
-            </div>
-            {!stats.hasRealSentimentData && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                * Estimated from keyword patterns in transcript - {stats.totalMoments} moments generated
-              </div>
-            )}
-            {stats.hasRealSentimentData && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                * AI analysis of {stats.totalMoments} conversation moments
-              </div>
-            )}
-          </div>
-          </div>
-          )}
-        </div>
-
-        {/* SERVQUAL Framework - Support Mode Only */}
-        {supportMode.supportMode && (
-          <section>
-              <div className="flex items-center gap-2 mb-3">
-                <Star className="w-4 h-4 text-amber-500" />
-                <h3 className="font-semibold text-foreground">SERVQUAL Service Quality</h3>
-            <span className="px-2 py-1 text-xs bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 rounded-md">
-              Support Framework
-            </span>
-            {hasAnalysis && !useLocalFallback && (
-              <span className="px-2 py-1 text-xs bg-green-100 dark:bg-green-900/20 text-green-700 dark:text-green-300 rounded-md">
-                AI Analyzed
-              </span>
-            )}
-            {hasAnalysis && useLocalFallback && (
-              <span className="px-2 py-1 text-xs bg-amber-100 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300 rounded-md">
-                Local Analysis
-              </span>
-            )}
-          </div>
-          
-          {supportLoading ? (
-            <div className="bg-card rounded-lg border border-border p-6 text-center">
-              <RefreshCw className="w-6 h-6 text-primary animate-spin mx-auto mb-2" />
-              <div className="text-sm text-muted-foreground">Loading support analysis...</div>
-            </div>
-          ) : supportError ? (
-            <div className="bg-card rounded-lg border border-border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <AlertTriangle className="w-4 h-4 text-orange-500" />
-                <span className="text-sm font-medium text-orange-700 dark:text-orange-300">Analysis Error</span>
-              </div>
-              <div className="text-sm text-muted-foreground mb-3">{supportError}</div>
-              {recording?.transcript && (
-                <Button 
-                  onClick={triggerAnalysis} 
-                  size="sm" 
-                  className="gap-2"
-                  disabled={supportLoading}
-                >
-                  <RefreshCw className="w-4 h-4" />
-                  Trigger Support Analysis
-                </Button>
-              )}
-            </div>
-          ) : !hasAnalysis ? (
-            <div className="bg-card rounded-lg border border-border p-4">
-              <div className="flex items-center gap-2 mb-3">
-                <Brain className="w-4 h-4 text-primary" />
-                <span className="text-sm font-medium text-foreground">Support Analysis Available</span>
-              </div>
-              <div className="text-sm text-muted-foreground mb-3">
-                Run AI analysis to get SERVQUAL metrics for this support call
-              </div>
-              {recording?.transcript ? (
-                <Button 
-                  onClick={triggerAnalysis} 
-                  size="sm" 
-                  className="gap-2"
-                  disabled={supportLoading}
-                >
-                  <Zap className="w-4 h-4" />
-                  Analyze Support Quality
-                </Button>
-              ) : (
-                <div className="text-xs text-muted-foreground">
-                  Transcript required for support analysis
-                </div>
-              )}
-            </div>
-          ) : (
-            <div className="bg-card rounded-lg border border-border p-4">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Empathy</span>
-                    <span className="text-sm font-medium text-foreground">{supportAnalysis?.servqualMetrics?.empathy || 0}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="h-2 rounded-full bg-blue-500 transition-all duration-300"
-                      style={{ width: `${supportAnalysis?.servqualMetrics?.empathy || 0}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Assurance</span>
-                    <span className="text-sm font-medium text-foreground">{supportAnalysis?.servqualMetrics?.assurance || 0}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="h-2 rounded-full bg-green-500 transition-all duration-300"
-                      style={{ width: `${supportAnalysis?.servqualMetrics?.assurance || 0}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Responsiveness</span>
-                    <span className="text-sm font-medium text-foreground">{supportAnalysis?.servqualMetrics?.responsiveness || 0}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="h-2 rounded-full bg-purple-500 transition-all duration-300"
-                      style={{ width: `${supportAnalysis?.servqualMetrics?.responsiveness || 0}%` }}
-                    />
-                  </div>
-                </div>
-                <div className="space-y-3">
-                  <div className="flex items-center justify-between">
-                    <span className="text-sm text-muted-foreground">Reliability</span>
-                    <span className="text-sm font-medium text-foreground">{supportAnalysis?.servqualMetrics?.reliability || 0}%</span>
-                  </div>
-                  <div className="w-full bg-muted rounded-full h-2">
-                    <div 
-                      className="h-2 rounded-full bg-emerald-500 transition-all duration-300"
-                      style={{ width: `${supportAnalysis?.servqualMetrics?.reliability || 0}%` }}
-                    />
-                  </div>
-                </div>
-              </div>
-              
-              {/* Customer Satisfaction and Escalation Risk Row */}
-              <div className="mt-4 grid grid-cols-1 md:grid-cols-2 gap-4">
-                <div className="p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <CheckCircle className="w-4 h-4 text-emerald-500" />
-                    <span className="text-sm font-medium text-foreground">Customer Satisfaction</span>
-                  </div>
-                  <div className="text-2xl font-bold text-emerald-600">{supportAnalysis?.customerSatisfaction || 0}%</div>
-                </div>
-                
-                <div className="p-3 bg-muted/30 rounded-lg">
-                  <div className="flex items-center gap-2 mb-2">
-                    <Shield className="w-4 h-4 text-orange-500" />
-                    <span className="text-sm font-medium text-foreground">Escalation Risk</span>
-                    <Badge 
-                      variant={supportAnalysis?.escalationRisk === 'low' ? 'default' : 
-                               supportAnalysis?.escalationRisk === 'medium' ? 'secondary' : 'destructive'}
-                    >
-                      {(supportAnalysis?.escalationRisk || 'unknown').toUpperCase()}
-                    </Badge>
-                  </div>
-                </div>
-              </div>
-              
-              <div className="mt-4 flex items-center justify-between">
-                <div className="text-xs text-muted-foreground">
-                  <div className="flex items-center gap-1">
-                    <Brain className="w-3 h-3" />
-                    Industry-standard SERVQUAL framework assessment powered by AI analysis
-                  </div>
-                </div>
-                {hasAnalysis && !useLocalFallback && (
-                  <Button
-                    variant="outline"
-                    size="sm"
-                    onClick={triggerAnalysis}
-                    disabled={supportLoading}
-                    className="text-xs gap-1"
-                  >
-                    <RefreshCw className="w-3 h-3" />
-                    Reanalyze
-                  </Button>
-                )}
-              </div>
-            </div>
-          )}
-            </section>
-          )}
-
-          {/* Support Performance Dashboard - Support Mode Only */}
-          {supportMode.supportMode && (
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <BarChart2 className="w-4 h-4 text-indigo-500" />
-                <h3 className="font-semibold text-foreground">Support Performance Dashboard</h3>
-                <span className="px-2 py-1 text-xs bg-indigo-100 dark:bg-indigo-900/20 text-indigo-700 dark:text-indigo-300 rounded-md">
-                  Key Performance Indicators
-                </span>
-              </div>
-              <div className="bg-card rounded-lg border border-border p-4">
-                {localSupportAnalysis ? (
-                  <div className="space-y-6">
-                    {/* Core Performance KPIs */}
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-3">Core Performance Metrics</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                        <div className="text-center p-3 bg-emerald-50 dark:bg-emerald-950/20 rounded-lg border border-emerald-200 dark:border-emerald-900">
-                          <div className="text-2xl font-bold text-emerald-600">
-                            {localSupportAnalysis.performanceMetrics?.firstContactResolution || 0}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">First Contact Resolution</div>
-                          <div className="text-xs text-emerald-600 mt-1">FCR Rate</div>
-                        </div>
-                        <div className="text-center p-3 bg-blue-50 dark:bg-blue-950/20 rounded-lg border border-blue-200 dark:border-blue-900">
-                          <div className="text-2xl font-bold text-blue-600">
-                            {localSupportAnalysis.performanceMetrics?.averageHandleTime || 0}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Handle Time Score</div>
-                          <div className="text-xs text-blue-600 mt-1">AHT Efficiency</div>
-                        </div>
-                        <div className="text-center p-3 bg-purple-50 dark:bg-purple-950/20 rounded-lg border border-purple-200 dark:border-purple-900">
-                          <div className="text-2xl font-bold text-purple-600">
-                            {localSupportAnalysis.performanceMetrics?.customerEffortScore || 0}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Customer Effort Score</div>
-                          <div className="text-xs text-purple-600 mt-1">CES Rating</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Call Resolution & Quality Metrics */}
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-3">Call Resolution & Quality</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                        <div className="p-3 bg-muted/30 rounded-lg">
-                          <div className="flex items-center gap-2 mb-1">
-                            <CheckCircle className={`w-4 h-4 ${
-                              localSupportAnalysis.performanceMetrics?.callResolutionStatus === 'resolved' ? 'text-green-500' :
-                              localSupportAnalysis.performanceMetrics?.callResolutionStatus === 'pending' ? 'text-yellow-500' :
-                              localSupportAnalysis.performanceMetrics?.callResolutionStatus === 'escalated' ? 'text-red-500' : 'text-blue-500'
-                            }`} />
-                            <span className="text-xs text-muted-foreground">Resolution Status</span>
-                          </div>
-                          <div className={`text-sm font-medium capitalize ${
-                            localSupportAnalysis.performanceMetrics?.callResolutionStatus === 'resolved' ? 'text-green-600' :
-                            localSupportAnalysis.performanceMetrics?.callResolutionStatus === 'pending' ? 'text-yellow-600' :
-                            localSupportAnalysis.performanceMetrics?.callResolutionStatus === 'escalated' ? 'text-red-600' : 'text-blue-600'
-                          }`}>
-                            {localSupportAnalysis.performanceMetrics?.callResolutionStatus || 'Unknown'}
-                          </div>
-                        </div>
-                        <div className="p-3 bg-muted/30 rounded-lg">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Timer className="w-4 h-4 text-orange-500" />
-                            <span className="text-xs text-muted-foreground">Response Quality</span>
-                          </div>
-                          <div className="text-sm font-medium text-orange-600">
-                            {localSupportAnalysis.performanceMetrics?.responseTimeQuality || 0}%
-                          </div>
-                        </div>
-                        <div className="p-3 bg-muted/30 rounded-lg">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Target className="w-4 h-4 text-cyan-500" />
-                            <span className="text-xs text-muted-foreground">Issue Complexity</span>
-                          </div>
-                          <div className={`text-sm font-medium capitalize ${
-                            localSupportAnalysis.performanceMetrics?.issueComplexity === 'simple' ? 'text-green-600' :
-                            localSupportAnalysis.performanceMetrics?.issueComplexity === 'medium' ? 'text-yellow-600' : 'text-red-600'
-                          }`}>
-                            {localSupportAnalysis.performanceMetrics?.issueComplexity || 'Medium'}
-                          </div>
-                        </div>
-                        <div className="p-3 bg-muted/30 rounded-lg">
-                          <div className="flex items-center gap-2 mb-1">
-                            <Brain className="w-4 h-4 text-pink-500" />
-                            <span className="text-xs text-muted-foreground">AI Confidence</span>
-                          </div>
-                          <div className="text-sm font-medium text-pink-600">85%</div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Support Quality Metrics */}
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-3">Agent Performance Quality</h4>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-muted-foreground">Communication Skills</span>
-                              <span className="text-sm font-medium">{localSupportAnalysis.qualityMetrics?.communicationSkills || 0}%</span>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-2">
-                              <div 
-                                className="h-2 rounded-full bg-blue-500 transition-all duration-300"
-                                style={{ width: `${localSupportAnalysis.qualityMetrics?.communicationSkills || 0}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-muted-foreground">Problem Solving</span>
-                              <span className="text-sm font-medium">{localSupportAnalysis.qualityMetrics?.problemSolvingEffectiveness || 0}%</span>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-2">
-                              <div 
-                                className="h-2 rounded-full bg-green-500 transition-all duration-300"
-                                style={{ width: `${localSupportAnalysis.qualityMetrics?.problemSolvingEffectiveness || 0}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-muted-foreground">De-escalation</span>
-                              <span className="text-sm font-medium">{localSupportAnalysis.qualityMetrics?.deEscalationTechniques || 0}%</span>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-2">
-                              <div 
-                                className="h-2 rounded-full bg-purple-500 transition-all duration-300"
-                                style={{ width: `${localSupportAnalysis.qualityMetrics?.deEscalationTechniques || 0}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                        <div className="space-y-3">
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-muted-foreground">Knowledge Base Usage</span>
-                              <span className="text-sm font-medium">{localSupportAnalysis.qualityMetrics?.knowledgeBaseUsage || 0}%</span>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-2">
-                              <div 
-                                className="h-2 rounded-full bg-orange-500 transition-all duration-300"
-                                style={{ width: `${localSupportAnalysis.qualityMetrics?.knowledgeBaseUsage || 0}%` }}
-                              />
-                            </div>
-                          </div>
-                          <div>
-                            <div className="flex items-center justify-between mb-1">
-                              <span className="text-sm text-muted-foreground">Compliance Adherence</span>
-                              <span className="text-sm font-medium">{localSupportAnalysis.qualityMetrics?.complianceAdherence || 0}%</span>
-                            </div>
-                            <div className="w-full bg-muted rounded-full h-2">
-                              <div 
-                                className="h-2 rounded-full bg-emerald-500 transition-all duration-300"
-                                style={{ width: `${localSupportAnalysis.qualityMetrics?.complianceAdherence || 0}%` }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-
-                    {/* Customer Journey Analysis */}
-                    <div>
-                      <h4 className="text-sm font-medium text-muted-foreground mb-3">Customer Journey Analysis</h4>
-                      <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
-                        <div className="p-3 bg-gradient-to-br from-blue-50 to-indigo-50 dark:from-blue-950/20 dark:to-indigo-950/20 rounded-lg border">
-                          <div className="text-lg font-bold text-blue-600">
-                            {localSupportAnalysis.journeyAnalysis?.issueIdentificationSpeed || 0}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Issue ID Speed</div>
-                        </div>
-                        <div className="p-3 bg-gradient-to-br from-green-50 to-emerald-50 dark:from-green-950/20 dark:to-emerald-950/20 rounded-lg border">
-                          <div className="text-lg font-bold text-green-600">
-                            {localSupportAnalysis.journeyAnalysis?.rootCauseAnalysisDepth || 0}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Root Cause Depth</div>
-                        </div>
-                        <div className="p-3 bg-gradient-to-br from-purple-50 to-violet-50 dark:from-purple-950/20 dark:to-violet-950/20 rounded-lg border">
-                          <div className="text-lg font-bold text-purple-600">
-                            {localSupportAnalysis.journeyAnalysis?.solutionClarityScore || 0}%
-                          </div>
-                          <div className="text-xs text-muted-foreground">Solution Clarity</div>
-                        </div>
-                      </div>
-                      <div className="mt-3 flex items-center gap-4">
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${localSupportAnalysis.journeyAnalysis?.customerEducationProvided ? 'bg-green-500' : 'bg-gray-300'}`}></div>
-                          <span className="text-xs text-muted-foreground">Customer Education Provided</span>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <div className={`w-3 h-3 rounded-full ${localSupportAnalysis.journeyAnalysis?.followUpPlanning ? 'bg-blue-500' : 'bg-gray-300'}`}></div>
-                          <span className="text-xs text-muted-foreground">Follow-up Planning</span>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="text-center py-6">
-                    <BarChart2 className="w-8 h-8 text-muted-foreground mx-auto mb-2" />
-                    <div className="text-sm text-muted-foreground">Support performance metrics will appear here</div>
-                    <div className="text-xs text-muted-foreground mt-1">Analysis in progress...</div>
-                  </div>
-                )}
-              </div>
-            </section>
-          )}
-
-          {/* Engagement Metrics */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Activity className="w-4 h-4 text-blue-500" />
-              <h3 className="font-semibold text-foreground">Engagement Metrics</h3>
-            </div>
-            <div className="bg-card rounded-lg border border-border p-4">
-          <div className="grid grid-cols-3 gap-4">
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Users className="w-4 h-4 text-blue-500" />
-                <span className="text-xs text-muted-foreground">Speaking Distribution</span>
-              </div>
-              <div className="text-lg font-bold text-foreground">{stats.talkRatio}%</div>
-              <div className="text-xs text-muted-foreground">Talk Ratio</div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <MessageSquare className="w-4 h-4 text-purple-500" />
-                <span className="text-xs text-muted-foreground">Interaction Level</span>
-              </div>
-              <div className="text-lg font-bold text-foreground">{getInteractionLevel()}</div>
-              <div className="text-xs text-muted-foreground">{stats.speakers} Speaker{stats.speakers !== 1 ? 's' : ''}</div>
-            </div>
-            <div>
-              <div className="flex items-center gap-2 mb-2">
-                <Timer className="w-4 h-4 text-orange-500" />
-                <span className="text-xs text-muted-foreground">Pace</span>
-              </div>
-              <div className="text-lg font-bold text-foreground">{getPaceLevel()}</div>
-              <div className="text-xs text-muted-foreground">{stats.wordsPerMinute} WPM</div>
-            </div>
-          </div>
-            </div>
-          </section>
-
-          {/* Buying Signal Progression - Sales Mode Only */}
-          {!supportMode.supportMode && (
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <Target className="w-4 h-4 text-violet-500" />
-                <h3 className="font-semibold text-foreground">Buying Signal Progression</h3>
-              </div>
-              <div className="bg-card rounded-lg border border-border p-4 space-y-3">
-          {(() => {
-            const signals = getBuyingSignals();
-            
-            if (signals.noData) {
-              return (
-                <div className="text-center py-2">
-                  <span className="text-sm text-muted-foreground">
-                    Sentiment analysis is being processed...
-                  </span>
-                </div>
-              );
-            }
-            
-            return (
-              <>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${signals.interestSignals ? 'bg-emerald-500' : 'bg-muted-foreground'}`}></div>
-                    <span className="text-sm text-muted-foreground">Interest Signals</span>
-                  </div>
-                  <span className={`text-sm font-medium ${signals.interestSignals ? 'text-emerald-600' : 'text-muted-foreground'}`}>
-                    {signals.interestSignals ? 'Detected' : 'Not Detected'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${signals.considerationPhase ? 'bg-blue-500' : 'bg-muted-foreground'}`}></div>
-                    <span className="text-sm text-muted-foreground">Consideration Phase</span>
-                  </div>
-                  <span className={`text-sm font-medium ${signals.considerationPhase ? 'text-blue-600' : 'text-muted-foreground'}`}>
-                    {signals.considerationPhase ? 'Started' : 'Not Started'}
-                  </span>
-                </div>
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2">
-                    <div className={`w-2 h-2 rounded-full ${signals.decisionReadiness ? 'bg-violet-500' : 'bg-muted-foreground'}`}></div>
-                    <span className="text-sm text-muted-foreground">Decision Readiness</span>
-                  </div>
-                  <span className={`text-sm font-medium ${signals.decisionReadiness ? 'text-violet-600' : 'text-muted-foreground'}`}>
-                    {signals.decisionReadiness ? 'Ready' : 'Pending'}
-                  </span>
-                </div>
-              </>
-            );
-          })()}
-              </div>
-            </section>
-          )}
-
-          {/* Risk Alerts & Opportunities - Sales Mode Only */}
-          {!supportMode.supportMode && (
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <section>
-                <div className="flex items-center gap-2 mb-3">
-                  <AlertTriangle className="w-4 h-4 text-orange-500" />
-                  <h3 className="font-semibold text-foreground">Risk Alerts</h3>
-                </div>
-                <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 rounded-lg p-4">
-                  <div className="space-y-2">
-                    {riskAlerts.slice(0, 3).map((risk, index) => (
-                      <div key={index} className="flex items-start gap-2">
-                        <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                        <span className="text-sm text-orange-800 dark:text-orange-200">
-                          {risk}
-                        </span>
-                      </div>
-                    ))}
-                    {riskAlerts.length === 0 && (
-                      <div className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                        No specific risks detected in this conversation
-                      </div>
-                    )}
                   </div>
                 </div>
               </section>
-            </div>
+            </>
           )}
-        </section>
 
-        {/* Risk Alerts - Sales Mode Only */}
-        {!supportMode.supportMode && (
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <AlertTriangle className="w-4 h-4 text-orange-500" />
-              <h3 className="font-semibold text-foreground">Risk Alerts</h3>
-            </div>
-            <div className="bg-orange-50 dark:bg-orange-950/20 border border-orange-200 dark:border-orange-900 rounded-lg p-4">
-              <div className="space-y-2">
-                {riskAlerts.slice(0, 3).map((risk, index) => (
-                  <div key={index} className="flex items-start gap-2">
-                    <AlertTriangle className="w-4 h-4 text-orange-600 mt-0.5 flex-shrink-0" />
-                    <span className="text-sm text-orange-800 dark:text-orange-200">
-                      {risk}
-                    </span>
-                  </div>
-                ))}
-                {riskAlerts.length === 0 && (
-                  <div className="text-sm font-medium text-orange-800 dark:text-orange-200">
-                    No specific risks detected in this conversation
-                  </div>
-                )}
-              </div>
-            </div>
-          </section>
-        )}
-
-          {/* Opportunities Section - Sales Mode Only */}
-          {!supportMode.supportMode && (
-            <section>
-              <div className="flex items-center gap-2 mb-3">
-                <CheckCircle className="w-4 h-4 text-emerald-500" />
-                <h3 className="font-semibold text-foreground">Opportunities</h3>
-              </div>
-              <div className="bg-emerald-50 dark:bg-emerald-950/20 border border-emerald-200 dark:border-emerald-900 rounded-lg p-4">
-                <div className="space-y-2">
-                  {opportunities.slice(0, 3).map((opportunity, index) => (
-                    <div key={index} className="flex items-start gap-2">
-                      <CheckCircle className="w-4 h-4 text-emerald-600 mt-0.5 flex-shrink-0" />
-                      <span className="text-sm text-emerald-800 dark:text-emerald-200">
-                        {opportunity}
-                      </span>
-                    </div>
-                  ))}
-                  {opportunities.length === 0 && (
-                    <div className="text-sm font-medium text-emerald-800 dark:text-emerald-200">
-                      No specific opportunities identified in this conversation
-                    </div>
-                  )}
+          {/* Sales Mode Analytics Sections */}
+          {isSales && (
+            <>
+              {/* Deal Progression Intelligence */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <Target className="w-5 h-5 text-emerald-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Deal Progression Intelligence</h3>
+                  <Badge variant="outline" className="text-xs">
+                    Sales Analytics
+                  </Badge>
                 </div>
-              </div>
-            </section>
-          )}
-              
 
-          {/* Key Insights & Moments */}
-          <section>
-            <div className="flex items-center gap-2 mb-3">
-              <Brain className="w-4 h-4 text-purple-500" />
-              <h3 className="font-semibold text-foreground">Key Insights</h3>
-            </div>
-            <div className="space-y-4">
-              {enhancedMoments.length > 0 ? (
-                <div className="space-y-3">
-                  {enhancedMoments.map((moment) => (
-                    <div key={moment.id} className={`p-4 rounded-lg border ${moment.bgColor}`}>
-                      <div className="flex items-start gap-3">
-                        <div className="flex-shrink-0 mt-0.5">
-                          {moment.icon}
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+                  {/* Success Probability */}
+                  <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-emerald-600 rounded-lg">
+                          <TrendingUp className="w-5 h-5 text-white" />
                         </div>
-                        <div className="flex-1 min-w-0">
-                          <div className="flex items-start justify-between mb-2">
-                            <div className="flex flex-col gap-1">
-                              <div className="flex items-center gap-2">
-                                <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
-                                  {moment.category}
-                                </span>
-                                <Badge variant="outline" className="text-xs">
-                                  {moment.impact === 'high' ? 'High Impact' : 
-                                   moment.impact === 'medium' ? 'Medium Impact' : 'Low Impact'}
-                                </Badge>
-                              </div>
-                              <h4 className="text-sm font-semibold text-foreground">
-                                {moment.title}
-                              </h4>
-                            </div>
-                            {moment.timestamp && (
-                              <Button
-                                variant="ghost"
-                                size="sm"
-                                className="h-6 px-2 text-xs text-muted-foreground hover:text-foreground"
-                                onClick={() => {
-                                  if (moment.timestamp) {
-                                    seek(moment.timestamp);
-                                  }
-                                }}
-                              >
-                                <Play className="w-3 h-3 mr-1" />
-                                {formatTime(moment.timestamp)}
-                              </Button>
-                            )}
+                        <div>
+                          <div className="text-2xl font-bold text-emerald-900">
+                            {predictiveInsights.successProbability}%
                           </div>
-                          <p className="text-sm text-foreground/80 leading-relaxed mb-2">
-                            {moment.description}
-                          </p>
-                          {(moment.speaker || moment.score !== undefined) && (
-                            <div className="flex items-center justify-between text-xs text-muted-foreground">
-                              {moment.speaker && (
-                                <div className="flex items-center gap-1">
-                                  <User className="w-3 h-3" />
-                                  <span>{moment.speaker}</span>
-                                </div>
-                              )}
-                              {moment.score !== undefined && (
-                                <span className="font-medium">Score: {moment.score}/10</span>
-                              )}
-                            </div>
-                          )}
+                          <div className="text-sm text-emerald-700">Success Probability</div>
                         </div>
                       </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Engagement Quality */}
+                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-blue-600 rounded-lg">
+                          <MessageSquare className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-blue-900">
+                            {performanceMetrics.engagementScore}%
+                          </div>
+                          <div className="text-sm text-blue-700">Engagement Score</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+
+                  {/* Call Effectiveness */}
+                  <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                    <CardContent className="p-4">
+                      <div className="flex items-center gap-3">
+                        <div className="p-2 bg-purple-600 rounded-lg">
+                          <Activity className="w-5 h-5 text-white" />
+                        </div>
+                        <div>
+                          <div className="text-2xl font-bold text-purple-900">
+                            {Math.min(100, Math.round(performanceMetrics.wordsPerMinute / 2))}%
+                          </div>
+                          <div className="text-sm text-purple-700">Call Effectiveness</div>
+                        </div>
+                      </div>
+                    </CardContent>
+                  </Card>
+                </div>
+              </section>
+
+              {/* Sales Performance Metrics */}
+              <section className="space-y-4">
+                <div className="flex items-center gap-2 mb-4">
+                  <BarChart3 className="w-5 h-5 text-orange-600" />
+                  <h3 className="text-lg font-semibold text-foreground">Sales Performance Metrics</h3>
+                </div>
+
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-orange-600">{formatTime(performanceMetrics.duration)}</div>
+                    <div className="text-sm text-muted-foreground">Call Duration</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {performanceMetrics.duration > 1800 ? 'Extended' : performanceMetrics.duration > 900 ? 'Standard' : 'Brief'}
                     </div>
-                  ))}
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-red-600">{performanceMetrics.wordsPerMinute}</div>
+                    <div className="text-sm text-muted-foreground">Words/Minute</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {getPaceLevel()}
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-green-600">{stats.positiveMoments}</div>
+                    <div className="text-sm text-muted-foreground">Positive Signals</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      Interest indicators
+                    </div>
+                  </div>
+
+                  <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
+                    <div className="text-2xl font-bold text-blue-600">{performanceMetrics.speakers}</div>
+                    <div className="text-sm text-muted-foreground">Participants</div>
+                    <div className="text-xs text-muted-foreground mt-1">
+                      {getInteractionLevel()}
+                    </div>
+                  </div>
                 </div>
-              ) : (
-                <div className="bg-card rounded-lg border border-border p-6 text-center">
-                  <Brain className="w-8 h-8 text-muted-foreground/50 mx-auto mb-3" />
-                  <div className="text-sm text-muted-foreground mb-1">Analyzing conversation insights...</div>
-                  <div className="text-xs text-muted-foreground">Key business moments will appear here once AI analysis is complete</div>
-                </div>
-              )}
-          </div>
-        </section>
+              </section>
+            </>
+          )}
+          {/* Universal Analytics Sections - For Both Modes */}
+
+          {/* Communication Performance Analysis */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Activity className="w-5 h-5 text-indigo-600" />
+              <h3 className="text-lg font-semibold text-foreground">Communication Performance</h3>
+              <Badge variant="outline" className="text-xs">
+                Universal Analytics
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              {/* Talk Time Distribution */}
+              <Card className="bg-gradient-to-br from-indigo-50 to-indigo-100 border-indigo-200">
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-indigo-900 mb-1">{performanceMetrics.talkRatio}%</div>
+                    <div className="text-sm text-indigo-700">
+                      {isSupport ? 'Agent Talk Time' : 'Rep Talk Time'}
+                    </div>
+                    <div className="text-xs text-indigo-600 mt-1">
+                      vs {isSupport ? 'Customer' : 'Prospect'}: {100 - performanceMetrics.talkRatio}%
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Speaking Pace */}
+              <Card className="bg-gradient-to-br from-cyan-50 to-cyan-100 border-cyan-200">
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-cyan-900 mb-1">{performanceMetrics.wordsPerMinute}</div>
+                    <div className="text-sm text-cyan-700">Words/Minute</div>
+                    <div className="text-xs text-cyan-600 mt-1">{getPaceLevel()} pace</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Interaction Quality */}
+              <Card className="bg-gradient-to-br from-teal-50 to-teal-100 border-teal-200">
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-teal-900 mb-1">{performanceMetrics.speakers}</div>
+                    <div className="text-sm text-teal-700">Participants</div>
+                    <div className="text-xs text-teal-600 mt-1">{getInteractionLevel()}</div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Duration Efficiency */}
+              <Card className="bg-gradient-to-br from-amber-50 to-amber-100 border-amber-200">
+                <CardContent className="p-4">
+                  <div className="text-center">
+                    <div className="text-2xl font-bold text-amber-900 mb-1">{formatTime(performanceMetrics.duration)}</div>
+                    <div className="text-sm text-amber-700">Duration</div>
+                    <div className="text-xs text-amber-600 mt-1">
+                      {performanceMetrics.duration > 1800 ? 'Extended' : performanceMetrics.duration > 900 ? 'Standard' : 'Brief'}
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* Predictive Intelligence */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <Gauge className="w-5 h-5 text-purple-600" />
+              <h3 className="text-lg font-semibold text-foreground">Predictive Intelligence</h3>
+              <Badge variant="outline" className="text-xs">
+                AI-Powered Insights
+              </Badge>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Success Prediction */}
+              <Card className="bg-gradient-to-br from-purple-50 to-purple-100 border-purple-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <TrendingUp className="w-4 h-4 text-purple-600" />
+                    {isSupport ? 'Resolution Probability' : 'Success Probability'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="flex items-center gap-4">
+                    <div className="text-4xl font-bold text-purple-900">
+                      {predictiveInsights.successProbability}%
+                    </div>
+                    <div className="flex-1">
+                      <Progress
+                        value={predictiveInsights.successProbability}
+                        className="h-3 bg-purple-200"
+                      />
+                      <div className="text-sm text-purple-700 mt-2">
+                        Confidence: {predictiveInsights.confidenceLevel}%
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Sentiment Analysis Overview */}
+              <Card className="bg-gradient-to-br from-emerald-50 to-emerald-100 border-emerald-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2">
+                    <Heart className="w-4 h-4 text-emerald-600" />
+                    Emotional Intelligence
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="space-y-3">
+                    <div className="flex items-center justify-between">
+                      <span className="text-sm text-emerald-700">Overall Sentiment</span>
+                      <span className="font-semibold text-emerald-900">{performanceMetrics.sentimentScore}%</span>
+                    </div>
+                    <Progress
+                      value={performanceMetrics.sentimentScore}
+                      className="h-2 bg-emerald-200"
+                    />
+                    <div className="grid grid-cols-3 gap-2 text-xs">
+                      <div className="text-center">
+                        <div className="font-semibold text-green-700">{stats.positiveMoments}</div>
+                        <div className="text-green-600">Positive</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-gray-700">{stats.neutralMoments}</div>
+                        <div className="text-gray-600">Neutral</div>
+                      </div>
+                      <div className="text-center">
+                        <div className="font-semibold text-red-700">{stats.negativeMoments}</div>
+                        <div className="text-red-600">Negative</div>
+                      </div>
+                    </div>
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* Risk and Opportunity Analysis */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <AlertTriangle className="w-5 h-5 text-orange-600" />
+              <h3 className="text-lg font-semibold text-foreground">Risk & Opportunity Analysis</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              {/* Risk Factors */}
+              <Card className="border-orange-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-orange-800">
+                    <AlertTriangle className="w-4 h-4" />
+                    Risk Factors
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {predictiveInsights.riskFactors.length > 0 ? (
+                    <div className="space-y-2">
+                      {predictiveInsights.riskFactors.map((risk, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-orange-500 rounded-full mt-2 flex-shrink-0" />
+                          <span className="text-sm text-orange-700">{risk}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-green-700 bg-green-50 p-3 rounded-lg">
+                      No significant risk factors detected in this {isSupport ? 'support interaction' : 'conversation'}.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+
+              {/* Recommendations */}
+              <Card className="border-blue-200">
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-base flex items-center gap-2 text-blue-800">
+                    <Lightbulb className="w-4 h-4" />
+                    AI Recommendations
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  {predictiveInsights.recommendations.length > 0 ? (
+                    <div className="space-y-2">
+                      {predictiveInsights.recommendations.map((recommendation, index) => (
+                        <div key={index} className="flex items-start gap-2">
+                          <div className="w-2 h-2 bg-blue-500 rounded-full mt-2 flex-shrink-0" />
+                          <span className="text-sm text-blue-700">{recommendation}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="text-sm text-blue-700 bg-blue-50 p-3 rounded-lg">
+                      Performance metrics are within optimal ranges. Continue current approach.
+                    </div>
+                  )}
+                </CardContent>
+              </Card>
+            </div>
+          </section>
+
+          {/* Advanced Metrics Visualization */}
+          <section className="space-y-4">
+            <div className="flex items-center gap-2 mb-4">
+              <PieChart className="w-5 h-5 text-gray-600" />
+              <h3 className="text-lg font-semibold text-foreground">Advanced Performance Metrics</h3>
+            </div>
+
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              {/* Engagement Score Breakdown */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-gray-700">Engagement Score</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-3">
+                    <div className="text-3xl font-bold text-gray-900">{performanceMetrics.engagementScore}</div>
+                    <div className="text-sm text-gray-600">Overall Score</div>
+                  </div>
+                  <Progress value={performanceMetrics.engagementScore} className="h-2" />
+                  <div className="text-xs text-gray-500 mt-2">
+                    {getEngagementLevel()} engagement level
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Response Timing */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-gray-700">
+                    {isSupport ? 'Response Efficiency' : 'Conversation Flow'}
+                  </CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-3">
+                    <div className="text-3xl font-bold text-gray-900">
+                      {formatTime(performanceMetrics.averageResponseTime)}
+                    </div>
+                    <div className="text-sm text-gray-600">Avg Response Time</div>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {performanceMetrics.averageResponseTime < 5 ? 'Quick responses' :
+                     performanceMetrics.averageResponseTime < 10 ? 'Standard timing' : 'Thoughtful responses'}
+                  </div>
+                </CardContent>
+              </Card>
+
+              {/* Content Density */}
+              <Card>
+                <CardHeader className="pb-3">
+                  <CardTitle className="text-sm text-gray-700">Content Density</CardTitle>
+                </CardHeader>
+                <CardContent>
+                  <div className="text-center mb-3">
+                    <div className="text-3xl font-bold text-gray-900">{performanceMetrics.wordCount}</div>
+                    <div className="text-sm text-gray-600">Total Words</div>
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {Math.round(performanceMetrics.wordCount / (performanceMetrics.duration / 60))} words/min density
+                  </div>
+                </CardContent>
+              </Card>
+            </div>
+          </section>
         </>
       )}
     </div>

@@ -1,6 +1,8 @@
 import React from 'react';
-import { Info, Calendar, Clock, User, FileAudio, Zap, Tag, CheckCircle, AlertCircle, RefreshCw } from 'lucide-react';
+import { Info, Calendar, Clock, User, FileAudio, Zap, Tag, CheckCircle, AlertCircle, RefreshCw, Star } from 'lucide-react';
 import { formatDuration } from '@/utils/mediaDuration';
+import { parseECIAnalysis, hasECIAnalysis, getECIOverallScore, getECIEscalationRisk } from '@/utils/eciAnalysis';
+import { useSupportMode } from '@/contexts/SupportContext';
 import type { Recording } from '@/types/recording';
 
 interface InfoPanelProps {
@@ -8,6 +10,10 @@ interface InfoPanelProps {
 }
 
 export default function InfoPanel({ recording }: InfoPanelProps) {
+  const supportMode = useSupportMode();
+  const eciAnalysis = recording ? parseECIAnalysis(recording) : null;
+  const isSupport = recording?.content_type === 'customer_support' || recording?.content_type === 'support_call' || supportMode.supportMode;
+
   if (!recording) {
     return (
       <div className="text-center py-8">
@@ -213,11 +219,45 @@ export default function InfoPanel({ recording }: InfoPanelProps) {
 
             {recording.enable_coaching && (
               <div className="flex justify-between">
-                <span className="text-gray-600">Coaching Analysis</span>
+                <span className="text-gray-600">
+                  {isSupport ? 'ECI Quality Analysis' : 'Coaching Analysis'}
+                </span>
                 <span className={`font-medium ${recording.coaching_evaluation ? 'text-green-600' : 'text-gray-400'}`}>
                   {recording.coaching_evaluation ? 'Complete' : 'Pending'}
                 </span>
               </div>
+            )}
+
+            {/* ECI Analysis Status for Support Recordings */}
+            {isSupport && eciAnalysis && (
+              <>
+                <div className="flex justify-between">
+                  <span className="text-gray-600 flex items-center gap-1">
+                    <Star className="w-3 h-3 text-blue-600" />
+                    ECI Framework Score
+                  </span>
+                  <span className="font-medium text-blue-600">
+                    {getECIOverallScore(eciAnalysis)}%
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Escalation Risk</span>
+                  <span className={`font-medium capitalize ${
+                    getECIEscalationRisk(eciAnalysis) === 'low' ? 'text-green-600' :
+                    getECIEscalationRisk(eciAnalysis) === 'medium' ? 'text-yellow-600' : 'text-red-600'
+                  }`}>
+                    {getECIEscalationRisk(eciAnalysis)}
+                  </span>
+                </div>
+
+                <div className="flex justify-between">
+                  <span className="text-gray-600">Manager Review</span>
+                  <span className={`font-medium ${eciAnalysis.summary.managerReviewRequired ? 'text-orange-600' : 'text-green-600'}`}>
+                    {eciAnalysis.summary.managerReviewRequired ? 'Required' : 'Not Needed'}
+                  </span>
+                </div>
+              </>
             )}
           </div>
 
