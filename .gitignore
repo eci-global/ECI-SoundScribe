@@ -58,3 +58,7 @@ dist-ssr
 # Vite
 vite.config.js.timestamp-*
 vite.config.ts.timestamp-*
+
+# Security - Exposed Service Role Key (DO NOT COMMIT)
+# This key was accidentally exposed and should never be committed
+eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InFpbmtsZGd2ZWpoZXBwaGV5a2ZsIiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc0OTU5MDQ0NywiZXhwIjoyMDY1MTY2NDQ3fQ.xSKYxzFkgO4i0HA9OHE3j0EjRUCxvyGhP6lKYp_NVDE
