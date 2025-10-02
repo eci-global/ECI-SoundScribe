@@ -36,8 +36,7 @@ export default function AdminHome() {
         <div className="h-full overflow-y-auto">
           <div className="max-w-7xl mx-auto p-8">
             <div className="mb-8">
-              <h1 className="text-display text-eci-gray-900 mb-2">Administration</h1>
-              <p className="text-body text-eci-gray-600">System overview and user management</p>
+              <p className="text-body text-eci-gray-600">Loading system overview and metrics...</p>
             </div>
             <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
               {[...Array(4)].map((_, i) => (
@@ -62,8 +61,6 @@ export default function AdminHome() {
           <section className="bg-white border border-eci-gray-200 rounded-2xl shadow-sm p-6 space-y-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-overline text-eci-gray-500 mb-2">Administration</p>
-                <h1 className="text-display text-eci-gray-900 mb-2">Control Center</h1>
                 <p className="text-body text-eci-gray-600 max-w-3xl">
                   Monitor platform health, oversee user activity, and keep critical automations on track.
                 </p>
