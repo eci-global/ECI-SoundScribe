@@ -1,6 +1,5 @@
 
 import React, { useEffect, useState } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { PlayCircle, Clock, User, Calendar } from 'lucide-react';
@@ -35,7 +34,7 @@ export default function RecordingTable() {
   };
 
   return (
-    <AdminLayout>
+    
       <div className="h-full overflow-y-auto">
         <div className="max-w-7xl mx-auto p-8">
           <div className="mb-8">
@@ -116,6 +115,6 @@ export default function RecordingTable() {
           </Card>
         </div>
       </div>
-    </AdminLayout>
+    
   );
 }

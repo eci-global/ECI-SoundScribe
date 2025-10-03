@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -315,19 +314,19 @@ export default function OrganizationOutreachSettings() {
 
   if (isLoading) {
     return (
-      <AdminLayout>
+      
         <div className="flex items-center justify-center h-full">
           <div className="text-center">
             <RefreshCw className="h-8 w-8 animate-spin text-gray-400 mx-auto mb-3" />
             <span className="text-gray-600">Loading organization settings...</span>
           </div>
         </div>
-      </AdminLayout>
+      
     );
   }
 
   return (
-    <AdminLayout>
+    
       <div className="h-full overflow-y-auto">
         <div className="max-w-6xl mx-auto p-8 space-y-6">
       {/* Header */}
@@ -696,6 +695,6 @@ export default function OrganizationOutreachSettings() {
       )}
         </div>
       </div>
-    </AdminLayout>
+    
   );
 }

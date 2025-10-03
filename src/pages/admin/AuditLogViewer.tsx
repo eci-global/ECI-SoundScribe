@@ -1,5 +1,4 @@
 import React, { useState, useEffect } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Input } from '@/components/ui/input';
@@ -226,7 +225,7 @@ export default function AuditLogViewer() {
 
   if (!isAdmin) {
     return (
-      <AdminLayout>
+      
         <div className="h-full overflow-y-auto">
           <div className="max-w-7xl mx-auto p-8">
             <div className="text-center py-12">
@@ -236,12 +235,12 @@ export default function AuditLogViewer() {
             </div>
           </div>
         </div>
-      </AdminLayout>
+      
     );
   }
 
   return (
-    <AdminLayout>
+    
       <div className="h-full overflow-y-auto">
         <div className="max-w-7xl mx-auto p-8">
           <div className="mb-8">
@@ -459,6 +458,6 @@ export default function AuditLogViewer() {
           </Card>
         </div>
       </div>
-    </AdminLayout>
+    
   );
 }

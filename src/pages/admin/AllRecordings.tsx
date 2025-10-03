@@ -1,6 +1,5 @@
 import React, { useState, useEffect } from 'react';
 import { useSearchParams, useNavigate } from 'react-router-dom';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -240,9 +239,8 @@ const AllRecordings = () => {
   }, [selectedRecordings]);
 
   return (
-    <AdminLayout>
-      <div className="h-full overflow-y-auto">
-        <div className="max-w-[1400px] mx-auto p-8">
+    <div className="h-full overflow-y-auto">
+      <div className="max-w-[1400px] mx-auto p-8">
           {/* Header */}
           <div className="mb-8">
             <div className="flex items-center justify-between mb-4">
@@ -555,9 +553,8 @@ const AllRecordings = () => {
               )}
             </div>
           </Card>
-        </div>
       </div>
-    </AdminLayout>
+    </div>
   );
 };
 

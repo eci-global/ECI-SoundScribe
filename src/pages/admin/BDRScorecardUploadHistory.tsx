@@ -7,7 +7,6 @@ import { Input } from '@/components/ui/input';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
-import AdminLayout from '@/components/admin/AdminLayout';
 
 interface BDRUploadRecord {
   id: string;
@@ -250,16 +249,16 @@ const BDRScorecardUploadHistory = () => {
 
   if (loading) {
     return (
-      <AdminLayout>
+      
         <div className="flex items-center justify-center h-64">
           <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
         </div>
-      </AdminLayout>
+      
     );
   }
 
   return (
-    <AdminLayout>
+    
       <div className="p-6 space-y-6">
         {/* Header */}
         <div className="flex items-center justify-between">
@@ -526,7 +525,7 @@ const BDRScorecardUploadHistory = () => {
           </div>
         )}
       </div>
-    </AdminLayout>
+    
   );
 };
 
