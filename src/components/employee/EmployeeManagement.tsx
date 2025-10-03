@@ -40,6 +40,8 @@ const EmployeeManagement: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [showAddEmployee, setShowAddEmployee] = useState(false);
   const [newEmployee, setNewEmployee] = useState<Partial<Employee>>({});
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<string | null>(null);
 
   useEffect(() => {
     loadTeams();
@@ -65,6 +67,15 @@ const EmployeeManagement: React.FC = () => {
   const handleAddEmployee = async () => {
     try {
       setLoading(true);
+      setError(null);
+      setSuccess(null);
+      
+      // Validate required fields
+      if (!newEmployee.first_name || !newEmployee.last_name || !newEmployee.email) {
+        setError('Please fill in all required fields (First Name, Last Name, Email)');
+        return;
+      }
+      
       const employee = await EmployeeService.createEmployee({
         ...newEmployee,
         status: 'active',
@@ -72,12 +83,24 @@ const EmployeeManagement: React.FC = () => {
         updated_at: new Date().toISOString()
       });
       
-      setShowAddEmployee(false);
+      setSuccess(`Employee ${employee.first_name} ${employee.last_name} created successfully!`);
       setNewEmployee({});
-      // Refresh the directory
-      window.location.reload();
+      
+      // Close dialog after a short delay
+      setTimeout(() => {
+        setShowAddEmployee(false);
+        setSuccess(null);
+        // Refresh the directory
+        window.location.reload();
+      }, 1500);
+      
     } catch (error) {
       console.error('Failed to create employee:', error);
+      if (error instanceof Error) {
+        setError(`Failed to create employee: ${error.message}`);
+      } else {
+        setError('Failed to create employee. Please check if the database tables exist.');
+      }
     } finally {
       setLoading(false);
     }
@@ -120,7 +143,13 @@ const EmployeeManagement: React.FC = () => {
           <p className="text-gray-600">Track performance, manage teams, and analyze employee data</p>
         </div>
         <div className="flex items-center space-x-4">
-          <Dialog open={showAddEmployee} onOpenChange={setShowAddEmployee}>
+          <Dialog open={showAddEmployee} onOpenChange={(open) => {
+            setShowAddEmployee(open);
+            if (open) {
+              setError(null);
+              setSuccess(null);
+            }
+          }}>
             <DialogTrigger asChild>
               <Button>
                 <UserPlus className="h-4 w-4 mr-2" />
@@ -135,6 +164,20 @@ const EmployeeManagement: React.FC = () => {
                 </DialogDescription>
               </DialogHeader>
               <div className="space-y-4">
+                {/* Error Message */}
+                {error && (
+                  <div className="bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+                    {error}
+                  </div>
+                )}
+                
+                {/* Success Message */}
+                {success && (
+                  <div className="bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+                    {success}
+                  </div>
+                )}
+                
                 <div className="grid grid-cols-2 gap-4">
                   <div>
                     <Label htmlFor="first_name">First Name</Label>
