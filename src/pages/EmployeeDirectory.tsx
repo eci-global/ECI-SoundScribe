@@ -40,10 +40,14 @@ const EmployeeDirectory: React.FC = () => {
   const loadEmployees = async () => {
     try {
       setLoading(true);
+      console.log('Loading employees with filters:', filters);
       const response = await EmployeeService.getEmployees(filters);
+      console.log('EmployeeService response:', response);
       setEmployees(response.employees);
+      console.log('Set employees:', response.employees);
     } catch (error) {
       console.error('Failed to load employees:', error);
+      setEmployees([]);
     } finally {
       setLoading(false);
     }

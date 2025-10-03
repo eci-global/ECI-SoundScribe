@@ -26,49 +26,60 @@ export class EmployeeService {
    * Get all employees with optional filters
    */
   static async getEmployees(filters?: EmployeeSearchFilters): Promise<EmployeeListResponse> {
-    let query = supabase
-      .from('employees')
-      .select(`
-        *,
-        teams:team_id(name, department),
-        manager:manager_id(first_name, last_name)
-      `)
-      .eq('status', 'active');
+    try {
+      // Simple query without complex joins for now
+      let query = supabase
+        .from('employees')
+        .select('*')
+        .eq('status', 'active');
 
-    if (filters?.department) {
-      query = query.eq('department', filters.department);
+      if (filters?.department) {
+        query = query.eq('department', filters.department);
+      }
+      if (filters?.team_id) {
+        query = query.eq('team_id', filters.team_id);
+      }
+      if (filters?.role) {
+        query = query.eq('role', filters.role);
+      }
+
+      const { data: employees, error } = await query.order('first_name');
+
+      if (error) {
+        console.error('Error fetching employees:', error);
+        throw error;
+      }
+
+      console.log('Fetched employees:', employees);
+
+      // Create simplified employee results without complex performance data
+      const employeesWithPerformance = employees.map((employee) => ({
+        employee,
+        performance_summary: {
+          employee_name: `${employee.first_name} ${employee.last_name}`,
+          total_calls: 0,
+          current_score: 0,
+          score_trend: 0,
+          recent_strengths: [],
+          recent_improvements: [],
+          coaching_notes_count: 0,
+          last_evaluation_date: new Date().toISOString()
+        },
+        recent_activity: 'No recent activity',
+        score_trend: 'stable' as const
+      }));
+
+      return {
+        employees: employeesWithPerformance,
+        total_count: employees.length,
+        page: 1,
+        page_size: employees.length,
+        filters_applied: filters || {}
+      };
+    } catch (error) {
+      console.error('Error in getEmployees:', error);
+      throw error;
     }
-    if (filters?.team_id) {
-      query = query.eq('team_id', filters.team_id);
-    }
-    if (filters?.role) {
-      query = query.eq('role', filters.role);
-    }
-
-    const { data: employees, error } = await query.order('first_name');
-
-    if (error) throw error;
-
-    // Get performance summaries for each employee
-    const employeesWithPerformance = await Promise.all(
-      employees.map(async (employee) => {
-        const performanceSummary = await this.getEmployeePerformanceSummary(employee.id);
-        return {
-          employee,
-          performance_summary: performanceSummary,
-          recent_activity: this.getRecentActivityText(performanceSummary),
-          score_trend: this.calculateScoreTrend(performanceSummary.score_trend)
-        };
-      })
-    );
-
-    return {
-      employees: employeesWithPerformance,
-      total_count: employees.length,
-      page: 1,
-      page_size: employees.length,
-      filters_applied: filters || {}
-    };
   }
 
   /**
