@@ -118,7 +118,7 @@ const EmployeeDirectory: React.FC = () => {
           <h1 className="text-3xl font-bold">Employee Directory</h1>
           <p className="text-gray-600">Manage and track employee performance</p>
         </div>
-        <Button onClick={() => navigate('/employees/new')}>
+        <Button onClick={() => window.location.href = '/employees'}>
           Add Employee
         </Button>
       </div>
@@ -345,7 +345,7 @@ const EmployeeDirectory: React.FC = () => {
           <p className="text-gray-600 mb-4">
             Try adjusting your search criteria or add a new employee.
           </p>
-          <Button onClick={() => navigate('/employees/new')}>
+          <Button onClick={() => window.location.href = '/employees'}>
             Add Employee
           </Button>
         </div>
