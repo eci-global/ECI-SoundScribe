@@ -43,7 +43,15 @@ import FloatingChat from '@/components/chat/FloatingChat';
 import { useToast } from '@/hooks/use-toast';
 import { exportRecordingToPDF } from '@/utils/pdfExport';
 import { useComprehensiveDelete } from '@/hooks/useComprehensiveDelete';
-import { analyzeAllSupportSignals } from '@/utils/supportSignals';
+import {
+  parseECIAnalysis,
+  getECIOverallScore,
+  getECIEscalationRisk,
+  getECIPrimaryStrength,
+  hasECIAnalysis,
+  getECIBehaviorSummary,
+  type ECIAnalysisResult
+} from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
 
 interface SupportRecordingsViewProps {
@@ -86,30 +94,30 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
     }
   });
 
-  // Filter recordings for support mode (enhanced logic)
+  // Filter recordings for support mode with ECI framework
   const supportRecordings = useMemo(() => {
     return recordings.filter(recording => {
-      // Explicit support analysis exists
-      if (recording.support_analysis) {
+      // Has ECI analysis
+      if (hasECIAnalysis(recording)) {
         return true;
       }
-      
+
       // Check content type for customer support
       if (recording.content_type === 'customer_support') {
         return true;
       }
-      
+
       // Has transcript but no coaching evaluation (likely support)
       if (recording.transcript && !recording.coaching_evaluation) {
         return true;
       }
-      
+
       // Processing recordings with customer_support content type
-      if ((recording.status === 'processing' || recording.status === 'uploading') && 
+      if ((recording.status === 'processing' || recording.status === 'uploading') &&
           recording.content_type === 'customer_support') {
         return true;
       }
-      
+
       return false;
     });
   }, [recordings]);
@@ -130,30 +138,20 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
         return false;
       }
 
-      // Get support analysis for filtering
-      let analysis = null;
-      try {
-        if (recording.support_analysis) {
-          analysis = typeof recording.support_analysis === 'string' 
-            ? JSON.parse(recording.support_analysis) 
-            : recording.support_analysis;
-        } else if (recording.transcript) {
-          analysis = analyzeAllSupportSignals(recording);
-        }
-      } catch (error) {
-        console.error('Error parsing support analysis:', error);
-      }
+      // Get ECI analysis for filtering
+      const analysis = parseECIAnalysis(recording);
 
-      // Satisfaction level filter
+      // ECI performance filter
       if (filters.satisfactionLevel !== 'all' && analysis) {
-        const satisfaction = analysis.customerSatisfaction || 0;
-        const level = satisfaction >= 80 ? 'high' : satisfaction >= 60 ? 'medium' : 'low';
+        const overallScore = getECIOverallScore(analysis);
+        const level = overallScore >= 80 ? 'high' : overallScore >= 60 ? 'medium' : 'low';
         if (level !== filters.satisfactionLevel) return false;
       }
 
       // Escalation risk filter
       if (filters.escalationRisk !== 'all' && analysis) {
-        if (analysis.escalationRisk !== filters.escalationRisk) return false;
+        const eciRisk = getECIEscalationRisk(analysis);
+        if (eciRisk !== filters.escalationRisk) return false;
       }
 
       return true;
@@ -292,7 +290,7 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
                 Support Mode
               </div>
             </div>
-            <p className="text-gray-600 mb-6">Customer service excellence with SERVQUAL insights and satisfaction tracking</p>
+            <p className="text-gray-600 mb-6">Customer service excellence with ECI Framework insights and behavior analysis</p>
             
             {/* Stats Bar */}
             <div className="flex items-center justify-center gap-6 text-sm text-gray-600">
@@ -306,7 +304,7 @@ export function SupportRecordingsView({ recordings, loading }: SupportRecordings
               </div>
               <div className="flex items-center gap-2">
                 <div className="w-3 h-3 bg-teal-400 rounded-full"></div>
-                <span>{supportRecordings.filter(r => r.support_analysis).length} With SERVQUAL</span>
+                <span>{supportRecordings.filter(r => hasECIAnalysis(r)).length} With ECI Analysis</span>
               </div>
             </div>
           </header>
@@ -536,56 +534,54 @@ function SupportRecordingsTable({
     }
   };
 
-  const getSupportAnalysis = (recording: Recording) => {
-    try {
-      if (recording.support_analysis) {
-        return typeof recording.support_analysis === 'string' 
-          ? JSON.parse(recording.support_analysis)
-          : recording.support_analysis;
-      } else if (recording.transcript) {
-        return analyzeAllSupportSignals(recording);
-      }
-    } catch (error) {
-      console.error('Error getting support analysis:', error);
-    }
-    return null;
+  const getECIAnalysis = (recording: Recording): ECIAnalysisResult | null => {
+    return parseECIAnalysis(recording);
   };
 
   const getSatisfactionCell = (recording: Recording) => {
-    const analysis = getSupportAnalysis(recording);
-    if (!analysis || !analysis.customerSatisfaction) {
+    const analysis = getECIAnalysis(recording);
+    if (!analysis) {
       return <span className="text-gray-400">-</span>;
     }
-    
-    const satisfaction = analysis.customerSatisfaction;
+
+    const overallScore = getECIOverallScore(analysis);
     let color = 'text-gray-600';
-    
-    if (satisfaction >= 80) {
+    let IconComponent = Heart;
+
+    if (overallScore >= 80) {
       color = 'text-green-600';
-    } else if (satisfaction >= 60) {
+    } else if (overallScore >= 60) {
       color = 'text-yellow-600';
     } else {
       color = 'text-red-600';
     }
 
+    // Show manager review indicator if needed
+    if (analysis.summary.managerReviewRequired) {
+      IconComponent = Eye;
+      color = 'text-purple-600';
+    }
+
     return (
       <div className="flex items-center gap-1">
-        <Heart className={cn('w-3 h-3', color)} />
-        <span className={cn('text-sm font-medium', color)}>{satisfaction}%</span>
+        <IconComponent className={cn('w-3 h-3', color)} />
+        <span className={cn('text-sm font-medium', color)}>
+          {analysis.summary.managerReviewRequired ? 'Review' : `${overallScore}%`}
+        </span>
       </div>
     );
   };
 
   const getEscalationCell = (recording: Recording) => {
-    const analysis = getSupportAnalysis(recording);
-    if (!analysis || !analysis.escalationRisk) {
+    const analysis = getECIAnalysis(recording);
+    if (!analysis) {
       return <span className="text-gray-400">-</span>;
     }
-    
-    const risk = analysis.escalationRisk;
+
+    const risk = getECIEscalationRisk(analysis);
     let color = 'text-gray-600';
     let icon = CheckCircle;
-    
+
     if (risk === 'high') {
       color = 'text-red-600';
       icon = AlertTriangle;
@@ -601,7 +597,7 @@ function SupportRecordingsTable({
     return (
       <div className="flex items-center gap-1">
         <IconComponent className={cn('w-3 h-3', color)} />
-        <span className={cn('text-xs font-medium capitalize', color)}>{risk}</span>
+        <span className={cn('text-xs font-medium capitalize', color)}>{risk} Risk</span>
       </div>
     );
   };
@@ -808,18 +804,18 @@ function EmptyState({ onUploadClick, hasRecordings }: EmptyStateProps) {
       <p className="text-gray-600 mb-8 max-w-md mx-auto">
         {hasRecordings 
           ? 'Try adjusting your search criteria or filters to find what you\'re looking for.'
-          : 'Upload your first customer service call to get started with SERVQUAL analysis and satisfaction insights'
+          : 'Upload your first customer service call to get started with ECI Framework analysis and behavior insights'
         }
       </p>
       {!hasRecordings && (
         <div className="flex items-center justify-center gap-6 mb-8">
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Heart className="w-4 h-4 text-pink-500" />
-            <span>SERVQUAL Analysis</span>
+            <CheckCircle className="w-4 h-4 text-green-500" />
+            <span>ECI Behavior Analysis</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
-            <Award className="w-4 h-4 text-indigo-500" />
-            <span>Quality Metrics</span>
+            <Eye className="w-4 h-4 text-purple-500" />
+            <span>Manager Review Support</span>
           </div>
           <div className="flex items-center gap-2 text-sm text-gray-500">
             <TrendingUp className="w-4 h-4 text-teal-500" />
@@ -918,20 +914,9 @@ function SupportRecordingCard({
   isSelected,
   onSelectRecording
 }: SupportRecordingCardProps) {
-  // Get support analysis
+  // Get ECI support analysis
   const getSupportAnalysis = () => {
-    try {
-      if (recording.support_analysis) {
-        return typeof recording.support_analysis === 'string' 
-          ? JSON.parse(recording.support_analysis)
-          : recording.support_analysis;
-      } else if (recording.transcript) {
-        return analyzeAllSupportSignals(recording);
-      }
-    } catch (error) {
-      console.error('Error getting support analysis:', error);
-    }
-    return null;
+    return parseECIAnalysis(recording);
   };
 
   const analysis = getSupportAnalysis();
@@ -947,12 +932,13 @@ function SupportRecordingCard({
   };
 
   const getSatisfactionBadge = () => {
-    if (!analysis || !analysis.customerSatisfaction) return null;
-    
-    const satisfaction = analysis.customerSatisfaction;
+    if (!analysis) return null;
+
+    // Use ECI overall score as satisfaction indicator
+    const satisfaction = getECIOverallScore(analysis);
     let color = 'bg-gray-100 text-gray-800 border-gray-200';
     let label = `${satisfaction}%`;
-    
+
     if (satisfaction >= 80) {
       color = 'bg-green-100 text-green-800 border-green-200';
       label = `${satisfaction}% High`;
@@ -972,13 +958,14 @@ function SupportRecordingCard({
     );
   };
 
-  const getEscalationRisk = () => {
-    if (!analysis || !analysis.escalationRisk) return null;
-    
-    const risk = analysis.escalationRisk;
+  const getEscalationRiskCard = (recording: Recording) => {
+    const analysis = parseECIAnalysis(recording);
+    if (!analysis) return null;
+
+    const risk = getECIEscalationRisk(analysis);
     let color = 'text-gray-600';
     let icon = CheckCircle;
-    
+
     if (risk === 'high') {
       color = 'text-red-600';
       icon = AlertTriangle;
@@ -994,29 +981,22 @@ function SupportRecordingCard({
     return (
       <div className="flex items-center gap-1">
         <IconComponent className={cn('w-3 h-3', color)} />
-        <span className={cn('text-xs font-medium capitalize', color)}>{risk} Risk</span>
+        <span className={cn('text-xs font-medium capitalize', color)}>{risk}</span>
       </div>
     );
   };
 
-  const getSERVQUALScore = () => {
-    if (!analysis || !analysis.servqualMetrics) return null;
-    
-    const metrics = analysis.servqualMetrics;
-    const avgScore = (
-      metrics.reliability + 
-      metrics.assurance + 
-      metrics.tangibles + 
-      metrics.empathy + 
-      metrics.responsiveness
-    ) / 5;
+  const getECIBehaviorScore = (recording: Recording) => {
+    const analysis = parseECIAnalysis(recording);
+    if (!analysis) return null;
 
-    const scoreColor = avgScore >= 80 ? 'text-green-600' : avgScore >= 60 ? 'text-yellow-600' : 'text-red-600';
-    
+    const overallScore = getECIOverallScore(analysis);
+    const scoreColor = overallScore >= 80 ? 'text-green-600' : overallScore >= 60 ? 'text-yellow-600' : 'text-red-600';
+
     return (
       <div className="flex items-center gap-1">
         <Award className={cn('w-3 h-3', scoreColor)} />
-        <span className={cn('text-xs font-medium', scoreColor)}>SERVQUAL {avgScore.toFixed(0)}</span>
+        <span className={cn('text-xs font-medium', scoreColor)}>ECI {overallScore}</span>
       </div>
     );
   };
@@ -1071,8 +1051,8 @@ function SupportRecordingCard({
 
               {/* Support Metrics */}
               <div className="flex items-center gap-3 text-xs">
-                {getEscalationRisk()}
-                {getSERVQUALScore()}
+                {getEscalationRiskCard(recording)}
+                {getECIBehaviorScore(recording)}
               </div>
             </div>
           </div>

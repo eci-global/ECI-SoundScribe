@@ -1,6 +1,5 @@
 
 import React from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { MetricTile } from '@/components/MetricTile';
 import { LicenseWidget } from '@/components/LicenseWidget';
 import { AuditLogTable } from '@/components/AuditLogTable';
@@ -32,38 +31,32 @@ export default function AdminHome() {
 
   if (loading) {
     return (
-      <AdminLayout>
-        <div className="h-full overflow-y-auto">
-          <div className="max-w-7xl mx-auto p-8">
-            <div className="mb-8">
-              <h1 className="text-display text-eci-gray-900 mb-2">Administration</h1>
-              <p className="text-body text-eci-gray-600">System overview and user management</p>
-            </div>
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
-              {[...Array(4)].map((_, i) => (
-                <div key={i} className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
-                  <div className="h-4 bg-gray-200 rounded mb-4"></div>
-                  <div className="h-8 bg-gray-200 rounded mb-2"></div>
-                  <div className="h-3 bg-gray-200 rounded w-1/2"></div>
-                </div>
-              ))}
-            </div>
+      <div className="h-full overflow-y-auto">
+        <div className="max-w-7xl mx-auto p-8">
+          <div className="mb-8">
+            <p className="text-body text-eci-gray-600">Loading system overview and metrics...</p>
+          </div>
+          <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 xl:grid-cols-4">
+            {[...Array(4)].map((_, i) => (
+              <div key={i} className="bg-white rounded-xl p-6 shadow-sm animate-pulse">
+                <div className="h-4 bg-gray-200 rounded mb-4"></div>
+                <div className="h-8 bg-gray-200 rounded mb-2"></div>
+                <div className="h-3 bg-gray-200 rounded w-1/2"></div>
+              </div>
+            ))}
           </div>
         </div>
-      </AdminLayout>
+      </div>
     );
   }
 
   return (
-    <AdminLayout>
-      <div className="h-full overflow-y-auto">
+    <div className="h-full overflow-y-auto">
         <div className="max-w-7xl mx-auto px-6 py-8 space-y-12">
           {/* Overview */}
           <section className="bg-white border border-eci-gray-200 rounded-2xl shadow-sm p-6 space-y-6">
             <div className="flex flex-col gap-4 lg:flex-row lg:items-center lg:justify-between">
               <div>
-                <p className="text-overline text-eci-gray-500 mb-2">Administration</p>
-                <h1 className="text-display text-eci-gray-900 mb-2">Control Center</h1>
                 <p className="text-body text-eci-gray-600 max-w-3xl">
                   Monitor platform health, oversee user activity, and keep critical automations on track.
                 </p>
@@ -232,6 +225,5 @@ export default function AdminHome() {
           </section>
         </div>
       </div>
-    </AdminLayout>
   );
 }

@@ -1406,6 +1406,31 @@ Deno.serve(async (req) => {
 
         console.log('✅ Transcript saved to database');
 
+        // Extract ECI employee name from transcript (automatic processing)
+        console.log('👤 Extracting ECI employee name from transcript...');
+        try {
+          if (transcript && transcript.length > 50) {
+            const { data: employeeData, error: employeeError } = await supabase.functions.invoke('extract-employee-name', {
+              body: {
+                recording_id: recording_id
+              }
+            });
+
+            if (employeeError) {
+              console.warn('⚠️ Employee name extraction failed (non-critical):', employeeError);
+            } else if (employeeData?.analysis?.employee_name) {
+              console.log(`✅ Auto-detected ECI employee: ${employeeData.analysis.employee_name} (confidence: ${employeeData.analysis.confidence})`);
+            } else {
+              console.log('ℹ️ No ECI employee identified in this recording (low confidence or unclear identification)');
+            }
+          } else {
+            console.log('ℹ️ Transcript too short for employee name extraction');
+          }
+        } catch (employeeExtractionError) {
+          console.warn('⚠️ Employee name extraction error (continuing processing):', employeeExtractionError);
+          // Don't fail the entire process if employee extraction fails
+        }
+
         // Create enhanced speaker analysis from Whisper transcript and segments
         console.log('🔍 Creating enhanced speaker analysis from transcript and segments...');
         await createEnhancedSpeakerAnalysis(transcript, recording_id, supabase, transcriptionResult.segments);

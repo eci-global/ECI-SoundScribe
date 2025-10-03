@@ -62,6 +62,245 @@ const ANALYSIS_METHODS = {
   'fallback_estimation': { priority: 6, icon: Shield, label: 'Estimation', confidence: 30, color: 'text-gray-600' }
 };
 
+// Utility functions for segment generation
+/**
+ * Generate realistic conversation segments from transcript analysis
+ */
+function generateRealisticSegments(
+  transcript: string,
+  speakerNames: string[],
+  totalDuration: number
+): EnhancedSpeakerSegment[] {
+  const segments: EnhancedSpeakerSegment[] = [];
+  const lines = transcript.split('\n').filter(line => line.trim());
+
+  if (lines.length === 0) {
+    return generateImprovedFallbackSegments(speakerNames, totalDuration);
+  }
+
+  console.log(`🎯 Analyzing ${lines.length} transcript lines for realistic segments`);
+
+  let currentTime = 0;
+  const avgSegmentDuration = Math.max(10, totalDuration / Math.max(lines.length, 10)); // At least 10 seconds per segment
+
+  let lastSpeakerIndex = 0;
+
+  for (let i = 0; i < lines.length; i++) {
+    const line = lines[i].trim();
+    if (!line) continue;
+
+    // Try to identify speaker from line
+    let speakerIndex = lastSpeakerIndex;
+    let text = line;
+    let confidence = 0.6;
+
+    // Check for explicit speaker labels in transcript
+    const speakerMatch = line.match(/^([^:]+):\s*(.+)/);
+    if (speakerMatch) {
+      const speakerLabel = speakerMatch[1].trim();
+      const lineText = speakerMatch[2].trim();
+
+      // Try to map to known speakers
+      const mappedIndex = findBestSpeakerMatch(speakerLabel, speakerNames);
+      if (mappedIndex !== -1) {
+        speakerIndex = mappedIndex;
+        confidence = 0.8;
+      }
+      text = lineText;
+    } else {
+      // Alternate speakers based on conversation flow
+      const lowerLine = line.toLowerCase();
+      if (suggestsSpeakerChange(lowerLine, i > 0 ? lines[i-1] : '')) {
+        speakerIndex = (lastSpeakerIndex + 1) % speakerNames.length;
+        confidence = 0.5;
+      }
+    }
+
+    // Calculate segment timing with some variation
+    const baseSegmentTime = avgSegmentDuration * (0.5 + Math.random()); // Random variation
+    const segmentDuration = Math.min(baseSegmentTime, totalDuration - currentTime);
+
+    if (segmentDuration > 0) {
+      const speaker = speakerNames[speakerIndex] || speakerNames[0];
+
+      segments.push({
+        speaker_name: speaker,
+        start_time: currentTime,
+        end_time: currentTime + segmentDuration,
+        text: text.length > 100 ? text.substring(0, 100) + '...' : text,
+        confidence: confidence,
+        analysis_method: 'transcript_analysis'
+      });
+
+      currentTime += segmentDuration;
+      lastSpeakerIndex = speakerIndex;
+
+      if (currentTime >= totalDuration) break;
+    }
+  }
+
+  // Fill remaining time if needed
+  if (currentTime < totalDuration) {
+    const finalSpeaker = speakerNames[(lastSpeakerIndex + 1) % speakerNames.length];
+
+    segments.push({
+      speaker_name: finalSpeaker,
+      start_time: currentTime,
+      end_time: totalDuration,
+      text: 'Closing remarks',
+      confidence: 0.4,
+      analysis_method: 'transcript_analysis'
+    });
+  }
+
+  console.log(`✅ Generated ${segments.length} realistic segments from transcript analysis`);
+  return segments;
+}
+
+/**
+ * Generate improved fallback segments with realistic timing patterns
+ */
+function generateImprovedFallbackSegments(
+  speakerNames: string[],
+  totalDuration: number
+): EnhancedSpeakerSegment[] {
+  const segments: EnhancedSpeakerSegment[] = [];
+
+  // Generate 8-15 segments for more realistic conversation flow
+  const numSegments = Math.min(15, Math.max(8, Math.floor(totalDuration / 30))); // 30 seconds avg per segment
+  let currentTime = 0;
+
+  console.log(`🎯 Generating ${numSegments} improved fallback segments`);
+
+  for (let i = 0; i < numSegments; i++) {
+    // Alternate speakers with some variation
+    const speakerIndex = selectNextSpeaker(i, speakerNames.length);
+    const speaker = speakerNames[speakerIndex];
+
+    // Create more realistic segment durations (15-90 seconds)
+    const minDuration = 15;
+    const maxDuration = Math.min(90, totalDuration / (numSegments * 0.7));
+    const segmentDuration = minDuration + Math.random() * (maxDuration - minDuration);
+
+    const endTime = Math.min(currentTime + segmentDuration, totalDuration);
+
+    if (endTime > currentTime) {
+      segments.push({
+        speaker_name: speaker,
+        start_time: currentTime,
+        end_time: endTime,
+        text: `Conversation segment ${i + 1}`,
+        confidence: 0.5,
+        analysis_method: 'improved_fallback'
+      });
+
+      currentTime = endTime;
+
+      // Add small pause between speakers (1-3 seconds)
+      if (i < numSegments - 1 && currentTime < totalDuration - 5) {
+        currentTime += 1 + Math.random() * 2;
+      }
+    }
+
+    if (currentTime >= totalDuration) break;
+  }
+
+  console.log(`✅ Generated ${segments.length} improved fallback segments`);
+  return segments;
+}
+
+/**
+ * Find the best speaker match for a transcript label
+ */
+function findBestSpeakerMatch(label: string, speakerNames: string[]): number {
+  const cleanLabel = label.toLowerCase().trim();
+
+  // Direct match
+  for (let i = 0; i < speakerNames.length; i++) {
+    if (speakerNames[i].toLowerCase() === cleanLabel) {
+      return i;
+    }
+  }
+
+  // Partial match
+  for (let i = 0; i < speakerNames.length; i++) {
+    const cleanSpeaker = speakerNames[i].toLowerCase();
+    if (cleanSpeaker.includes(cleanLabel) || cleanLabel.includes(cleanSpeaker)) {
+      return i;
+    }
+  }
+
+  // Speaker number match (Speaker 1, Speaker 2, etc.)
+  const numberMatch = cleanLabel.match(/(?:speaker\s*|participant\s*)?(\d+)/);
+  if (numberMatch) {
+    const speakerNum = parseInt(numberMatch[1]) - 1;
+    if (speakerNum >= 0 && speakerNum < speakerNames.length) {
+      return speakerNum;
+    }
+  }
+
+  return -1; // No match found
+}
+
+/**
+ * Check if a line suggests a speaker change
+ */
+function suggestsSpeakerChange(currentLine: string, previousLine: string): boolean {
+  // Conversation starters that suggest speaker change
+  const speakerChangeIndicators = [
+    /^(well|so|actually|yes|no|okay|sure|right|exactly|absolutely)/,
+    /\?$/, // Questions often indicate turn-taking
+    /^(thank|thanks|i\s+think|i\s+believe|i\s+would|let\s+me)/,
+    /^(what|how|why|when|where|who)/,
+  ];
+
+  // Response patterns
+  const responsePatterns = [
+    /^(yes|no|sure|okay|right|exactly|absolutely|definitely|probably)/,
+    /^(i\s+agree|i\s+disagree|that's|this\s+is|it's)/
+  ];
+
+  // Check if previous line was a question (likely to trigger response)
+  const previousWasQuestion = previousLine.includes('?');
+
+  if (previousWasQuestion && responsePatterns.some(pattern => pattern.test(currentLine))) {
+    return true;
+  }
+
+  return speakerChangeIndicators.some(pattern => pattern.test(currentLine));
+}
+
+/**
+ * Select next speaker with realistic conversation patterns
+ */
+function selectNextSpeaker(segmentIndex: number, numSpeakers: number): number {
+  if (numSpeakers === 2) {
+    // For 2 speakers, alternate with occasional longer turns
+    if (Math.random() < 0.15) { // 15% chance to continue with same speaker
+      return segmentIndex % numSpeakers;
+    }
+    return segmentIndex % numSpeakers;
+  } else {
+    // For more speakers, use weighted random selection
+    const weights = Array(numSpeakers).fill(1);
+    const lastSpeaker = (segmentIndex - 1) % numSpeakers;
+
+    // Reduce weight for the last speaker (less likely to speak again immediately)
+    if (lastSpeaker >= 0) weights[lastSpeaker] = 0.3;
+
+    // Select based on weights
+    const totalWeight = weights.reduce((sum, w) => sum + w, 0);
+    let random = Math.random() * totalWeight;
+
+    for (let i = 0; i < weights.length; i++) {
+      random -= weights[i];
+      if (random <= 0) return i;
+    }
+
+    return segmentIndex % numSpeakers;
+  }
+}
+
 export default function SpeakerTimeline({ 
   recording, 
   recordingId,
@@ -149,27 +388,22 @@ export default function SpeakerTimeline({
         }));
       }
     }
-    // 4. Fallback to speaker resolver with enhanced metadata
+    // 4. Fallback to enhanced transcript analysis with realistic segments
     else {
-      console.log('⚠️ Using SpeakerResolver fallback...');
+      console.log('⚠️ Using enhanced transcript analysis fallback...');
       try {
         const speakerNames = MemoizedSpeakerResolver.getSpeakerNames(recording);
         console.log('🎯 SpeakerResolver found speakers:', speakerNames);
-        
-        if (speakerNames.length > 0) {
-          const segmentDuration = totalDuration / speakerNames.length;
-          
-          segments = speakerNames.map((name, index) => ({
-            speaker_name: name,
-            start_time: index * segmentDuration,
-            end_time: (index + 1) * segmentDuration,
-            text: `Speaker segment ${index + 1}`,
-            confidence: 0.4,
-            analysis_method: 'fallback_estimation'
-          }));
+
+        if (speakerNames.length > 0 && recording.transcript) {
+          // Generate realistic conversation segments from transcript
+          segments = generateRealisticSegments(recording.transcript, speakerNames, totalDuration);
+        } else if (speakerNames.length > 0) {
+          // Fallback to improved segment distribution
+          segments = generateImprovedFallbackSegments(speakerNames, totalDuration);
         }
       } catch (error) {
-        console.error('❌ SpeakerResolver error:', error);
+        console.error('❌ Enhanced transcript analysis error:', error);
       }
     }
 

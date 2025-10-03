@@ -618,46 +618,178 @@ export class SpeakerResolver {
   private static extractSpeakerNamesFromTranscript(transcript: string): ResolvedSpeaker[] {
     const speakers: ResolvedSpeaker[] = [];
     const names = new Set<string>();
-    
-    // Common introduction patterns
+
+    // Enhanced introduction patterns - more specific and accurate
     const introPatterns = [
-      /(?:I'm|I am|This is|My name is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/gi,
-      /Hi,?\s+([A-Z][a-z]+)/gi,
-      /([A-Z][a-z]+)\s+here/gi,
-      /([A-Z][a-z]+)\s+speaking/gi
+      // Direct self-introductions
+      /(?:I'm|I am|This is|My name is)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+){0,2})/gi,
+      // Name in conversation context
+      /(?:Hi|Hello),?\s+(?:this\s+is\s+)?([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:from|with|calling|here)/gi,
+      // Professional introductions
+      /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:speaking|here|from\s+[A-Z])/gi,
+      // Name followed by role/company
+      /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)\s+(?:at|from|with)\s+[A-Z]/gi,
+      // Transcript speaker labels (but not generic ones)
+      /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?):(?!\s*(?:Hi|Hello|Yes|No|Okay|Well|Um|Uh))/gim
     ];
-    
-    // Try each pattern
+
+    // Common words and greetings to exclude (expanded list)
+    const excludeWords = new Set([
+      'Hi', 'Hello', 'Hey', 'Good', 'Thank', 'Thanks', 'Please', 'Just', 'Well',
+      'Now', 'Let', 'Great', 'Okay', 'Yes', 'No', 'Um', 'Uh', 'So', 'Actually',
+      'Really', 'Sure', 'Right', 'Today', 'Tomorrow', 'Yesterday', 'Morning',
+      'Afternoon', 'Evening', 'Here', 'There', 'This', 'That', 'What', 'When',
+      'Where', 'Why', 'How', 'Can', 'Could', 'Should', 'Would', 'Will', 'May',
+      'Might', 'Must', 'Need', 'Want', 'Like', 'Know', 'Think', 'Feel', 'See',
+      'Look', 'Call', 'Phone', 'Meet', 'Talk', 'Speak', 'Say', 'Tell', 'Ask'
+    ]);
+
+    // Try each pattern with better validation
     for (const pattern of introPatterns) {
-      const matches = transcript.match(pattern);
-      if (matches) {
-        matches.forEach(match => {
-          const nameMatch = match.match(/([A-Z][a-z]+(?:\s+[A-Z][a-z]+)?)/);
-          if (nameMatch && nameMatch[1]) {
-            const name = nameMatch[1].trim();
-            // Filter out common words that aren't names
-            if (!['Today', 'Good', 'Thank', 'Thanks', 'Please', 'Just', 'Well', 'Now', 'Let', 'Great'].includes(name)) {
-              names.add(name);
-            }
+      const matches = [...transcript.matchAll(pattern)];
+      matches.forEach(match => {
+        if (match[1]) {
+          const name = match[1].trim();
+
+          // Enhanced validation
+          if (this.isValidSpeakerName(name, excludeWords)) {
+            names.add(name);
+            console.log(`✅ Extracted valid speaker name: "${name}" from pattern`);
+          } else {
+            console.log(`❌ Rejected invalid speaker name: "${name}"`);
           }
-        });
-      }
+        }
+      });
     }
-    
-    // Convert to ResolvedSpeaker objects
-    Array.from(names).forEach((name, index) => {
+
+    // Try extracting from structured transcript format
+    const transcriptSpeakers = this.extractFromStructuredTranscript(transcript, excludeWords);
+    transcriptSpeakers.forEach(name => names.add(name));
+
+    // Convert to ResolvedSpeaker objects with role-based fallback
+    const nameArray = Array.from(names);
+    if (nameArray.length === 0) {
+      // Provide role-based names instead of random words
+      return this.generateRoleBasedSpeakers(transcript);
+    }
+
+    nameArray.forEach((name, index) => {
       speakers.push({
         id: `extracted-${index}`,
         name,
         displayName: name,
-        confidence: 0.6,
+        confidence: 0.7, // Higher confidence for properly extracted names
         segments: 0,
         isAiIdentified: false
       });
     });
-    
+
     // Limit to reasonable number of speakers
-    return speakers.slice(0, 8);
+    return speakers.slice(0, 6);
+  }
+
+  /**
+   * Validate if a potential speaker name is actually a name
+   */
+  private static isValidSpeakerName(name: string, excludeWords: Set<string>): boolean {
+    // Basic validation
+    if (!name || name.length < 2 || name.length > 50) return false;
+
+    // Check against exclude words
+    if (excludeWords.has(name)) return false;
+
+    // Check if it's a single excluded word
+    const words = name.split(/\s+/);
+    if (words.length === 1 && excludeWords.has(words[0])) return false;
+
+    // Must start with capital letter
+    if (!/^[A-Z]/.test(name)) return false;
+
+    // Reject if all caps (likely not a name)
+    if (name === name.toUpperCase()) return false;
+
+    // Reject if contains numbers or special chars
+    if (/[\d@#$%^&*()_+=\[\]{}|;':"<>?/\\]/.test(name)) return false;
+
+    // Reject common generic labels
+    if (/^(?:Speaker|User|Agent|Customer|Client|Rep|Representative|Person|Individual|Someone|Caller)[\s\d]*$/i.test(name)) {
+      return false;
+    }
+
+    return true;
+  }
+
+  /**
+   * Extract speaker names from structured transcript format
+   */
+  private static extractFromStructuredTranscript(transcript: string, excludeWords: Set<string>): string[] {
+    const speakers: string[] = [];
+    const lines = transcript.split('\n');
+
+    for (const line of lines) {
+      // Match patterns like "John Smith: Hello there"
+      const match = line.match(/^([A-Z][A-Za-z\s]+?):\s*(.+)/);
+      if (match && match[1] && match[2]) {
+        const name = match[1].trim();
+        const text = match[2].trim();
+
+        // Validate the name and ensure it's not just a greeting
+        if (this.isValidSpeakerName(name, excludeWords) &&
+            text.length > 3 &&
+            !excludeWords.has(text.split(/\s+/)[0])) {
+          speakers.push(name);
+          console.log(`✅ Found structured speaker: "${name}"`);
+        }
+      }
+    }
+
+    return [...new Set(speakers)]; // Remove duplicates
+  }
+
+  /**
+   * Generate role-based speaker names when no actual names are found
+   */
+  private static generateRoleBasedSpeakers(transcript: string): ResolvedSpeaker[] {
+    const speakers: ResolvedSpeaker[] = [];
+
+    // Analyze transcript content to determine likely roles
+    const content = transcript.toLowerCase();
+    const isSupport = /(?:support|help|issue|problem|ticket|case|resolve|assist)/i.test(content);
+    const isSales = /(?:product|price|buy|purchase|deal|offer|quote|proposal|demo)/i.test(content);
+    const isMeeting = /(?:meeting|discuss|agenda|presentation|review|update)/i.test(content);
+
+    // Count approximate number of speakers from dialogue patterns
+    const dialoguePatterns = transcript.split(/\n/).filter(line =>
+      /^[A-Za-z\s]+:/.test(line) || line.includes('?') || line.includes('.')
+    );
+
+    const estimatedSpeakers = Math.min(Math.max(2, Math.ceil(dialoguePatterns.length / 10)), 4);
+
+    // Generate appropriate role-based names
+    for (let i = 0; i < estimatedSpeakers; i++) {
+      let name: string;
+      if (isSupport) {
+        name = i === 0 ? 'Support Agent' : 'Customer';
+      } else if (isSales) {
+        name = i === 0 ? 'Sales Rep' : 'Prospect';
+      } else if (isMeeting) {
+        name = `Participant ${i + 1}`;
+      } else {
+        name = i === 0 ? 'Host' : `Participant ${i + 1}`;
+      }
+
+      speakers.push({
+        id: `role-${i}`,
+        name,
+        displayName: name,
+        confidence: 0.5, // Medium confidence for role-based names
+        segments: 0,
+        isAiIdentified: false
+      });
+    }
+
+    console.log(`✅ Generated ${speakers.length} role-based speakers for ${isSupport ? 'support' : isSales ? 'sales' : 'meeting'} context`);
+    return speakers;
   }
   
   /**

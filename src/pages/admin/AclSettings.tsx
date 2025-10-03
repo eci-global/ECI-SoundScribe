@@ -1,5 +1,4 @@
 import React, { useState } from 'react';
-import AdminLayout from '@/components/admin/AdminLayout';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -80,7 +79,7 @@ export default function AclSettings() {
   };
 
   return (
-    <AdminLayout>
+    
       <div className="h-full overflow-y-auto">
         <div className="max-w-7xl mx-auto p-8">
           <div className="mb-8">
@@ -215,6 +214,6 @@ export default function AclSettings() {
           </AdminTableShell>
         </div>
       </div>
-    </AdminLayout>
+    
   );
 }

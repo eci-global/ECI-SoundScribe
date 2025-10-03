@@ -11,7 +11,6 @@ import ErrorBoundary from "@/components/ErrorBoundary";
 import Index from "./pages/Index";
 import AdminDashboard from "./pages/AdminDashboard";
 import AdminSignIn from "./pages/admin/AdminSignIn";
-import AdminLibrary from "./pages/admin/AdminLibrary";
 import CreateUsers from "./pages/admin/CreateUsers";
 import NotFound from "./pages/NotFound";
 import UploadsImport from "./pages/UploadsImport";
@@ -30,6 +29,7 @@ import AssistantCoach from "./pages/AssistantCoach";
 import DurationDebug from "./pages/DurationDebug";
 import Recordings from "./pages/Recordings";
 import BDRTrainingSettings from "./pages/admin/BDRTrainingSettings";
+<<<<<<< HEAD
 import FeedbackSystemTest from "./pages/FeedbackSystemTest";
 import FeedbackAnalytics from "./pages/admin/FeedbackAnalytics";
 import EmployeeManagement from "./components/employee/EmployeeManagement";
@@ -37,6 +37,9 @@ import EmployeeDirectory from "./pages/EmployeeDirectory";
 import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
+=======
+import AllRecordings from "./pages/admin/AllRecordings";
+>>>>>>> ben_dev/main
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
 
@@ -96,7 +99,7 @@ const App = () => {
                   <Route path="/debug/duration" element={<DurationDebug />} />
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/sign-in" element={<AdminSignIn />} />
-                  <Route path="/admin/library" element={<AdminLibrary />} />
+                  <Route path="/admin/library" element={<AllRecordings />} />
                   <Route path="/admin/create-users" element={<CreateUsers />} />
                   <Route path="/admin/recordings" element={<AdminDashboard />} />
                   <Route path="/admin/files" element={<AdminDashboard />} />
@@ -111,7 +114,12 @@ const App = () => {
                   <Route path="/admin/integrations" element={<AdminDashboard />} />
                   <Route path="/admin/organization-outreach" element={<AdminDashboard />} />
                   <Route path="/admin/analytics" element={<AdminDashboard />} />
+<<<<<<< HEAD
                   <Route path="/admin/bdr-training" element={<AdminLayout><BDRTrainingSettings /></AdminLayout>} />
+=======
+                  <Route path="/admin/bdr-training" element={<BDRTrainingSettings />} />
+                  <Route path="/admin/all-recordings" element={<AllRecordings />} />
+>>>>>>> ben_dev/main
                   <Route path="/admin/bdr-scorecard-history" element={<AdminDashboard />} />
                   <Route path="/admin/privacy" element={<AdminDashboard />} />
                   <Route path="/admin/activity" element={<AdminDashboard />} />

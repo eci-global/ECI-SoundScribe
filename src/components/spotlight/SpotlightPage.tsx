@@ -5,6 +5,7 @@ import CallBriefCard from './CallBriefCard';
 import NextStepsCard from './NextStepsCard';
 import CoachingInsightsCard from './CoachingInsightsCard';
 import BDRCoachingInsights from '@/components/coach/BDRCoachingInsights';
+import ECICoachingInsights from '@/components/coach/ECICoachingInsights';
 import CallMediaPaneSimple from '@/components/player/CallMediaPaneSimple';
 import SpeakerTrack from './SpeakerTrack';
 import { parseSpotlightSpeakers } from '@/utils/spotlightSpeakerParser';
@@ -34,6 +35,8 @@ import { RefreshCw } from 'lucide-react';
 import { useToast } from '@/hooks/use-toast';
 import { supabase } from '@/integrations/supabase/client';
 import { AzureConnectivityTest } from '@/components/debug/AzureConnectivityTest';
+import { useSupportMode } from '@/contexts/SupportContext';
+import { hasECIAnalysis } from '@/utils/eciAnalysis';
 
 interface SpotlightPageProps {
   recording?: Recording | null;
@@ -365,13 +368,8 @@ export default function SpotlightPage({ recording, startTime, onRecordingUpdate 
                       compact={true}
                     />
                     
-                    {/* BDR Coaching Insights for Sales Calls */}
-                    {recording?.content_type === 'sales_call' && (
-                      <BDRCoachingInsights 
-                        recording={recording} 
-                        className="mt-4"
-                      />
-                    )}
+                    {/* Note: CoachingInsightsCard above already handles BDR and ECI analysis based on recording type */}
+                    {/* No additional coaching components needed here to avoid duplication */}
                   </div>
                 </>
               ) : (

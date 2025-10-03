@@ -6,6 +6,8 @@ import { FormattedText, cleanAIText } from '@/utils/textFormatter';
 import { CoachingService } from '@/services/coachingService';
 import { generateInstantCoaching } from '@/utils/instantAnalysis';
 import BDRCoachingInsights from '@/components/coach/BDRCoachingInsights';
+import ECICoachingInsights from '@/components/coach/ECICoachingInsights';
+import { hasECIAnalysis } from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
 
 interface CoachingInsightsCardProps {
@@ -241,7 +243,12 @@ export default function CoachingInsightsCard({ recording, onCoachingUpdate, comp
         </div>
       )}
 
-      <BDRCoachingInsights recording={recording} />
+      {/* Conditional Coaching Insights Based on Recording Type */}
+      {recording?.content_type === 'sales_call' ? (
+        <BDRCoachingInsights recording={recording} />
+      ) : recording && (recording?.content_type === 'customer_support' || recording?.content_type === 'support_call' || hasECIAnalysis(recording)) ? (
+        <ECICoachingInsights recording={recording} />
+      ) : null}
     </div>
   );
 }

@@ -22,8 +22,8 @@ import {
 
 // Page components
 import AdminHome from '@/pages/admin/AdminHome';
-import LibraryDashboard from '@/pages/admin/LibraryDashboard';
 import RecordingTable from '@/pages/admin/RecordingTable';
+import AllRecordings from '@/pages/admin/AllRecordings';
 import FileManager from '@/pages/admin/FileManager';
 import StorageAnalytics from '@/pages/admin/StorageAnalytics';
 import OrgOverview from '@/pages/admin/OrgOverview';
@@ -61,7 +61,7 @@ export const adminNav: AdminNavItem[] = [
     title: 'Library',
     icon: LibraryIcon,
     children: [
-      { title: 'All recordings', path: '/admin/library' },
+      { title: 'All recordings', path: '/admin/all-recordings' },
       { title: 'File management', path: '/admin/files' },
       { title: 'Storage analytics', path: '/admin/storage-analytics' },
     ],
@@ -76,7 +76,14 @@ export const adminNav: AdminNavItem[] = [
   },
   { title: 'Access control', icon: Lock, path: '/admin/access' },
   { title: 'Tools', icon: Settings, path: '/admin/tools' },
-  { title: 'Records', icon: Database, path: '/admin/recordings' },
+  {
+    title: 'Records',
+    icon: Database,
+    children: [
+      { title: 'All recordings (Legacy)', path: '/admin/recordings' },
+      { title: 'Manager recordings', path: '/admin/all-recordings' }
+    ]
+  },
   { title: 'Targeting', icon: Target, path: '/admin/targeting' },
   { title: 'Workflow automations', icon: Workflow, path: '/admin/automations' },
   { title: 'Integrations', icon: Plug, path: '/admin/integrations' },
@@ -111,8 +118,9 @@ export const adminNav: AdminNavItem[] = [
 // Path -> Component map used by AdminDashboard
 export const adminRouteMap: Record<string, React.ComponentType<any>> = {
   '/admin': AdminHome,
-  '/admin/library': LibraryDashboard,
+  '/admin/library': AllRecordings,
   '/admin/recordings': RecordingTable,
+  '/admin/all-recordings': AllRecordings,
   '/admin/files': FileManager,
   '/admin/storage-analytics': StorageAnalytics,
   '/admin/org': OrgOverview,

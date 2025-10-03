@@ -10,6 +10,8 @@ import { useFrameworkAnalytics } from '@/hooks/useFrameworkAnalytics';
 import { useCoachingInsights } from '@/hooks/useCoachingInsights';
 import { useSupportMode } from '@/contexts/SupportContext';
 import { useSupportFrameworkAnalytics } from '@/hooks/useSupportFrameworkAnalytics';
+import { useECIFrameworkAnalytics } from '@/hooks/useECIFrameworkAnalytics';
+import ECIAnalyticsDashboard from './ECIAnalyticsDashboard';
 import BANTAnalysisCard from './BANTAnalysisCard';
 import MEDDICAnalysisCard from './MEDDICAnalysisCard';
 import type { Recording } from '@/types/recording';
@@ -24,7 +26,7 @@ export default function FrameworkAnalyticsDashboard({ userId, recordings = [] }:
   
   // Return appropriate component based on mode
   if (supportMode.supportMode) {
-    return <SupportFrameworkAnalyticsDashboard userId={userId} recordings={recordings} />;
+    return <ECIAnalyticsDashboard userId={userId} recordings={recordings} />;
   } else {
     return <SalesFrameworkAnalyticsDashboard userId={userId} />;
   }
@@ -288,24 +290,21 @@ function SalesFrameworkAnalyticsDashboard({ userId }: FrameworkAnalyticsDashboar
   );
 }
 
-// Support Framework Analytics Component
+// Support Framework Analytics Component - Now using ECI Framework
 function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: FrameworkAnalyticsDashboardProps) {
   const [selectedFramework, setSelectedFramework] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
-  
-  // Use the real-time support framework analytics hook
+
+  // Use the ECI framework analytics hook
   const {
     overviewStats,
-    servqualData,
-    journeyStageData,
-    resolutionMetrics,
+    sectionPerformance,
+    managerReviewQueue,
+    teamPerformance,
     trendData,
-    servqualDimensions,
-    journeyStages,
-    resolutionCategories,
     loading,
     error
-  } = useSupportFrameworkAnalytics(recordings, timeRange);
+  } = useECIFrameworkAnalytics(recordings, timeRange);
 
   if (loading) {
     return (
@@ -332,11 +331,11 @@ function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: Framewo
   }
 
   const supportFrameworkOptions = [
-    { value: 'all', label: 'All Support Frameworks' },
-    { value: 'SERVQUAL', label: 'SERVQUAL' },
-    { value: 'CUSTOMER_JOURNEY', label: 'Customer Journey' },
-    { value: 'SUPPORT_QUALITY', label: 'Support Quality' },
-    { value: 'RESOLUTION_FRAMEWORK', label: 'Resolution Framework' }
+    { value: 'all', label: 'All ECI Behaviors' },
+    { value: 'CARE_FOR_CUSTOMER', label: 'Care for Customer (60%)' },
+    { value: 'CALL_RESOLUTION', label: 'Call Resolution (30%)' },
+    { value: 'CALL_FLOW', label: 'Call Flow (10%)' },
+    { value: 'MANAGER_REVIEW', label: 'Manager Review Queue' }
   ];
 
   const timeRangeOptions = [
@@ -352,8 +351,8 @@ function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: Framewo
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-bold">Support Framework Analytics</h2>
-          <p className="text-gray-600">Track your customer service framework performance</p>
+          <h2 className="text-2xl font-bold">ECI Support Analytics</h2>
+          <p className="text-gray-600">Track performance using ECI Quality Framework with manager review support</p>
         </div>
         <div className="flex items-center gap-4">
           <Select value={selectedFramework} onValueChange={setSelectedFramework}>
@@ -383,7 +382,7 @@ function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: Framewo
         </div>
       </div>
 
-      {/* Overview Cards */}
+      {/* ECI Overview Cards */}
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <Card>
           <CardContent className="p-6">
@@ -392,8 +391,24 @@ function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: Framewo
                 <Star className="h-6 w-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">SERVQUAL Score</p>
-                <p className="text-2xl font-bold">{overviewStats.averageServqual}</p>
+                <p className="text-sm text-gray-600">ECI Score</p>
+                <p className="text-2xl font-bold">{overviewStats.averageECIScore}</p>
+                <p className="text-xs text-gray-500">Overall Performance</p>
+              </div>
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardContent className="p-6">
+            <div className="flex items-center gap-3">
+              <div className="p-3 bg-purple-100 rounded-lg">
+                <Users className="h-6 w-6 text-purple-600" />
+              </div>
+              <div>
+                <p className="text-sm text-gray-600">Manager Reviews</p>
+                <p className="text-2xl font-bold">{overviewStats.managerReviewRequired}</p>
+                <p className="text-xs text-gray-500">Need Attention</p>
               </div>
             </div>
           </CardContent>
@@ -406,22 +421,9 @@ function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: Framewo
                 <Heart className="h-6 w-6 text-green-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Customer Satisfaction</p>
-                <p className="text-2xl font-bold">{overviewStats.customerSatisfaction}%</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-3">
-              <div className="p-3 bg-emerald-100 rounded-lg">
-                <Target className="h-6 w-6 text-emerald-600" />
-              </div>
-              <div>
-                <p className="text-sm text-gray-600">Resolution Rate</p>
-                <p className="text-2xl font-bold">{overviewStats.resolutionRate}%</p>
+                <p className="text-sm text-gray-600">Care Excellence</p>
+                <p className="text-2xl font-bold">{overviewStats.careExcellenceRate}%</p>
+                <p className="text-xs text-gray-500">Customer Care</p>
               </div>
             </div>
           </CardContent>
@@ -434,8 +436,9 @@ function SupportFrameworkAnalyticsDashboard({ userId, recordings = [] }: Framewo
                 <Shield className="h-6 w-6 text-orange-600" />
               </div>
               <div>
-                <p className="text-sm text-gray-600">Escalation Rate</p>
+                <p className="text-sm text-gray-600">Escalation Risk</p>
                 <p className="text-2xl font-bold">{overviewStats.escalationRate}%</p>
+                <p className="text-xs text-gray-500">High Risk Calls</p>
               </div>
             </div>
           </CardContent>
