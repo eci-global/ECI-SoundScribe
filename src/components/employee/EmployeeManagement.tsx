@@ -26,6 +26,7 @@ import {
   Upload
 } from 'lucide-react';
 import { EmployeeService } from '@/services/employeeService';
+import { supabase } from '@/integrations/supabase/client';
 import EmployeeDirectory from '@/pages/EmployeeDirectory';
 import EmployeeProfile from '@/pages/EmployeeProfile';
 import EmployeeDashboard from '@/pages/EmployeeDashboard';
@@ -50,15 +51,22 @@ const EmployeeManagement: React.FC = () => {
   const loadTeams = async () => {
     try {
       setLoading(true);
-      // This would be replaced with actual team loading
-      const mockTeams: Team[] = [
-        { id: '1', name: 'Sales Team', description: 'Primary sales team', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-        { id: '2', name: 'BDR Team', description: 'Business Development Representatives', created_at: new Date().toISOString(), updated_at: new Date().toISOString() },
-        { id: '3', name: 'Support Team', description: 'Customer support team', created_at: new Date().toISOString(), updated_at: new Date().toISOString() }
-      ];
-      setTeams(mockTeams);
+      // Load teams from Supabase database
+      const { data: teams, error } = await supabase
+        .from('teams')
+        .select('*')
+        .order('name');
+      
+      if (error) {
+        console.error('Failed to load teams:', error);
+        // Fallback to empty array if teams table doesn't exist yet
+        setTeams([]);
+      } else {
+        setTeams(teams || []);
+      }
     } catch (error) {
       console.error('Failed to load teams:', error);
+      setTeams([]);
     } finally {
       setLoading(false);
     }
