@@ -56,6 +56,7 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
   const [data, setData] = useState<FeedbackAnalyticsData | null>(null);
   const [loading, setLoading] = useState(true);
   const [timeRange, setTimeRange] = useState('30d');
+  const [customDateRange, setCustomDateRange] = useState<{from: string, to: string} | null>(null);
   const [selectedManager, setSelectedManager] = useState('all');
   const [recentPage, setRecentPage] = useState(0);
 
@@ -65,14 +66,14 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
   useEffect(() => {
     loadAnalyticsData();
     setRecentPage(0);
-  }, [timeRange, selectedManager]);
+  }, [timeRange, selectedManager, customDateRange]);
 
   const loadAnalyticsData = async () => {
     try {
       setLoading(true);
 
       // Check if we're in demo mode (no database tables)
-      const isDemoMode = false; // Tables exist, so we can use real data
+      const isDemoMode = true; // Set to false when manager_feedback_corrections table exists
       
       if (isDemoMode) {
         // Demo mode - generate mock analytics data
@@ -171,9 +172,17 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
       }
 
       // Calculate date range
-      const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
-      const startDate = new Date();
-      startDate.setDate(startDate.getDate() - days);
+      let startDate: Date;
+      let endDate: Date = new Date();
+      
+      if (customDateRange) {
+        startDate = new Date(customDateRange.from);
+        endDate = new Date(customDateRange.to);
+      } else {
+        const days = timeRange === '7d' ? 7 : timeRange === '30d' ? 30 : 90;
+        startDate = new Date();
+        startDate.setDate(startDate.getDate() - days);
+      }
 
       // Build query filters (commented out since we're in demo mode)
       // let query = supabase
@@ -395,14 +404,26 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
         <div>
           <h2 className="text-2xl font-bold">Feedback Analytics</h2>
           <p className="text-gray-600">AI vs Manager scoring alignment trends</p>
-          <div className="mt-2">
+          <div className="mt-2 flex items-center gap-2">
             <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
               🎭 Demo Mode
             </Badge>
+            <span className="text-sm text-gray-500">
+              {customDateRange 
+                ? `${customDateRange.from} to ${customDateRange.to}`
+                : timeRange === '7d' ? 'Last 7 days' 
+                : timeRange === '30d' ? 'Last 30 days' 
+                : timeRange === '90d' ? 'Last 90 days' 
+                : 'Custom Range'
+              }
+            </span>
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Select value={timeRange} onValueChange={setTimeRange}>
+          <Select value={timeRange} onValueChange={(value) => {
+            setTimeRange(value);
+            setCustomDateRange(null); // Clear custom range when selecting preset
+          }}>
             <SelectTrigger className="w-32">
               <SelectValue />
             </SelectTrigger>
@@ -410,8 +431,30 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
               <SelectItem value="7d">Last 7 days</SelectItem>
               <SelectItem value="30d">Last 30 days</SelectItem>
               <SelectItem value="90d">Last 90 days</SelectItem>
+              <SelectItem value="custom">Custom Range</SelectItem>
             </SelectContent>
           </Select>
+          
+          {timeRange === 'custom' && (
+            <div className="flex items-center gap-2">
+              <input
+                type="date"
+                value={customDateRange?.from || ''}
+                onChange={(e) => setCustomDateRange(prev => ({...prev, from: e.target.value}))}
+                className="px-3 py-1 border rounded-md text-sm"
+                placeholder="From"
+              />
+              <span className="text-gray-500">to</span>
+              <input
+                type="date"
+                value={customDateRange?.to || ''}
+                onChange={(e) => setCustomDateRange(prev => ({...prev, to: e.target.value}))}
+                className="px-3 py-1 border rounded-md text-sm"
+                placeholder="To"
+              />
+            </div>
+          )}
+          
           <Button variant="outline" size="sm" onClick={loadAnalyticsData}>
             <RefreshCw className="h-4 w-4 mr-2" />
             Refresh
