@@ -11,6 +11,7 @@ import { useSearchParams, useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { useToast } from '@/hooks/use-toast';
 import type { Recording } from '@/types/recording';
+import { ContentTypeBadge } from '@/utils/contentTypeBadge';
 
 export default function UploadsImport() {
   const [searchParams] = useSearchParams();
@@ -287,7 +288,10 @@ export default function UploadsImport() {
                             </div>
                           </td>
                           <td className="px-6 py-4">
-                            <div className="text-sm text-eci-gray-900">{recording.title || 'Untitled Recording'}</div>
+                            <div className="flex items-center gap-2">
+                              <div className="text-sm text-eci-gray-900">{recording.title || 'Untitled Recording'}</div>
+                              <ContentTypeBadge contentType={recording.content_type} />
+                            </div>
                           </td>
                           <td className="px-6 py-4 whitespace-nowrap">
                             <div className="text-sm text-eci-gray-700">{recording.file_type?.toUpperCase() || 'Unknown'}</div>

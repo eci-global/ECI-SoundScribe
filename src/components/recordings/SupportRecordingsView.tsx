@@ -53,6 +53,7 @@ import {
   type ECIAnalysisResult
 } from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
+import { ContentTypeBadge } from '@/utils/contentTypeBadge';
 
 interface SupportRecordingsViewProps {
   recordings: Recording[];
@@ -657,9 +658,12 @@ function SupportRecordingsTable({
                       <FileAudio className="w-4 h-4 text-gray-500 flex-shrink-0" />
                     )}
                     <div className="min-w-0 flex-1">
-                      <p className="font-medium text-gray-900 truncate">
-                        {recording.title || 'Untitled Recording'}
-                      </p>
+                      <div className="flex items-center gap-2">
+                        <p className="font-medium text-gray-900 truncate">
+                          {recording.title || 'Untitled Recording'}
+                        </p>
+                        <ContentTypeBadge contentType={recording.content_type} />
+                      </div>
                       {recording.description && (
                         <p className="text-xs text-gray-500 truncate">
                           {recording.description}
@@ -1039,6 +1043,7 @@ function SupportRecordingCard({
                 <CardTitle className="text-base font-semibold line-clamp-1">
                   {recording.title || 'Untitled Recording'}
                 </CardTitle>
+                <ContentTypeBadge contentType={recording.content_type} />
               </div>
             
             {/* Badges */}

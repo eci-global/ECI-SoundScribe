@@ -44,6 +44,7 @@ import { useToast } from '@/hooks/use-toast';
 import { exportRecordingToPDF } from '@/utils/pdfExport';
 import { useComprehensiveDelete } from '@/hooks/useComprehensiveDelete';
 import type { Recording } from '@/types/recording';
+import { ContentTypeBadge } from '@/utils/contentTypeBadge';
 
 interface SalesRecordingsViewProps {
   recordings: Recording[];
@@ -665,9 +666,12 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
                       className="w-full rounded-xl border border-blue-200 bg-white/60 px-4 py-3 text-left transition hover:bg-white"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-blue-900 truncate">
-                          {recording.title || 'Untitled recording'}
-                        </p>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <p className="text-sm font-medium text-blue-900 truncate">
+                            {recording.title || 'Untitled recording'}
+                          </p>
+                          <ContentTypeBadge contentType={recording.content_type} />
+                        </div>
                         <Badge className="bg-blue-100 text-blue-800 border-blue-200 text-[11px] capitalize">
                           {recording.status}
                         </Badge>
@@ -712,9 +716,12 @@ export function SalesRecordingsView({ recordings, loading }: SalesRecordingsView
                       className="w-full rounded-xl border border-rose-200 bg-white/70 px-4 py-3 text-left transition hover:bg-white"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <p className="text-sm font-medium text-rose-900 truncate">
-                          {recording.title || 'Untitled recording'}
-                        </p>
+                        <div className="flex items-center gap-2 min-w-0">
+                          <p className="text-sm font-medium text-rose-900 truncate">
+                            {recording.title || 'Untitled recording'}
+                          </p>
+                          <ContentTypeBadge contentType={recording.content_type} />
+                        </div>
                         <ChevronRight className="h-4 w-4 text-rose-400" />
                       </div>
                       <p className="mt-1 text-xs text-rose-700/70">
@@ -1025,6 +1032,7 @@ function RecordingListItem({
                   <FileAudio className="h-4 w-4 text-slate-500" />
                 )}
                 <span className="line-clamp-1">{recording.title || 'Untitled recording'}</span>
+                <ContentTypeBadge contentType={recording.content_type} />
               </div>
               <div className="flex flex-wrap items-center gap-2">
                 <Badge className={cn('text-xs capitalize border', getStatusBadgeClasses(recording.status))}>
@@ -1243,9 +1251,12 @@ function RecordingsTable({
                         <FileAudio className="h-4 w-4 text-slate-500" />
                       )}
                       <div className="min-w-0">
-                        <p className="font-medium text-slate-900 truncate">
-                          {recording.title || 'Untitled recording'}
-                        </p>
+                        <div className="flex items-center gap-2">
+                          <p className="font-medium text-slate-900 truncate">
+                            {recording.title || 'Untitled recording'}
+                          </p>
+                          <ContentTypeBadge contentType={recording.content_type} />
+                        </div>
                         {recording.description && (
                           <p className="text-xs text-slate-500 truncate">{recording.description}</p>
                         )}
