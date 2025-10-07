@@ -72,12 +72,26 @@ function SupportAssistantCoach({ recordings }: { recordings: any[] }) {
         {/* Header */}
         <header className="text-center mb-6">
           <div className="flex items-center justify-center gap-3 mb-2">
-            <h1 className="text-4xl font-bold text-gray-800">AI Support Coach</h1>
-            <div className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md font-medium">
-              Support Mode
+            <h1 className="text-4xl font-bold text-gray-800">{
+              supportMode.currentMode === 'support' ? 'AI Support Coach' :
+              supportMode.currentMode === 'ux' ? 'AI UX Coach' :
+              'AI Sales Coach'
+            }</h1>
+            <div className={`px-3 py-1 text-sm rounded-md font-medium ${
+              supportMode.currentMode === 'support' ? 'bg-blue-100 text-blue-700' :
+              supportMode.currentMode === 'ux' ? 'bg-purple-100 text-purple-700' :
+              'bg-emerald-100 text-emerald-700'
+            }`}>
+              {supportMode.currentMode === 'support' ? 'Support Mode' :
+               supportMode.currentMode === 'ux' ? 'UX Mode' :
+               'Sales Mode'}
             </div>
           </div>
-          <p className="text-gray-600">Your intelligent customer service coaching companion with personalized insights</p>
+          <p className="text-gray-600">{
+            supportMode.currentMode === 'support' ? 'Your intelligent customer service coaching companion with personalized insights' :
+            supportMode.currentMode === 'ux' ? 'Your intelligent user experience coaching companion with interview insights' :
+            'Your intelligent sales coaching companion with personalized insights'
+          }</p>
         </header>
 
         {/* AI Learning Intelligence Dashboard */}

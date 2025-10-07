@@ -17,6 +17,7 @@ import {
   Sparkles,
   Phone,
   UserCheck,
+  MessageSquare,
   AlertTriangle,
   Users
 } from 'lucide-react';
@@ -439,17 +440,23 @@ export function PersonalizedDashboard() {
                   <option value="90d">90 days</option>
                 </select>
                 <Button 
-                  onClick={supportMode.toggleSupportMode}
-                  variant={supportMode.supportMode ? "default" : "outline"}
+                  onClick={supportMode.toggleMode}
+                  variant="outline"
                   className={cn(
                     "transition-all duration-200",
-                    supportMode.supportMode 
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800" 
-                      : "border-blue-200 hover:border-blue-300 hover:bg-blue-50"
+                    supportMode.currentMode === 'sales' 
+                      ? "border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50" 
+                      : supportMode.currentMode === 'support'
+                      ? "border-blue-200 hover:border-blue-300 hover:bg-blue-50"
+                      : "border-purple-200 hover:border-purple-300 hover:bg-purple-50"
                   )}
                 >
-                  {supportMode.supportMode ? <UserCheck className="w-4 h-4 mr-2" /> : <Phone className="w-4 h-4 mr-2" />}
-                  {supportMode.supportMode ? 'Support Mode' : 'Sales Mode'}
+                  {supportMode.currentMode === 'sales' && <Phone className="w-4 h-4 mr-2" />}
+                  {supportMode.currentMode === 'support' && <UserCheck className="w-4 h-4 mr-2" />}
+                  {supportMode.currentMode === 'ux' && <MessageSquare className="w-4 h-4 mr-2" />}
+                  {supportMode.currentMode === 'sales' && 'Sales Mode'}
+                  {supportMode.currentMode === 'support' && 'Support Mode'}
+                  {supportMode.currentMode === 'ux' && 'UX Mode'}
                 </Button>
                 <Button onClick={() => setUploadModalOpen(true)} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg">
                   <Upload className="w-4 h-4 mr-2" />
