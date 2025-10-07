@@ -15,6 +15,7 @@ import {
 } from '@/utils/coachingAccessors';
 import { useSupportMode } from '@/contexts/SupportContext';
 import { analyzeAllSupportSignals } from '@/utils/supportSignals';
+import { UXAnalyticsDashboard } from './UXAnalyticsDashboard';
 
 interface AnalyticsDashboardProps {
   recordings: Recording[];
@@ -24,8 +25,10 @@ export function AnalyticsDashboard({ recordings }: AnalyticsDashboardProps) {
   const supportMode = useSupportMode();
   
   // Return appropriate component based on mode
-  if (supportMode.supportMode) {
+  if (supportMode.currentMode === 'support') {
     return <SupportAnalyticsOverview recordings={recordings} />;
+  } else if (supportMode.currentMode === 'ux') {
+    return <UXAnalyticsDashboard recordings={recordings} />;
   } else {
     return <SalesAnalyticsOverview recordings={recordings} />;
   }

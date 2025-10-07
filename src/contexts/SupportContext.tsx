@@ -1,9 +1,13 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import { useAuth } from '@/hooks/useAuth';
 
+type AppMode = 'sales' | 'support' | 'ux';
+
 interface SupportContextType {
   supportMode: boolean;
   setSupportMode: (enabled: boolean) => void;
+  currentMode: AppMode;
+  setCurrentMode: (mode: AppMode) => void;
   servqualMetrics: {
     empathy: number;
     professionalism: number;
@@ -17,6 +21,7 @@ interface SupportContextType {
     resolutionEffectiveness: number;
   };
   toggleSupportMode: () => void;
+  toggleMode: () => void;
 }
 
 const SupportContext = createContext<SupportContextType | undefined>(undefined);
@@ -27,20 +32,27 @@ interface SupportProviderProps {
 
 export function SupportProvider({ children }: SupportProviderProps) {
   const [supportMode, setSupportMode] = useState(false);
+  const [currentMode, setCurrentMode] = useState<AppMode>('sales');
   const { user } = useAuth();
 
-  // Initialize support mode based on user preferences or context
+  // Initialize mode based on user preferences or context
   useEffect(() => {
-    const savedMode = localStorage.getItem('support-mode');
+    const savedMode = localStorage.getItem('app-mode');
+    const savedSupportMode = localStorage.getItem('support-mode');
+    
     if (savedMode) {
-      setSupportMode(JSON.parse(savedMode));
+      setCurrentMode(savedMode as AppMode);
+    }
+    if (savedSupportMode) {
+      setSupportMode(JSON.parse(savedSupportMode));
     }
   }, []);
 
-  // Save support mode preference
+  // Save mode preferences
   useEffect(() => {
+    localStorage.setItem('app-mode', currentMode);
     localStorage.setItem('support-mode', JSON.stringify(supportMode));
-  }, [supportMode]);
+  }, [currentMode, supportMode]);
 
   // Mock SERVQUAL metrics - in real implementation, these would come from AI analysis
   const servqualMetrics = {
@@ -69,12 +81,25 @@ export function SupportProvider({ children }: SupportProviderProps) {
     setSupportMode(!supportMode);
   };
 
+  const toggleMode = () => {
+    const modes: AppMode[] = ['sales', 'support', 'ux'];
+    const currentIndex = modes.indexOf(currentMode);
+    const nextIndex = (currentIndex + 1) % modes.length;
+    setCurrentMode(modes[nextIndex]);
+    
+    // Update supportMode based on current mode
+    setSupportMode(modes[nextIndex] === 'support');
+  };
+
   const value: SupportContextType = {
     supportMode,
     setSupportMode,
+    currentMode,
+    setCurrentMode,
     servqualMetrics,
     supportSignals,
-    toggleSupportMode
+    toggleSupportMode,
+    toggleMode
   };
 
   return (

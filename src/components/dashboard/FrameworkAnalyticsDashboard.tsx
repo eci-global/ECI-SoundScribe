@@ -13,6 +13,7 @@ import { useSupportFrameworkAnalytics } from '@/hooks/useSupportFrameworkAnalyti
 import { useECIFrameworkAnalytics } from '@/hooks/useECIFrameworkAnalytics';
 import ECIAnalyticsDashboard from './ECIAnalyticsDashboard';
 import BANTAnalysisCard from './BANTAnalysisCard';
+import { UXAnalyticsDashboard } from './UXAnalyticsDashboard';
 import MEDDICAnalysisCard from './MEDDICAnalysisCard';
 import type { Recording } from '@/types/recording';
 
@@ -25,8 +26,10 @@ export default function FrameworkAnalyticsDashboard({ userId, recordings = [] }:
   const supportMode = useSupportMode();
   
   // Return appropriate component based on mode
-  if (supportMode.supportMode) {
+  if (supportMode.currentMode === 'support') {
     return <ECIAnalyticsDashboard userId={userId} recordings={recordings} />;
+  } else if (supportMode.currentMode === 'ux') {
+    return <UXAnalyticsDashboard recordings={recordings} />;
   } else {
     return <SalesFrameworkAnalyticsDashboard userId={userId} />;
   }
