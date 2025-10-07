@@ -119,8 +119,8 @@ serve(async (req) => {
     const userIds = authUsers.map((u) => u.id);
     console.log(`🔍 Fetching profiles and roles for ${userIds.length} users`);
 
-    // Fetch user profiles and roles in parallel
-    const [profileResult, userRoleResult] = await Promise.all([
+    // Fetch user profiles, roles, and policy assignments in parallel
+    const [profileResult, userRoleResult, policyAssignmentResult] = await Promise.all([
       supabase
         .from('profiles')
         .select('id, full_name, avatar_url, created_at, updated_at')
@@ -129,6 +129,25 @@ serve(async (req) => {
         .from('user_roles')
         .select('id, user_id, role, created_at')
         .in('user_id', userIds),
+      supabase
+        .from('user_policy_assignments')
+        .select(`
+          id,
+          user_id,
+          is_active,
+          assigned_at,
+          expires_at,
+          policy:access_policies(
+            id,
+            name,
+            description,
+            resource_name,
+            permissions,
+            enabled
+          )
+        `)
+        .in('user_id', userIds)
+        .eq('is_active', true),
     ]);
 
     // Check for profile fetch errors
@@ -161,10 +180,18 @@ serve(async (req) => {
       }
     }
 
+    // Check for policy assignments fetch errors (non-critical)
+    if (policyAssignmentResult.error) {
+      console.warn('Failed to fetch policy assignments (non-critical):', policyAssignmentResult.error);
+      // Set empty data so the rest of the function continues to work
+      policyAssignmentResult.data = [];
+    }
+
     const profileRows = profileResult.data || [];
     const userRoleRows = userRoleResult.data || [];
+    const policyAssignmentRows = policyAssignmentResult.data || [];
 
-    console.log(`📊 Found ${profileRows.length} profiles and ${userRoleRows.length} role assignments`);
+    console.log(`📊 Found ${profileRows.length} profiles, ${userRoleRows.length} role assignments, and ${policyAssignmentRows.length} policy assignments`);
 
     const profilesById = new Map((profileRows || []).map((profile) => [profile.id, profile]));
 
@@ -179,9 +206,28 @@ serve(async (req) => {
       rolesByUserId.set(role.user_id, entry);
     });
 
+    const policiesByUserId = new Map<string, any[]>();
+    (policyAssignmentRows || []).forEach((assignment) => {
+      const entry = policiesByUserId.get(assignment.user_id) || [];
+      entry.push({
+        id: assignment.id,
+        policy_id: assignment.policy.id,
+        policy_name: assignment.policy.name,
+        policy_description: assignment.policy.description,
+        resource_name: assignment.policy.resource_name,
+        permissions: assignment.policy.permissions,
+        assigned_at: assignment.assigned_at,
+        expires_at: assignment.expires_at,
+        is_active: assignment.is_active,
+        enabled: assignment.policy.enabled
+      });
+      policiesByUserId.set(assignment.user_id, entry);
+    });
+
     const enrichedUsers = authUsers.map((authUser) => {
       const profile = profilesById.get(authUser.id);
       const assignedRoles = rolesByUserId.get(authUser.id) || [];
+      const assignedPolicies = policiesByUserId.get(authUser.id) || [];
       let status: 'active' | 'inactive' | 'suspended' = 'active';
       if (authUser.banned_until) {
         status = 'suspended';
@@ -202,6 +248,18 @@ serve(async (req) => {
           role: role.role,
           created_at: role.created_at || new Date().toISOString(),
         })),
+        policies: assignedPolicies.map((policy) => ({
+          id: policy.id,
+          policy_id: policy.policy_id,
+          policy_name: policy.policy_name,
+          policy_description: policy.policy_description,
+          resource_name: policy.resource_name,
+          permissions: policy.permissions,
+          assigned_at: policy.assigned_at,
+          expires_at: policy.expires_at,
+          is_active: policy.is_active,
+          enabled: policy.enabled
+        })),
         status,
         metadata: authUser.user_metadata || {},
       };
@@ -214,7 +272,11 @@ serve(async (req) => {
       totalUsers: enrichedUsers.length,
       activeUsers: enrichedUsers.filter((user) => user.status === 'active').length,
       admins: enrichedUsers.filter((user) => user.roles.some((role) => role.role === 'admin')).length,
+      managers: enrichedUsers.filter((user) => user.roles.some((role) => role.role === 'manager')).length,
       newUsersThisMonth: enrichedUsers.filter((user) => new Date(user.created_at) >= monthStart).length,
+      usersWithPolicies: enrichedUsers.filter((user) => user.policies.length > 0).length,
+      totalPolicyAssignments: enrichedUsers.reduce((acc, user) => acc + user.policies.length, 0),
+      usersWithBothRolesAndPolicies: enrichedUsers.filter((user) => user.roles.length > 0 && user.policies.length > 0).length,
     };
 
     console.log(`✅ Successfully processed ${enrichedUsers.length} users with stats:`, stats);
