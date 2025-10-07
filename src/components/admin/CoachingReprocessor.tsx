@@ -230,6 +230,7 @@ export default function CoachingReprocessor() {
       case 'customer_support': return 'bg-green-100 text-green-800';
       case 'team_meeting': return 'bg-purple-100 text-purple-800';
       case 'training_session': return 'bg-orange-100 text-orange-800';
+      case 'user_experience': return 'bg-indigo-100 text-indigo-800';
       default: return 'bg-gray-100 text-gray-800';
     }
   };
@@ -240,6 +241,7 @@ export default function CoachingReprocessor() {
       case 'customer_support': return 'Support';
       case 'team_meeting': return 'Meeting';
       case 'training_session': return 'Training';
+      case 'user_experience': return 'UX Interview';
       default: return contentType || 'Other';
     }
   };
