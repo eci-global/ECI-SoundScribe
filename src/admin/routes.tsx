@@ -27,6 +27,8 @@ import AllRecordings from '@/pages/admin/AllRecordings';
 import FileManager from '@/pages/admin/FileManager';
 import StorageAnalytics from '@/pages/admin/StorageAnalytics';
 import OrgOverview from '@/pages/admin/OrgOverview';
+import UserAccessManagement from '@/pages/admin/UserAccessManagement';
+// Legacy components (deprecated - replaced by UserAccessManagement)
 import UserManagement from '@/pages/admin/UserManagement';
 import AclSettings from '@/pages/admin/AclSettings';
 import AdminTools from '@/pages/admin/AdminTools';
@@ -69,10 +71,9 @@ export const adminNav: AdminNavItem[] = [
     icon: Users,
     children: [
       { title: 'Overview', path: '/admin/org' },
-      { title: 'User management', path: '/admin/org/users' },
+      { title: 'User & Access Management', path: '/admin/users-access' },
     ],
   },
-  { title: 'Access control', icon: Lock, path: '/admin/access' },
   { title: 'Tools', icon: Settings, path: '/admin/tools' },
   {
     title: 'Records',
@@ -120,8 +121,11 @@ export const adminRouteMap: Record<string, React.ComponentType<any>> = {
   '/admin/files': FileManager,
   '/admin/storage-analytics': StorageAnalytics,
   '/admin/org': OrgOverview,
-  '/admin/org/users': UserManagement,
-  '/admin/access': AclSettings,
+  // Unified User & Access Management
+  '/admin/users-access': UserAccessManagement,
+  // Legacy routes (backwards compatibility) - redirect to unified page
+  '/admin/org/users': UserAccessManagement,
+  '/admin/access': UserAccessManagement,
   '/admin/tools': AdminTools,
   '/admin/audit': AuditLogViewer,
   '/admin/targeting': TargetRules,
