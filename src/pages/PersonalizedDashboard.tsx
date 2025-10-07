@@ -588,9 +588,23 @@ export function PersonalizedDashboard() {
                   <div className="space-y-2 max-h-[400px] overflow-y-auto">
                     {recentRecordings.length === 0 ? (
                       <div className="text-center py-8">
-                        <Phone className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                        <p className="text-gray-500 mb-2">No recordings yet</p>
-                        <p className="text-sm text-gray-400">Upload your first call to get started</p>
+                        {supportMode.currentMode === 'support' ? (
+                          <UserCheck className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        ) : supportMode.currentMode === 'ux' ? (
+                          <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        ) : (
+                          <Phone className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        )}
+                        <p className="text-gray-500 mb-2">
+                          {supportMode.currentMode === 'support' ? 'No support calls yet' :
+                           supportMode.currentMode === 'ux' ? 'No interviews yet' :
+                           'No recordings yet'}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {supportMode.currentMode === 'support' ? 'Upload your first support call to get started' :
+                           supportMode.currentMode === 'ux' ? 'Upload your first interview to get started' :
+                           'Upload your first call to get started'}
+                        </p>
                       </div>
                     ) : (
                       recentRecordings.slice(0, 8).map((recording) => (
@@ -669,15 +683,27 @@ export function PersonalizedDashboard() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-gray-900">{recordings.length}</div>
-                      <div className="text-xs text-gray-600">Total Calls</div>
+                      <div className="text-xs text-gray-600">
+                        {supportMode.currentMode === 'support' ? 'Total Support Calls' :
+                         supportMode.currentMode === 'ux' ? 'Total Interviews' :
+                         'Total Calls'}
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">{Math.round((completedRecordings.length / recordings.length) * 100) || 0}%</div>
-                      <div className="text-xs text-gray-600">Completion Rate</div>
+                      <div className="text-xs text-gray-600">
+                        {supportMode.currentMode === 'support' ? 'Resolution Rate' :
+                         supportMode.currentMode === 'ux' ? 'Analysis Rate' :
+                         'Completion Rate'}
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">{recordingsWithFramework.length}</div>
-                      <div className="text-xs text-gray-600">Analyzed</div>
+                      <div className="text-xs text-gray-600">
+                        {supportMode.currentMode === 'support' ? 'Quality Analyzed' :
+                         supportMode.currentMode === 'ux' ? 'Insights Generated' :
+                         'Analyzed'}
+                      </div>
                     </div>
                   </div>
                 </CardContent>
