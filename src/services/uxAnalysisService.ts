@@ -148,7 +148,7 @@ export class UXAnalysisService {
   }
 
   /**
-   * Extract questions from transcript
+   * Extract questions from transcript with better context and pairing
    */
   private static extractQuestions(lines: string[]): ExtractedQuestion[] {
     const questions: ExtractedQuestion[] = [];
@@ -157,11 +157,11 @@ export class UXAnalysisService {
     lines.forEach((line, index) => {
       const trimmedLine = line.trim();
       
-      // Look for lines that end with question marks
-      if (trimmedLine.endsWith('?')) {
+      // Look for lines that end with question marks or contain question words
+      if (trimmedLine.endsWith('?') || this.containsQuestionWords(trimmedLine)) {
         const question: ExtractedQuestion = {
           id: `q_${questionId++}`,
-          question_text: trimmedLine,
+          question_text: this.cleanQuestionText(trimmedLine),
           question_type: this.classifyQuestionType(trimmedLine),
           asked_by: this.extractSpeakerName(line),
           timestamp: index * 30, // Rough estimate
@@ -214,7 +214,7 @@ export class UXAnalysisService {
   }
 
   /**
-   * Extract customer answers
+   * Extract customer answers with better pairing to questions
    */
   private static extractAnswers(lines: string[]): CustomerAnswer[] {
     const answers: CustomerAnswer[] = [];
@@ -222,13 +222,18 @@ export class UXAnalysisService {
 
     lines.forEach((line, index) => {
       const trimmedLine = line.trim();
+      const speakerName = this.extractSpeakerName(line);
       
-      // Look for non-question responses (lines that don't end with ?)
-      if (!trimmedLine.endsWith('?') && trimmedLine.length > 20) {
+      // Look for substantial responses (not questions, not too short)
+      if (!trimmedLine.endsWith('?') && 
+          !this.containsQuestionWords(trimmedLine) && 
+          trimmedLine.length > 15 &&
+          speakerName.toLowerCase() !== 'interviewer') {
+        
         const answer: CustomerAnswer = {
           id: `a_${answerId++}`,
-          answer_text: trimmedLine,
-          customer_name: this.extractSpeakerName(line),
+          answer_text: this.cleanAnswerText(trimmedLine),
+          customer_name: speakerName,
           timestamp: index * 30,
           sentiment: this.analyzeSentiment(trimmedLine),
           completeness: this.assessAnswerCompleteness(trimmedLine),
@@ -242,6 +247,22 @@ export class UXAnalysisService {
   }
 
   // Helper methods for analysis
+  private static containsQuestionWords(text: string): boolean {
+    const questionWords = ['what', 'how', 'why', 'when', 'where', 'who', 'can you', 'could you', 'would you', 'do you', 'are you', 'have you', 'did you'];
+    const lowerText = text.toLowerCase();
+    return questionWords.some(word => lowerText.includes(word));
+  }
+
+  private static cleanQuestionText(text: string): string {
+    // Remove speaker prefix if present
+    return text.replace(/^[^:]+:\s*/, '').trim();
+  }
+
+  private static cleanAnswerText(text: string): string {
+    // Remove speaker prefix if present
+    return text.replace(/^[^:]+:\s*/, '').trim();
+  }
+
   private static classifyQuestionType(question: string): ExtractedQuestion['question_type'] {
     const lowerQuestion = question.toLowerCase();
     
@@ -392,67 +413,236 @@ export class UXAnalysisService {
     // Generate recommendations based on questions and answers
     questions.forEach((question, index) => {
       const relatedAnswer = answers[index];
-      if (relatedAnswer && relatedAnswer.sentiment === 'negative') {
-        recommendations.push({
-          id: `rec_${recId++}`,
-          question_id: question.id,
-          recommended_solution: `Address the concern raised: "${question.question_text}"`,
-          solution_type: 'immediate',
-          priority: 'high',
-          rationale: 'Customer expressed negative sentiment',
-          implementation_steps: [
-            'Review the specific concern',
-            'Develop targeted response',
-            'Follow up with customer'
-          ],
-          expected_impact: 'Improved customer satisfaction'
+      if (relatedAnswer) {
+        // Generate specific solutions based on content analysis
+        const solutions = this.generateSpecificSolutions(question, relatedAnswer);
+        solutions.forEach(solution => {
+          recommendations.push({
+            id: `rec_${recId++}`,
+            question_id: question.id,
+            recommended_solution: solution.solution,
+            solution_type: solution.type,
+            priority: solution.priority,
+            rationale: solution.rationale,
+            implementation_steps: solution.steps,
+            expected_impact: solution.impact
+          });
         });
       }
+    });
+    
+    // Add general recommendations based on overall patterns
+    const generalRecommendations = this.generateGeneralRecommendations(questions, answers);
+    generalRecommendations.forEach(rec => {
+      recommendations.push({
+        id: `rec_${recId++}`,
+        question_id: 'general',
+        ...rec
+      });
     });
     
     return recommendations;
   }
 
+  private static generateSpecificSolutions(question: ExtractedQuestion, answer: CustomerAnswer): any[] {
+    const solutions: any[] = [];
+    const lowerAnswer = answer.answer_text.toLowerCase();
+    const lowerQuestion = question.question_text.toLowerCase();
+
+    // Performance-related solutions
+    if (lowerAnswer.includes('slow') || lowerAnswer.includes('performance') || lowerAnswer.includes('speed')) {
+      solutions.push({
+        solution: 'Optimize system performance and response times',
+        type: 'immediate' as const,
+        priority: 'high' as const,
+        rationale: 'Customer reported performance issues affecting their workflow',
+        steps: [
+          'Conduct performance audit of current system',
+          'Identify bottlenecks in file upload process',
+          'Implement caching mechanisms',
+          'Optimize database queries',
+          'Monitor performance metrics post-implementation'
+        ],
+        impact: 'Reduced wait times and improved user productivity'
+      });
+    }
+
+    // Usability-related solutions
+    if (lowerAnswer.includes('interface') || lowerAnswer.includes('ui') || lowerAnswer.includes('confusing') || lowerAnswer.includes('intuitive')) {
+      solutions.push({
+        solution: 'Redesign user interface for better usability',
+        type: 'short_term' as const,
+        priority: 'high' as const,
+        rationale: 'Customer expressed confusion with current interface design',
+        steps: [
+          'Conduct user experience research',
+          'Create wireframes for improved navigation',
+          'Implement user testing sessions',
+          'Iterate based on feedback',
+          'Deploy updated interface'
+        ],
+        impact: 'Improved user satisfaction and reduced learning curve'
+      });
+    }
+
+    // Feature-related solutions
+    if (lowerAnswer.includes('feature') || lowerAnswer.includes('missing') || lowerAnswer.includes('need')) {
+      solutions.push({
+        solution: 'Develop requested features based on customer feedback',
+        type: 'long_term' as const,
+        priority: 'medium' as const,
+        rationale: 'Customer identified specific feature needs',
+        steps: [
+          'Prioritize feature requests',
+          'Create detailed specifications',
+          'Develop and test new features',
+          'Gather customer feedback during beta',
+          'Release to production'
+        ],
+        impact: 'Enhanced product functionality and customer retention'
+      });
+    }
+
+    // Support-related solutions
+    if (lowerAnswer.includes('support') || lowerAnswer.includes('help') || lowerAnswer.includes('documentation')) {
+      solutions.push({
+        solution: 'Enhance customer support and documentation',
+        type: 'immediate' as const,
+        priority: 'medium' as const,
+        rationale: 'Customer needs better support resources',
+        steps: [
+          'Review current support processes',
+          'Create comprehensive documentation',
+          'Implement live chat support',
+          'Train support team on common issues',
+          'Monitor support ticket resolution times'
+        ],
+        impact: 'Faster issue resolution and improved customer satisfaction'
+      });
+    }
+
+    return solutions;
+  }
+
+  private static generateGeneralRecommendations(questions: ExtractedQuestion[], answers: CustomerAnswer[]): any[] {
+    const recommendations: any[] = [];
+    
+    // Analyze overall sentiment
+    const negativeAnswers = answers.filter(a => a.sentiment === 'negative');
+    const positiveAnswers = answers.filter(a => a.sentiment === 'positive');
+    
+    if (negativeAnswers.length > positiveAnswers.length) {
+      recommendations.push({
+        recommended_solution: 'Implement comprehensive customer feedback program',
+        solution_type: 'process_improvement' as const,
+        priority: 'high' as const,
+        rationale: 'Overall negative sentiment indicates need for systematic feedback collection',
+        implementation_steps: [
+          'Set up regular customer feedback surveys',
+          'Implement feedback tracking system',
+          'Create feedback response protocols',
+          'Schedule regular customer check-ins',
+          'Monitor sentiment trends over time'
+        ],
+        expected_impact: 'Proactive issue identification and improved customer relationships'
+      });
+    }
+
+    // Analyze question quality
+    const lowQualityQuestions = questions.filter(q => q.effectiveness_score < 0.6);
+    if (lowQualityQuestions.length > questions.length * 0.3) {
+      recommendations.push({
+        recommended_solution: 'Improve interview question quality and structure',
+        solution_type: 'process_improvement' as const,
+        priority: 'medium' as const,
+        rationale: 'High percentage of low-quality questions affecting data collection',
+        implementation_steps: [
+          'Review and refine question templates',
+          'Train interviewers on effective questioning techniques',
+          'Implement question effectiveness tracking',
+          'Create question bank with proven effectiveness',
+          'Regular interviewer feedback sessions'
+        ],
+        expected_impact: 'Higher quality customer insights and more actionable feedback'
+      });
+    }
+
+    return recommendations;
+  }
+
   private static generateCallBreakdown(lines: string[], questions: ExtractedQuestion[], answers: CustomerAnswer[]): CallBreakdown {
     const totalDuration = lines.length * 30; // Rough estimate
-    const sectionDuration = totalDuration / 3;
+    const sectionDuration = totalDuration / 4; // More detailed breakdown
+    
+    // Extract key topics from the conversation
+    const keyTopics = this.extractKeyTopics(lines);
+    
+    // Extract pain points and opportunities
+    const painPoints = this.extractPainPoints(answers);
+    const opportunities = this.extractOpportunities(answers);
     
     return {
       sections: [
         {
           id: 'intro',
-          title: 'Introduction & Setup',
+          title: 'Introduction & Context Setting',
           start_time: 0,
           end_time: sectionDuration,
-          participants: ['Interviewer', 'Customer'],
-          key_points: ['Meeting introduction', 'Context setting'],
-          questions_asked: questions.slice(0, 2).map(q => q.question_text),
-          customer_feedback: answers.slice(0, 2).map(a => a.answer_text)
+          participants: this.extractParticipants(lines),
+          key_points: [
+            'Meeting introduction and agenda overview',
+            'Customer background and role clarification',
+            'Product usage context establishment'
+          ],
+          questions_asked: questions.slice(0, Math.ceil(questions.length * 0.25)).map(q => q.question_text),
+          customer_feedback: answers.slice(0, Math.ceil(answers.length * 0.25)).map(a => a.answer_text)
         },
         {
-          id: 'main',
-          title: 'Main Discussion',
+          id: 'experience',
+          title: 'Current Experience & Usage',
           start_time: sectionDuration,
           end_time: sectionDuration * 2,
-          participants: ['Interviewer', 'Customer'],
-          key_points: ['Core topics discussed', 'Key insights gathered'],
-          questions_asked: questions.slice(2, -2).map(q => q.question_text),
-          customer_feedback: answers.slice(2, -2).map(a => a.answer_text)
+          participants: this.extractParticipants(lines),
+          key_points: [
+            'Current product usage patterns',
+            'Daily workflow integration',
+            'Initial user experience assessment'
+          ],
+          questions_asked: questions.slice(Math.ceil(questions.length * 0.25), Math.ceil(questions.length * 0.5)).map(q => q.question_text),
+          customer_feedback: answers.slice(Math.ceil(answers.length * 0.25), Math.ceil(answers.length * 0.5)).map(a => a.answer_text)
+        },
+        {
+          id: 'challenges',
+          title: 'Challenges & Pain Points',
+          start_time: sectionDuration * 2,
+          end_time: sectionDuration * 3,
+          participants: this.extractParticipants(lines),
+          key_points: [
+            'Specific challenges encountered',
+            'Workflow disruptions identified',
+            'Frustration points and impact assessment'
+          ],
+          questions_asked: questions.slice(Math.ceil(questions.length * 0.5), Math.ceil(questions.length * 0.75)).map(q => q.question_text),
+          customer_feedback: answers.slice(Math.ceil(answers.length * 0.5), Math.ceil(answers.length * 0.75)).map(a => a.answer_text)
         },
         {
           id: 'conclusion',
-          title: 'Wrap-up & Next Steps',
-          start_time: sectionDuration * 2,
+          title: 'Feedback & Next Steps',
+          start_time: sectionDuration * 3,
           end_time: totalDuration,
-          participants: ['Interviewer', 'Customer'],
-          key_points: ['Summary of discussion', 'Action items identified'],
-          questions_asked: questions.slice(-2).map(q => q.question_text),
-          customer_feedback: answers.slice(-2).map(a => a.answer_text)
+          participants: this.extractParticipants(lines),
+          key_points: [
+            'Overall product assessment',
+            'Feature requests and suggestions',
+            'Action items and follow-up plans'
+          ],
+          questions_asked: questions.slice(Math.ceil(questions.length * 0.75)).map(q => q.question_text),
+          customer_feedback: answers.slice(Math.ceil(answers.length * 0.75)).map(a => a.answer_text)
         }
       ],
-      key_topics: ['User Experience', 'Product Feedback', 'Process Improvement'],
-      customer_pain_points: answers.filter(a => a.sentiment === 'negative').map(a => a.answer_text),
-      opportunities_identified: answers.filter(a => a.sentiment === 'positive').map(a => a.answer_text),
+      key_topics: keyTopics,
+      customer_pain_points: painPoints,
+      opportunities_identified: opportunities,
       overall_sentiment: this.calculateOverallSentiment(answers)
     };
   }
@@ -471,44 +661,234 @@ export class UXAnalysisService {
     return maxSentiment.sentiment as CallBreakdown['overall_sentiment'];
   }
 
+  private static extractKeyTopics(lines: string[]): string[] {
+    const allText = lines.join(' ').toLowerCase();
+    const topics: string[] = [];
+    
+    // Common UX interview topics
+    const topicKeywords = {
+      'User Experience': ['experience', 'ux', 'usability', 'interface', 'design'],
+      'Performance': ['performance', 'speed', 'slow', 'fast', 'loading', 'response'],
+      'Features': ['feature', 'functionality', 'capability', 'tool', 'option'],
+      'Support': ['support', 'help', 'documentation', 'training', 'guidance'],
+      'Workflow': ['workflow', 'process', 'routine', 'daily', 'task'],
+      'Integration': ['integration', 'connect', 'api', 'sync', 'import', 'export'],
+      'Mobile': ['mobile', 'phone', 'tablet', 'app', 'responsive'],
+      'Security': ['security', 'privacy', 'data', 'protection', 'access']
+    };
+    
+    Object.entries(topicKeywords).forEach(([topic, keywords]) => {
+      if (keywords.some(keyword => allText.includes(keyword))) {
+        topics.push(topic);
+      }
+    });
+    
+    return topics.length > 0 ? topics : ['User Experience', 'Product Feedback'];
+  }
+
+  private static extractPainPoints(answers: CustomerAnswer[]): string[] {
+    const painPoints: string[] = [];
+    
+    answers.forEach(answer => {
+      if (answer.sentiment === 'negative') {
+        // Extract specific pain points from negative responses
+        const text = answer.answer_text.toLowerCase();
+        if (text.includes('slow') || text.includes('performance')) {
+          painPoints.push('Performance and speed issues');
+        }
+        if (text.includes('confusing') || text.includes('difficult') || text.includes('hard')) {
+          painPoints.push('Usability and interface confusion');
+        }
+        if (text.includes('missing') || text.includes('need') || text.includes('want')) {
+          painPoints.push('Missing features or functionality');
+        }
+        if (text.includes('support') || text.includes('help')) {
+          painPoints.push('Inadequate support resources');
+        }
+      }
+    });
+    
+    // Remove duplicates and return unique pain points
+    return [...new Set(painPoints)];
+  }
+
+  private static extractOpportunities(answers: CustomerAnswer[]): string[] {
+    const opportunities: string[] = [];
+    
+    answers.forEach(answer => {
+      if (answer.sentiment === 'positive') {
+        // Extract opportunities from positive responses
+        const text = answer.answer_text.toLowerCase();
+        if (text.includes('like') || text.includes('love') || text.includes('great')) {
+          opportunities.push('Positive user sentiment and satisfaction');
+        }
+        if (text.includes('improve') || text.includes('better') || text.includes('enhance')) {
+          opportunities.push('Enhancement and improvement opportunities');
+        }
+        if (text.includes('recommend') || text.includes('suggest')) {
+          opportunities.push('User recommendations and suggestions');
+        }
+      }
+    });
+    
+    // Remove duplicates and return unique opportunities
+    return [...new Set(opportunities)];
+  }
+
+  private static extractParticipants(lines: string[]): string[] {
+    const participants = new Set<string>();
+    
+    lines.forEach(line => {
+      const speakerMatch = line.match(/^([^:]+):/);
+      if (speakerMatch) {
+        const speakerName = speakerMatch[1].trim();
+        if (speakerName && speakerName !== '') {
+          participants.add(speakerName);
+        }
+      }
+    });
+    
+    return Array.from(participants);
+  }
+
   private static generateComprehensiveSummary(questions: ExtractedQuestion[], answers: CustomerAnswer[], employees: IdentifiedEmployee[]): string {
     const questionCount = questions.length;
     const answerCount = answers.length;
     const employeeCount = employees.length;
     const avgQuestionQuality = questions.length > 0 ? questions.reduce((sum, q) => sum + q.effectiveness_score, 0) / questions.length : 0;
     
-    return `This user experience interview involved ${employeeCount} participants and included ${questionCount} questions with ${answerCount} responses. The overall question quality scored ${(avgQuestionQuality * 100).toFixed(1)}%. Key themes discussed included user feedback, process improvement opportunities, and product enhancement suggestions. The interview provided valuable insights into customer needs and pain points that can inform future product development and service improvements.`;
+    // Analyze sentiment distribution
+    const sentimentCounts = answers.reduce((acc, answer) => {
+      acc[answer.sentiment] = (acc[answer.sentiment] || 0) + 1;
+      return acc;
+    }, {} as Record<string, number>);
+    
+    const positiveCount = sentimentCounts.positive || 0;
+    const negativeCount = sentimentCounts.negative || 0;
+    const neutralCount = sentimentCounts.neutral || 0;
+    
+    // Identify key themes
+    const keyThemes = this.extractKeyTopicsFromAnswers(answers);
+    
+    // Generate dynamic summary
+    let summary = `This comprehensive user experience interview involved ${employeeCount} participants and generated ${questionCount} questions with ${answerCount} detailed responses. `;
+    
+    summary += `The interview quality scored ${(avgQuestionQuality * 100).toFixed(1)}%, indicating ${avgQuestionQuality > 0.7 ? 'high-quality' : avgQuestionQuality > 0.5 ? 'moderate-quality' : 'basic'} questioning techniques. `;
+    
+    summary += `Customer sentiment analysis revealed ${positiveCount} positive, ${negativeCount} negative, and ${neutralCount} neutral responses, `;
+    
+    if (positiveCount > negativeCount) {
+      summary += `indicating overall positive user experience with room for targeted improvements. `;
+    } else if (negativeCount > positiveCount) {
+      summary += `highlighting significant areas requiring immediate attention and improvement. `;
+    } else {
+      summary += `showing a balanced perspective with both strengths and areas for enhancement. `;
+    }
+    
+    summary += `Key themes identified include ${keyThemes.slice(0, 3).join(', ')}. `;
+    
+    summary += `The interview provided actionable insights into user needs, pain points, and enhancement opportunities that can directly inform product roadmap decisions and customer success strategies.`;
+    
+    return summary;
+  }
+
+  private static extractKeyTopicsFromAnswers(answers: CustomerAnswer[]): string[] {
+    const allText = answers.map(a => a.answer_text).join(' ').toLowerCase();
+    const topics: string[] = [];
+    
+    const topicKeywords = {
+      'Performance Issues': ['slow', 'performance', 'speed', 'loading', 'response time'],
+      'Usability Concerns': ['confusing', 'difficult', 'interface', 'ui', 'navigation'],
+      'Feature Requests': ['missing', 'need', 'want', 'feature', 'functionality'],
+      'Support Needs': ['support', 'help', 'documentation', 'training'],
+      'Workflow Integration': ['workflow', 'process', 'integration', 'daily use'],
+      'Positive Feedback': ['like', 'love', 'great', 'excellent', 'satisfied']
+    };
+    
+    Object.entries(topicKeywords).forEach(([topic, keywords]) => {
+      if (keywords.some(keyword => allText.includes(keyword))) {
+        topics.push(topic);
+      }
+    });
+    
+    return topics.length > 0 ? topics : ['User Experience', 'Product Feedback'];
   }
 
   private static generateNextSteps(questions: ExtractedQuestion[], answers: CustomerAnswer[]): CallBreakdown['next_steps'] {
     const nextSteps: CallBreakdown['next_steps'] = [];
     
-    // Generate next steps based on analysis
+    // Analyze sentiment and generate targeted next steps
+    const negativeAnswers = answers.filter(a => a.sentiment === 'negative');
+    const positiveAnswers = answers.filter(a => a.sentiment === 'positive');
+    const lowQualityQuestions = questions.filter(q => q.effectiveness_score < 0.6);
+    
+    // Always include core analysis steps
     nextSteps.push({
       id: 'analyze_feedback',
-      action: 'Analyze customer feedback and identify key themes',
+      action: 'Conduct comprehensive analysis of customer feedback and identify key themes',
       owner: 'Product Team',
       priority: 'high',
       status: 'pending'
     });
     
     nextSteps.push({
-      id: 'follow_up',
-      action: 'Follow up with customer on any outstanding questions',
-      owner: 'Customer Success',
-      priority: 'medium',
+      id: 'create_action_plan',
+      action: 'Create detailed action plan based on interview insights',
+      owner: 'Product Manager',
+      priority: 'high',
       status: 'pending'
     });
     
-    if (answers.some(a => a.sentiment === 'negative')) {
+    // Add sentiment-specific steps
+    if (negativeAnswers.length > 0) {
       nextSteps.push({
         id: 'address_concerns',
-        action: 'Address customer concerns and pain points',
+        action: `Address ${negativeAnswers.length} identified customer concerns and pain points`,
         owner: 'Product Team',
         priority: 'high',
         status: 'pending'
       });
     }
+    
+    if (positiveAnswers.length > 0) {
+      nextSteps.push({
+        id: 'leverage_strengths',
+        action: 'Leverage positive feedback to enhance marketing and customer success',
+        owner: 'Marketing Team',
+        priority: 'medium',
+        status: 'pending'
+      });
+    }
+    
+    // Add process improvement steps
+    if (lowQualityQuestions.length > questions.length * 0.3) {
+      nextSteps.push({
+        id: 'improve_interview_process',
+        action: 'Enhance interview question quality and interviewer training',
+        owner: 'Research Team',
+        priority: 'medium',
+        status: 'pending'
+      });
+    }
+    
+    // Add follow-up steps
+    nextSteps.push({
+      id: 'schedule_follow_up',
+      action: 'Schedule follow-up interview to track progress on identified issues',
+      owner: 'Customer Success',
+      priority: 'medium',
+      status: 'pending',
+      due_date: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0] // 30 days from now
+    });
+    
+    // Add implementation tracking
+    nextSteps.push({
+      id: 'track_implementation',
+      action: 'Implement tracking system for solution implementation progress',
+      owner: 'Product Team',
+      priority: 'medium',
+      status: 'pending'
+    });
     
     return nextSteps;
   }

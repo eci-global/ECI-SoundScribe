@@ -328,45 +328,104 @@ const UXCoachingInsights: React.FC<UXCoachingInsightsProps> = ({ recording, clas
 
         {/* Questions Tab */}
         <TabsContent value="questions" className="space-y-4">
-          {analysis.question_analysis.questions.map((question) => (
-            <Card key={question.id}>
-              <CardContent className="pt-4">
-                <div className="space-y-3">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <p className="font-medium text-gray-900 mb-1">{question.question_text}</p>
-                      <div className="flex items-center space-x-2 text-sm text-gray-600">
-                        <span>Asked by: {question.asked_by}</span>
-                        <Badge variant="outline" className="text-xs">
-                          {question.question_type.replace('_', ' ')}
-                        </Badge>
-                        <span>•</span>
-                        <span>{Math.round(question.timestamp / 60)}m</span>
+          <div className="mb-4">
+            <h4 className="font-medium text-gray-900 mb-2">Question & Answer Analysis</h4>
+            <p className="text-sm text-gray-600">
+              {analysis.question_analysis.questions.length} questions analyzed with effectiveness scoring
+            </p>
+          </div>
+          
+          {analysis.question_analysis.questions.map((question, index) => {
+            // Try to find a related answer (simple pairing by index)
+            const relatedAnswer = analysis.call_breakdown.sections
+              .flatMap(section => section.customer_feedback)
+              .find((_, i) => i === index);
+            
+            return (
+              <Card key={question.id}>
+                <CardContent className="pt-4">
+                  <div className="space-y-4">
+                    {/* Question */}
+                    <div className="border-l-4 border-blue-500 pl-4">
+                      <div className="flex items-start justify-between mb-2">
+                        <div className="flex-1">
+                          <p className="font-medium text-gray-900 mb-1">{question.question_text}</p>
+                          <div className="flex items-center space-x-2 text-sm text-gray-600">
+                            <span>Asked by: {question.asked_by}</span>
+                            <Badge variant="outline" className="text-xs">
+                              {question.question_type.replace('_', ' ')}
+                            </Badge>
+                            <span>•</span>
+                            <span>{Math.round(question.timestamp / 60)}m</span>
+                          </div>
+                        </div>
+                        <div className="text-right">
+                          <div className="text-sm font-medium">
+                            {(question.effectiveness_score * 100).toFixed(0)}%
+                          </div>
+                          <Progress value={question.effectiveness_score * 100} className="w-16 mt-1" />
+                        </div>
                       </div>
                     </div>
-                    <div className="text-right">
-                      <div className="text-sm font-medium">
-                        {(question.effectiveness_score * 100).toFixed(0)}%
+                    
+                    {/* Answer */}
+                    {relatedAnswer && (
+                      <div className="border-l-4 border-green-500 pl-4">
+                        <p className="font-medium text-gray-700 mb-1">Customer Response:</p>
+                        <p className="text-sm text-gray-600 mb-2">{relatedAnswer}</p>
+                        <div className="flex items-center space-x-2">
+                          <Badge 
+                            variant="outline" 
+                            className={`text-xs ${
+                              relatedAnswer.toLowerCase().includes('good') || 
+                              relatedAnswer.toLowerCase().includes('great') || 
+                              relatedAnswer.toLowerCase().includes('like')
+                                ? 'text-green-600 bg-green-50' 
+                                : relatedAnswer.toLowerCase().includes('problem') || 
+                                  relatedAnswer.toLowerCase().includes('issue') || 
+                                  relatedAnswer.toLowerCase().includes('difficult')
+                                ? 'text-red-600 bg-red-50'
+                                : 'text-gray-600 bg-gray-50'
+                            }`}
+                          >
+                            {relatedAnswer.toLowerCase().includes('good') || 
+                             relatedAnswer.toLowerCase().includes('great') || 
+                             relatedAnswer.toLowerCase().includes('like')
+                              ? 'Positive' 
+                              : relatedAnswer.toLowerCase().includes('problem') || 
+                                relatedAnswer.toLowerCase().includes('issue') || 
+                                relatedAnswer.toLowerCase().includes('difficult')
+                              ? 'Negative'
+                              : 'Neutral'}
+                          </Badge>
+                        </div>
                       </div>
-                      <Progress value={question.effectiveness_score * 100} className="w-16 mt-1" />
-                    </div>
+                    )}
+                    
+                    {/* Context */}
+                    {question.context && (
+                      <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
+                        <span className="font-medium">Context:</span> {question.context}
+                      </div>
+                    )}
                   </div>
-                  
-                  {question.context && (
-                    <div className="text-sm text-gray-600 bg-gray-50 p-2 rounded">
-                      <span className="font-medium">Context:</span> {question.context}
-                    </div>
-                  )}
-                </div>
-              </CardContent>
-            </Card>
-          ))}
+                </CardContent>
+              </Card>
+            );
+          })}
         </TabsContent>
 
         {/* Solutions Tab */}
         <TabsContent value="solutions" className="space-y-4">
+          <div className="mb-4">
+            <h4 className="font-medium text-gray-900 mb-2">Solution Recommendations</h4>
+            <p className="text-sm text-gray-600">
+              {analysis.solution_recommendations.length} actionable solutions identified based on interview analysis
+            </p>
+          </div>
+          
           {analysis.solution_recommendations.map((solution) => (
-            <Card key={solution.id}>
+            <Card key={solution.id} className="border-l-4 border-l-blue-500">
               <CardHeader>
                 <div className="flex items-start justify-between">
                   <CardTitle className="text-sm font-medium">{solution.recommended_solution}</CardTitle>
@@ -380,22 +439,36 @@ const UXCoachingInsights: React.FC<UXCoachingInsightsProps> = ({ recording, clas
                   </div>
                 </div>
               </CardHeader>
-              <CardContent className="space-y-3">
-                <p className="text-sm text-gray-700">{solution.rationale}</p>
+              <CardContent className="space-y-4">
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm text-gray-700 font-medium">Rationale:</p>
+                  <p className="text-sm text-gray-600 mt-1">{solution.rationale}</p>
+                </div>
                 
                 <div>
-                  <span className="font-medium text-sm">Implementation Steps:</span>
-                  <ol className="list-decimal list-inside space-y-1 mt-1 text-sm text-gray-600">
+                  <span className="font-medium text-sm flex items-center mb-2">
+                    <Target className="w-4 h-4 mr-1" />
+                    Implementation Steps:
+                  </span>
+                  <ol className="list-decimal list-inside space-y-2 text-sm text-gray-600">
                     {solution.implementation_steps.map((step, index) => (
-                      <li key={index}>{step}</li>
+                      <li key={index} className="bg-gray-50 p-2 rounded">
+                        {step}
+                      </li>
                     ))}
                   </ol>
                 </div>
                 
-                <div>
-                  <span className="font-medium text-sm">Expected Impact:</span>
-                  <p className="text-sm text-gray-600 mt-1">{solution.expected_impact}</p>
+                <div className="bg-green-50 p-3 rounded-lg">
+                  <span className="font-medium text-sm text-green-800">Expected Impact:</span>
+                  <p className="text-sm text-green-700 mt-1">{solution.expected_impact}</p>
                 </div>
+                
+                {solution.question_id !== 'general' && (
+                  <div className="text-xs text-gray-500">
+                    Related to question: {analysis.question_analysis.questions.find(q => q.id === solution.question_id)?.question_text || 'Unknown'}
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
@@ -403,8 +476,86 @@ const UXCoachingInsights: React.FC<UXCoachingInsightsProps> = ({ recording, clas
 
         {/* Breakdown Tab */}
         <TabsContent value="breakdown" className="space-y-4">
+          <div className="mb-4">
+            <h4 className="font-medium text-gray-900 mb-2">Call Breakdown & Analysis</h4>
+            <p className="text-sm text-gray-600">
+              Detailed analysis of {analysis.call_breakdown.sections.length} call sections with key insights
+            </p>
+          </div>
+          
+          {/* Key Topics and Sentiment Overview */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Key Topics Discussed</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-1">
+                  {analysis.call_breakdown.key_topics.map((topic, i) => (
+                    <Badge key={i} variant="secondary" className="text-xs">
+                      {topic}
+                    </Badge>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+            
+            <Card>
+              <CardHeader className="pb-2">
+                <CardTitle className="text-sm font-medium">Overall Sentiment</CardTitle>
+              </CardHeader>
+              <CardContent>
+                <Badge className={getSentimentColor(analysis.call_breakdown.overall_sentiment)}>
+                  {analysis.call_breakdown.overall_sentiment}
+                </Badge>
+              </CardContent>
+            </Card>
+          </div>
+          
+          {/* Pain Points and Opportunities */}
+          {(analysis.call_breakdown.customer_pain_points.length > 0 || analysis.call_breakdown.opportunities_identified.length > 0) && (
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+              {analysis.call_breakdown.customer_pain_points.length > 0 && (
+                <Card className="border-l-4 border-l-red-500">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-red-700">Customer Pain Points</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1 text-sm text-gray-600">
+                      {analysis.call_breakdown.customer_pain_points.map((point, i) => (
+                        <li key={i} className="flex items-start">
+                          <span className="w-1.5 h-1.5 bg-red-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {point}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+              
+              {analysis.call_breakdown.opportunities_identified.length > 0 && (
+                <Card className="border-l-4 border-l-green-500">
+                  <CardHeader className="pb-2">
+                    <CardTitle className="text-sm font-medium text-green-700">Opportunities Identified</CardTitle>
+                  </CardHeader>
+                  <CardContent>
+                    <ul className="space-y-1 text-sm text-gray-600">
+                      {analysis.call_breakdown.opportunities_identified.map((opportunity, i) => (
+                        <li key={i} className="flex items-start">
+                          <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                          {opportunity}
+                        </li>
+                      ))}
+                    </ul>
+                  </CardContent>
+                </Card>
+              )}
+            </div>
+          )}
+          
+          {/* Call Sections */}
           {analysis.call_breakdown.sections.map((section) => (
-            <Card key={section.id}>
+            <Card key={section.id} className="border-l-4 border-l-blue-500">
               <CardHeader>
                 <CardTitle className="text-sm font-medium flex items-center">
                   <Clock className="w-4 h-4 mr-2" />
@@ -414,7 +565,7 @@ const UXCoachingInsights: React.FC<UXCoachingInsightsProps> = ({ recording, clas
                   {Math.round(section.start_time / 60)}m - {Math.round(section.end_time / 60)}m
                 </p>
               </CardHeader>
-              <CardContent className="space-y-3">
+              <CardContent className="space-y-4">
                 <div>
                   <span className="font-medium text-sm">Participants:</span>
                   <div className="flex flex-wrap gap-1 mt-1">
@@ -447,16 +598,27 @@ const UXCoachingInsights: React.FC<UXCoachingInsightsProps> = ({ recording, clas
                     </ul>
                   </div>
                 )}
+                
+                {section.customer_feedback.length > 0 && (
+                  <div>
+                    <span className="font-medium text-sm">Customer Feedback:</span>
+                    <ul className="list-disc list-inside space-y-1 mt-1 text-sm text-gray-600">
+                      {section.customer_feedback.slice(0, 2).map((feedback, i) => (
+                        <li key={i}>{feedback}</li>
+                      ))}
+                    </ul>
+                  </div>
+                )}
               </CardContent>
             </Card>
           ))}
           
           {/* Next Steps */}
-          <Card>
+          <Card className="border-l-4 border-l-purple-500">
             <CardHeader>
               <CardTitle className="text-sm font-medium flex items-center">
                 <Target className="w-4 h-4 mr-2" />
-                Next Steps
+                Action Items & Next Steps
               </CardTitle>
             </CardHeader>
             <CardContent>
@@ -473,6 +635,9 @@ const UXCoachingInsights: React.FC<UXCoachingInsightsProps> = ({ recording, clas
                         <Badge variant="outline">
                           {step.status}
                         </Badge>
+                        {step.due_date && (
+                          <span>Due: {step.due_date}</span>
+                        )}
                       </div>
                     </div>
                   </div>

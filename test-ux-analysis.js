@@ -32,21 +32,38 @@ Customer: Overall, I think it's a solid product, but these performance and usabi
     console.log('💡 Solutions recommended:', analysis.solution_recommendations.length);
     console.log('📈 Overall sentiment:', analysis.call_breakdown.overall_sentiment);
     
-    // Display some sample data
+    // Display enhanced sample data
     if (analysis.question_analysis.questions.length > 0) {
-      console.log('\n🔍 Sample Question:');
-      const sampleQuestion = analysis.question_analysis.questions[0];
-      console.log(`  "${sampleQuestion.question_text}"`);
-      console.log(`  Type: ${sampleQuestion.question_type}`);
-      console.log(`  Effectiveness: ${(sampleQuestion.effectiveness_score * 100).toFixed(0)}%`);
+      console.log('\n🔍 Sample Questions:');
+      analysis.question_analysis.questions.slice(0, 3).forEach((question, i) => {
+        console.log(`  ${i + 1}. "${question.question_text}"`);
+        console.log(`     Type: ${question.question_type} | Effectiveness: ${(question.effectiveness_score * 100).toFixed(0)}%`);
+      });
     }
     
     if (analysis.solution_recommendations.length > 0) {
-      console.log('\n💡 Sample Solution:');
-      const sampleSolution = analysis.solution_recommendations[0];
-      console.log(`  ${sampleSolution.recommended_solution}`);
-      console.log(`  Priority: ${sampleSolution.priority}`);
-      console.log(`  Type: ${sampleSolution.solution_type}`);
+      console.log('\n💡 Sample Solutions:');
+      analysis.solution_recommendations.slice(0, 3).forEach((solution, i) => {
+        console.log(`  ${i + 1}. ${solution.recommended_solution}`);
+        console.log(`     Priority: ${solution.priority} | Type: ${solution.solution_type}`);
+        console.log(`     Steps: ${solution.implementation_steps.length} implementation steps`);
+      });
+    }
+    
+    if (analysis.call_breakdown.sections.length > 0) {
+      console.log('\n📋 Call Breakdown:');
+      analysis.call_breakdown.sections.forEach((section, i) => {
+        console.log(`  ${i + 1}. ${section.title} (${Math.round(section.start_time / 60)}m - ${Math.round(section.end_time / 60)}m)`);
+        console.log(`     Key Points: ${section.key_points.length} | Questions: ${section.questions_asked.length}`);
+      });
+    }
+    
+    if (analysis.next_steps.length > 0) {
+      console.log('\n🎯 Next Steps:');
+      analysis.next_steps.slice(0, 3).forEach((step, i) => {
+        console.log(`  ${i + 1}. ${step.action}`);
+        console.log(`     Owner: ${step.owner} | Priority: ${step.priority}`);
+      });
     }
     
     console.log('\n🎉 UX Analysis test completed successfully!');
