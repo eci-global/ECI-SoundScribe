@@ -88,9 +88,9 @@ function SupportAssistantCoach({ recordings }: { recordings: any[] }) {
             </div>
           </div>
           <p className="text-gray-600">{
-            supportMode.currentMode === 'support' ? 'Your intelligent customer service coaching companion with personalized insights' :
-            supportMode.currentMode === 'ux' ? 'Your intelligent user experience coaching companion with interview insights' :
-            'Your intelligent sales coaching companion with personalized insights'
+            supportMode.currentMode === 'support' ? 'Get personalized coaching on empathy, problem-solving, and customer satisfaction to excel in support interactions' :
+            supportMode.currentMode === 'ux' ? 'Receive targeted guidance on interview techniques, question formulation, and insight extraction to conduct effective user research' :
+            'Access AI-powered coaching on discovery, objection handling, and closing techniques to accelerate sales success'
           }</p>
         </header>
 

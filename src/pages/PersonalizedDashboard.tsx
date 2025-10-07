@@ -387,7 +387,12 @@ export function PersonalizedDashboard() {
                       {getGreeting()}, {firstName}!
                     </h1>
                     <p className="text-sm text-gray-600">
-                      {supportMode.supportMode ? 'Your customer support analytics hub' : 'Your AI sales performance hub'}
+                      {supportMode.currentMode === 'support' 
+                        ? 'Your customer support analytics hub - track service quality, resolution times, and customer satisfaction'
+                        : supportMode.currentMode === 'ux'
+                        ? 'Your user experience research hub - analyze interviews, identify pain points, and generate actionable insights'
+                        : 'Your AI sales performance hub - track deals, coaching insights, and revenue optimization'
+                      }
                     </p>
                   </div>
                 </div>

@@ -217,10 +217,10 @@ export default function TrendAnalytics() {
             </div>
             <p className="text-body-large text-eci-gray-600">
               {supportMode.currentMode === 'support' 
-                ? 'Analyze support quality trends and customer service insights across your recordings'
+                ? 'Track customer satisfaction scores, resolution times, escalation patterns, and service quality metrics to optimize support operations'
                 : supportMode.currentMode === 'ux'
-                ? 'Analyze user experience interview trends and insights across your recordings'
-                : 'Analyze performance trends and coaching insights across your recordings'
+                ? 'Monitor interview effectiveness, pain point identification, solution recommendations, and user feedback trends to improve product experience'
+                : 'Measure deal progression, coaching effectiveness, objection handling, and sales performance metrics to drive revenue growth'
               }
             </p>
           </div>
