@@ -194,19 +194,33 @@ export default function TrendAnalytics() {
           <div className="mb-8">
             <div className="flex items-center gap-4 mb-2">
               <h1 className="text-display text-eci-gray-800 flex items-center space-x-3">
-                <TrendingUp className={`w-8 h-8 ${supportMode.supportMode ? 'text-blue-600' : 'text-eci-red'}`} />
-                <span>{supportMode.supportMode ? 'Support Performance Analytics' : 'Sales Performance Analytics'}</span>
+                <TrendingUp className={`w-8 h-8 ${
+                  supportMode.currentMode === 'support' ? 'text-blue-600' : 
+                  supportMode.currentMode === 'ux' ? 'text-purple-600' : 
+                  'text-eci-red'
+                }`} />
+                <span>{
+                  supportMode.currentMode === 'support' ? 'Support Performance Analytics' : 
+                  supportMode.currentMode === 'ux' ? 'UX Interview Analytics' :
+                  'Sales Performance Analytics'
+                }</span>
               </h1>
-              {supportMode.supportMode && (
-                <div className="px-3 py-1 text-sm bg-blue-100 text-blue-700 rounded-md font-medium">
-                  Support Mode
-                </div>
-              )}
+              <div className={`px-3 py-1 text-sm rounded-md font-medium ${
+                supportMode.currentMode === 'support' ? 'bg-blue-100 text-blue-700' :
+                supportMode.currentMode === 'ux' ? 'bg-purple-100 text-purple-700' :
+                'bg-emerald-100 text-emerald-700'
+              }`}>
+                {supportMode.currentMode === 'support' ? 'Support Mode' :
+                 supportMode.currentMode === 'ux' ? 'UX Mode' :
+                 'Sales Mode'}
+              </div>
             </div>
             <p className="text-body-large text-eci-gray-600">
-              {supportMode.supportMode 
-                ? 'Analyze support quality trends and customer service insights across your recordings'
-                : 'Analyze performance trends and coaching insights across your recordings'
+              {supportMode.currentMode === 'support' 
+                ? 'Track customer satisfaction scores, resolution times, escalation patterns, and service quality metrics to optimize support operations'
+                : supportMode.currentMode === 'ux'
+                ? 'Monitor interview effectiveness, pain point identification, solution recommendations, and user feedback trends to improve product experience'
+                : 'Measure deal progression, coaching effectiveness, objection handling, and sales performance metrics to drive revenue growth'
               }
             </p>
           </div>

@@ -43,6 +43,7 @@ import { ValidationQueue } from '@/components/training/ValidationQueue';
 import { ExcelUploadComponent } from '@/components/training/ExcelUploadComponent';
 import { BdrRecordingUploadComponent } from '@/components/training/BdrRecordingUploadComponent';
 import { useFileOperations } from '@/hooks/useFileOperations';
+import ScorecardMatrixEditor from '@/components/admin/ScorecardMatrixEditor';
 
 interface ProgramStats {
   totalPrograms: number;
@@ -206,6 +207,13 @@ export default function BDRTrainingSettings() {
     setPrograms(programs.map(p => p.id === updatedProgram.id ? updatedProgram : p));
     setSelectedProgram(updatedProgram);
     toast.success('Training program updated successfully');
+  };
+
+  const handleMatrixUpdate = (updatedCriteria: any) => {
+    if (selectedProgram) {
+      const updatedProgram = { ...selectedProgram, scorecard_criteria: updatedCriteria };
+      handleProgramUpdated(updatedProgram);
+    }
   };
 
   const toggleProgramStatus = async (program: BDRTrainingProgram) => {
@@ -493,11 +501,12 @@ export default function BDRTrainingSettings() {
             <div className="lg:col-span-3">
               {selectedProgram && (
                 <Tabs value={activeTab} onValueChange={setActiveTab}>
-                  <TabsList className="grid w-full grid-cols-5">
+                  <TabsList className="grid w-full grid-cols-6">
                     <TabsTrigger value="overview">Overview</TabsTrigger>
                     <TabsTrigger value="analytics">Analytics</TabsTrigger>
                     <TabsTrigger value="batch">Batch Processing</TabsTrigger>
                     <TabsTrigger value="validation">Validation</TabsTrigger>
+                    <TabsTrigger value="scorecard">Scorecard</TabsTrigger>
                     <TabsTrigger value="settings">Settings</TabsTrigger>
                   </TabsList>
 
@@ -617,6 +626,13 @@ export default function BDRTrainingSettings() {
                         toast.success(`Item ${action} successfully`);
                         loadStats();
                       }}
+                    />
+                  </TabsContent>
+
+                  <TabsContent value="scorecard">
+                    <ScorecardMatrixEditor
+                      program={selectedProgram}
+                      onMatrixUpdate={handleMatrixUpdate}
                     />
                   </TabsContent>
 

@@ -29,6 +29,13 @@ import AssistantCoach from "./pages/AssistantCoach";
 import DurationDebug from "./pages/DurationDebug";
 import Recordings from "./pages/Recordings";
 import BDRTrainingSettings from "./pages/admin/BDRTrainingSettings";
+import FeedbackSystemTest from "./pages/FeedbackSystemTest";
+import FeedbackAnalytics from "./pages/admin/FeedbackAnalytics";
+import EmployeeManagement from "./components/employee/EmployeeManagement";
+import EmployeeDirectory from "./pages/EmployeeDirectory";
+import EmployeeProfile from "./pages/EmployeeProfile";
+import EmployeeDashboard from "./pages/EmployeeDashboard";
+import AdminLayout from "./components/admin/AdminLayout";
 import AllRecordings from "./pages/admin/AllRecordings";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
@@ -105,7 +112,7 @@ const App = () => {
                   <Route path="/admin/integrations" element={<AdminDashboard />} />
                   <Route path="/admin/organization-outreach" element={<AdminDashboard />} />
                   <Route path="/admin/analytics" element={<AdminDashboard />} />
-                  <Route path="/admin/bdr-training" element={<BDRTrainingSettings />} />
+                  <Route path="/admin/bdr-training" element={<AdminLayout><BDRTrainingSettings /></AdminLayout>} />
                   <Route path="/admin/all-recordings" element={<AllRecordings />} />
                   <Route path="/admin/bdr-scorecard-history" element={<AdminDashboard />} />
                   <Route path="/admin/privacy" element={<AdminDashboard />} />
@@ -115,6 +122,13 @@ const App = () => {
                   <Route path="/admin/ai-models" element={<AdminDashboard />} />
                   <Route path="/admin/ai-scoring" element={<AdminDashboard />} />
                   <Route path="/admin/ai-experiments" element={<AdminDashboard />} />
+                  <Route path="/admin/feedback-analytics" element={<AdminLayout><FeedbackAnalytics /></AdminLayout>} />
+                  <Route path="/feedback-test" element={<FeedbackSystemTest />} />
+                  {/* Employee Management Routes */}
+                  <Route path="/employees" element={<AdminLayout><EmployeeManagement /></AdminLayout>} />
+                  <Route path="/employees/directory" element={<AdminLayout><EmployeeDirectory /></AdminLayout>} />
+                  <Route path="/employees/dashboard" element={<AdminLayout><EmployeeDashboard /></AdminLayout>} />
+                  <Route path="/employees/profile/:id" element={<AdminLayout><EmployeeProfile /></AdminLayout>} />
                   <Route path="*" element={<NotFound />} />
                 </Routes>
               </BrowserRouter>

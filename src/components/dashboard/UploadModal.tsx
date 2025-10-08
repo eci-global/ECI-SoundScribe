@@ -103,6 +103,13 @@ export default function UploadModal({ open, onClose, onUpload, uploadProgress, i
       coachingAreas: ['Knowledge transfer', 'Engagement', 'Question handling', 'Clarity']
     },
     { 
+      value: 'user_experience' as ContentType, 
+      label: 'User Experience Interview', 
+      icon: MessageSquare, 
+      description: 'Customer interviews, user research, feedback sessions',
+      coachingAreas: ['Employee identification', 'Question analysis', 'Answer extraction', 'Solution recommendations']
+    },
+    { 
       value: 'bdr_training_data' as ContentType, 
       label: 'BDR Training Data', 
       icon: BookOpen, 

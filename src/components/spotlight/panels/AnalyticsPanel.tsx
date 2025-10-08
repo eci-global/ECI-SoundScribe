@@ -102,14 +102,18 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
 
   // Mode detection logic
   const isSupport = React.useMemo(() => {
-    return supportMode.supportMode ||
+    return supportMode.currentMode === 'support' ||
       recording?.content_type === 'customer_support' ||
       recording?.content_type === 'support_call';
-  }, [supportMode.supportMode, recording?.content_type]);
+  }, [supportMode.currentMode, recording?.content_type]);
 
   const isSales = React.useMemo(() => {
-    return !supportMode.supportMode && recording?.content_type === 'sales_call';
-  }, [supportMode.supportMode, recording?.content_type]);
+    return supportMode.currentMode === 'sales' && recording?.content_type === 'sales_call';
+  }, [supportMode.currentMode, recording?.content_type]);
+
+  const isUX = React.useMemo(() => {
+    return supportMode.currentMode === 'ux' || recording?.content_type === 'user_experience';
+  }, [supportMode.currentMode, recording?.content_type]);
 
   // ECI analysis for support mode
   const eciAnalysis: ECIAnalysisResult | null = React.useMemo(() => {
@@ -922,15 +926,21 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
             <div className="flex items-center gap-3">
               {isSupport ? (
                 <Shield className="w-6 h-6 text-blue-600" />
+              ) : isUX ? (
+                <MessageSquare className="w-6 h-6 text-purple-600" />
               ) : (
                 <BarChart3 className="w-6 h-6 text-emerald-600" />
               )}
               <div>
                 <h2 className="text-xl font-bold text-foreground">
-                  {isSupport ? 'Service Performance Dashboard' : 'Sales Performance Analytics'}
+                  {isSupport ? 'Service Performance Dashboard' : 
+                   isUX ? 'UX Interview Analytics' : 
+                   'Sales Performance Analytics'}
                 </h2>
                 <p className="text-sm text-muted-foreground">
-                  {isSupport ? 'Customer service delivery intelligence' : 'Deal progression and engagement metrics'}
+                  {isSupport ? 'Customer service delivery intelligence' : 
+                   isUX ? 'User experience insights and interview analysis' :
+                   'Deal progression and engagement metrics'}
                 </p>
               </div>
             </div>
@@ -942,6 +952,11 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
               {isSupport && (
                 <Badge variant="secondary" className="bg-blue-100 text-blue-800">
                   Support Mode
+                </Badge>
+              )}
+              {isUX && (
+                <Badge variant="secondary" className="bg-purple-100 text-purple-800">
+                  UX Mode
                 </Badge>
               )}
               {isSales && (

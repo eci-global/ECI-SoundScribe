@@ -17,7 +17,9 @@ import {
   Sparkles,
   Phone,
   UserCheck,
-  AlertTriangle
+  MessageSquare,
+  AlertTriangle,
+  Users
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -385,7 +387,12 @@ export function PersonalizedDashboard() {
                       {getGreeting()}, {firstName}!
                     </h1>
                     <p className="text-sm text-gray-600">
-                      {supportMode.supportMode ? 'Your customer support analytics hub' : 'Your AI sales performance hub'}
+                      {supportMode.currentMode === 'support' 
+                        ? 'Your customer support analytics hub - track service quality, resolution times, and customer satisfaction'
+                        : supportMode.currentMode === 'ux'
+                        ? 'Your user experience research hub - analyze interviews, identify pain points, and generate actionable insights'
+                        : 'Your AI sales performance hub - track deals, coaching insights, and revenue optimization'
+                      }
                     </p>
                   </div>
                 </div>
@@ -438,17 +445,23 @@ export function PersonalizedDashboard() {
                   <option value="90d">90 days</option>
                 </select>
                 <Button 
-                  onClick={supportMode.toggleSupportMode}
-                  variant={supportMode.supportMode ? "default" : "outline"}
+                  onClick={supportMode.toggleMode}
+                  variant="outline"
                   className={cn(
                     "transition-all duration-200",
-                    supportMode.supportMode 
-                      ? "bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800" 
-                      : "border-blue-200 hover:border-blue-300 hover:bg-blue-50"
+                    supportMode.currentMode === 'sales' 
+                      ? "border-emerald-200 hover:border-emerald-300 hover:bg-emerald-50" 
+                      : supportMode.currentMode === 'support'
+                      ? "border-blue-200 hover:border-blue-300 hover:bg-blue-50"
+                      : "border-purple-200 hover:border-purple-300 hover:bg-purple-50"
                   )}
                 >
-                  {supportMode.supportMode ? <UserCheck className="w-4 h-4 mr-2" /> : <Phone className="w-4 h-4 mr-2" />}
-                  {supportMode.supportMode ? 'Support Mode' : 'Sales Mode'}
+                  {supportMode.currentMode === 'sales' && <Phone className="w-4 h-4 mr-2" />}
+                  {supportMode.currentMode === 'support' && <UserCheck className="w-4 h-4 mr-2" />}
+                  {supportMode.currentMode === 'ux' && <MessageSquare className="w-4 h-4 mr-2" />}
+                  {supportMode.currentMode === 'sales' && 'Sales Mode'}
+                  {supportMode.currentMode === 'support' && 'Support Mode'}
+                  {supportMode.currentMode === 'ux' && 'UX Mode'}
                 </Button>
                 <Button onClick={() => setUploadModalOpen(true)} className="bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 shadow-lg">
                   <Upload className="w-4 h-4 mr-2" />
@@ -500,6 +513,10 @@ export function PersonalizedDashboard() {
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/analytics')}>
                       <TrendingUp className="w-3 h-3 mr-2" />
                       Analytics
+                    </Button>
+                    <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/employees')}>
+                      <Users className="w-3 h-3 mr-2" />
+                      Employee Management
                     </Button>
                     <Button variant="outline" size="sm" className="w-full justify-start text-xs" onClick={() => navigate('/library')}>
                       <BookOpen className="w-3 h-3 mr-2" />
@@ -571,9 +588,23 @@ export function PersonalizedDashboard() {
                   <div className="space-y-2 max-h-[400px] overflow-y-auto">
                     {recentRecordings.length === 0 ? (
                       <div className="text-center py-8">
-                        <Phone className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                        <p className="text-gray-500 mb-2">No recordings yet</p>
-                        <p className="text-sm text-gray-400">Upload your first call to get started</p>
+                        {supportMode.currentMode === 'support' ? (
+                          <UserCheck className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        ) : supportMode.currentMode === 'ux' ? (
+                          <MessageSquare className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        ) : (
+                          <Phone className="w-12 h-12 mx-auto mb-4 text-gray-300" />
+                        )}
+                        <p className="text-gray-500 mb-2">
+                          {supportMode.currentMode === 'support' ? 'No support calls yet' :
+                           supportMode.currentMode === 'ux' ? 'No interviews yet' :
+                           'No recordings yet'}
+                        </p>
+                        <p className="text-sm text-gray-400">
+                          {supportMode.currentMode === 'support' ? 'Upload your first support call to get started' :
+                           supportMode.currentMode === 'ux' ? 'Upload your first interview to get started' :
+                           'Upload your first call to get started'}
+                        </p>
                       </div>
                     ) : (
                       recentRecordings.slice(0, 8).map((recording) => (
@@ -652,15 +683,27 @@ export function PersonalizedDashboard() {
                   <div className="space-y-4">
                     <div className="text-center">
                       <div className="text-2xl font-bold text-gray-900">{recordings.length}</div>
-                      <div className="text-xs text-gray-600">Total Calls</div>
+                      <div className="text-xs text-gray-600">
+                        {supportMode.currentMode === 'support' ? 'Total Support Calls' :
+                         supportMode.currentMode === 'ux' ? 'Total Interviews' :
+                         'Total Calls'}
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-green-600">{Math.round((completedRecordings.length / recordings.length) * 100) || 0}%</div>
-                      <div className="text-xs text-gray-600">Completion Rate</div>
+                      <div className="text-xs text-gray-600">
+                        {supportMode.currentMode === 'support' ? 'Resolution Rate' :
+                         supportMode.currentMode === 'ux' ? 'Analysis Rate' :
+                         'Completion Rate'}
+                      </div>
                     </div>
                     <div className="text-center">
                       <div className="text-2xl font-bold text-blue-600">{recordingsWithFramework.length}</div>
-                      <div className="text-xs text-gray-600">Analyzed</div>
+                      <div className="text-xs text-gray-600">
+                        {supportMode.currentMode === 'support' ? 'Quality Analyzed' :
+                         supportMode.currentMode === 'ux' ? 'Insights Generated' :
+                         'Analyzed'}
+                      </div>
                     </div>
                   </div>
                 </CardContent>

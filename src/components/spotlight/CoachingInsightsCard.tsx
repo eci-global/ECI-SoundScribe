@@ -7,6 +7,7 @@ import { CoachingService } from '@/services/coachingService';
 import { generateInstantCoaching } from '@/utils/instantAnalysis';
 import BDRCoachingInsights from '@/components/coach/BDRCoachingInsights';
 import ECICoachingInsights from '@/components/coach/ECICoachingInsights';
+import UXCoachingInsights from '@/components/coach/UXCoachingInsights';
 import { hasECIAnalysis } from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
 
@@ -22,6 +23,19 @@ export default function CoachingInsightsCard({ recording, onCoachingUpdate, comp
   const [progressMessage, setProgressMessage] = useState<string>('');
   const [elapsedTime, setElapsedTime] = useState<number>(0);
   const [instantCoaching, setInstantCoaching] = useState<any>(null);
+
+  // Debug logging for content type
+  React.useEffect(() => {
+    if (recording) {
+      console.log('🔍 CoachingInsightsCard - Recording content type:', {
+        id: recording.id,
+        title: recording.title,
+        content_type: recording.content_type,
+        hasECIAnalysis: hasECIAnalysis(recording),
+        hasCoaching: !!recording.coaching_evaluation
+      });
+    }
+  }, [recording]);
   // If the recording owner explicitly disabled coaching and no evaluation exists, hide the card.
   const rawCoaching = recording?.coaching_evaluation;
   const coachingDisabled = recording && recording.enable_coaching === false;
@@ -244,10 +258,98 @@ export default function CoachingInsightsCard({ recording, onCoachingUpdate, comp
       )}
 
       {/* Conditional Coaching Insights Based on Recording Type */}
-      {recording?.content_type === 'sales_call' ? (
+      {recording?.content_type === 'sales_call' || recording?.content_type === 'bdr_training_data' ? (
         <BDRCoachingInsights recording={recording} />
       ) : recording && (recording?.content_type === 'customer_support' || recording?.content_type === 'support_call' || hasECIAnalysis(recording)) ? (
         <ECICoachingInsights recording={recording} />
+      ) : recording?.content_type === 'user_experience' ? (
+        <UXCoachingInsights recording={recording} />
+      ) : recording && (recording?.content_type === 'team_meeting' || recording?.content_type === 'training_session' || recording?.content_type === 'other' || !recording?.content_type) ? (
+        <div className="space-y-4">
+          {/* Fallback insights for other content types */}
+          {hasRealData ? (
+            <div className="space-y-3">
+              <div className="flex items-center justify-between">
+                <h4 className="font-medium text-gray-900">Overall Score</h4>
+                <span className="text-2xl font-bold text-blue-600">{overallScore.toFixed(1)}</span>
+              </div>
+              
+              {strengths && strengths.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-green-700 mb-2 flex items-center">
+                    <CheckCircle className="w-4 h-4 mr-1" />
+                    Strengths
+                  </h5>
+                  <ul className="space-y-1">
+                    {strengths.slice(0, 3).map((strength, index) => (
+                      <li key={index} className="text-sm text-gray-700 flex items-start">
+                        <span className="w-1.5 h-1.5 bg-green-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                        {strength}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {improvements && improvements.length > 0 && (
+                <div>
+                  <h5 className="font-medium text-orange-700 mb-2 flex items-center">
+                    <Target className="w-4 h-4 mr-1" />
+                    Areas for Improvement
+                  </h5>
+                  <ul className="space-y-1">
+                    {improvements.slice(0, 3).map((improvement, index) => (
+                      <li key={index} className="text-sm text-gray-700 flex items-start">
+                        <span className="w-1.5 h-1.5 bg-orange-500 rounded-full mt-2 mr-2 flex-shrink-0"></span>
+                        {improvement}
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              )}
+              
+              {summary && (
+                <div>
+                  <h5 className="font-medium text-gray-700 mb-2 flex items-center">
+                    <Brain className="w-4 h-4 mr-1" />
+                    Summary
+                  </h5>
+                  <p className="text-sm text-gray-600 leading-relaxed">
+                    <FormattedText text={summary} />
+                  </p>
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="text-center py-8">
+              <AlertCircle className="w-12 h-12 text-gray-400 mx-auto mb-3" />
+              <h4 className="font-medium text-gray-900 mb-2">No AI Analysis Available</h4>
+              <p className="text-sm text-gray-600 mb-4">
+                This recording doesn't have AI coaching insights yet.
+              </p>
+              {recording?.transcript && (
+                <Button 
+                  onClick={handleGenerateInstantCoaching}
+                  disabled={isGenerating}
+                  size="sm"
+                  className="bg-blue-600 hover:bg-blue-700"
+                >
+                  {isGenerating ? (
+                    <>
+                      <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      Analyzing...
+                    </>
+                  ) : (
+                    <>
+                      <Zap className="w-4 h-4 mr-2" />
+                      Generate Quick Analysis
+                    </>
+                  )}
+                </Button>
+              )}
+            </div>
+          )}
+        </div>
       ) : null}
     </div>
   );

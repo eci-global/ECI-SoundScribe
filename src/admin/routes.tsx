@@ -47,6 +47,8 @@ import AIPromptManagement from '@/pages/admin/AIPromptManagement';
 import AIModelConfiguration from '@/pages/admin/AIModelConfiguration';
 import AIScoringRubrics from '@/pages/admin/AIScoringRubrics';
 import AIExperiments from '@/pages/admin/AIExperiments';
+import EmployeeManagement from '@/components/employee/EmployeeManagement';
+import FeedbackAnalytics from '@/pages/admin/FeedbackAnalytics';
 
 export interface AdminNavItem {
   title: string;
@@ -92,7 +94,8 @@ export const adminNav: AdminNavItem[] = [
     icon: GraduationCap,
     children: [
       { title: 'Settings & Programs', path: '/admin/bdr-training' },
-      { title: 'Upload History', path: '/admin/bdr-scorecard-history' }
+      { title: 'Upload History', path: '/admin/bdr-scorecard-history' },
+      { title: 'Feedback Analytics', path: '/admin/feedback-analytics' }
     ]
   },
   {
@@ -109,6 +112,7 @@ export const adminNav: AdminNavItem[] = [
   { title: 'Data & privacy', icon: Lock, path: '/admin/privacy' },
   { title: 'System activity', icon: Activity, path: '/admin/activity' },
   { title: 'Audit', icon: Key, path: '/admin/audit' },
+  { title: 'Employee Management', icon: Users, path: '/employees' },
   { title: 'Advanced Analytics', icon: Activity, path: '/admin/analytics' },
 ];
 
@@ -142,6 +146,7 @@ export const adminRouteMap: Record<string, React.ComponentType<any>> = {
   '/admin/ai-models': AIModelConfiguration,
   '/admin/ai-scoring': AIScoringRubrics,
   '/admin/ai-experiments': AIExperiments,
+  '/employees': EmployeeManagement,
 };
 
 export function resolveAdminComponent(pathname: string): React.ReactElement {
