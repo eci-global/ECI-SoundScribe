@@ -2,19 +2,17 @@ import React from 'react';
 import { Card, CardContent } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
-import {
-  Brain,
-  TrendingUp,
-  Target,
+import { 
+  Brain, 
+  TrendingUp, 
+  Target, 
   Star,
   Users,
   Award,
-  Zap,
+  Zap
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import type { Recording } from '@/types/recording';
-
-type FrameworkRecording = Recording & { primary_framework?: string };
 
 interface UserLearningProfile {
   learningProgress: number;
@@ -33,45 +31,51 @@ interface AILearningDashboardProps {
 }
 
 export function AILearningDashboard({ recordings, userProfile }: AILearningDashboardProps) {
+  // Calculate learning profile from recordings if not provided
   const calculateLearningProfile = (): UserLearningProfile => {
     const analyzedRecordings = recordings.filter(r => r.coaching_evaluation);
     const totalCalls = recordings.length;
-
+    
+    // Calculate average scores for each framework
     const frameworkScores = {
       BANT: 0,
       MEDDIC: 0,
-      SPICED: 0,
+      SPICED: 0
     };
-
-    const frameworkCounts = { BANT: 0, MEDDIC: 0, SPICED: 0 };
-
+    
+    let frameworkCounts = { BANT: 0, MEDDIC: 0, SPICED: 0 };
+    
     analyzedRecordings.forEach(recording => {
-      const framework = (recording as FrameworkRecording).primary_framework as keyof typeof frameworkScores | undefined;
+      const framework = (recording as any).primary_framework;
       const score = recording.coaching_evaluation?.overallScore || 0;
-
-      if (framework && frameworkScores[framework] !== undefined) {
-        frameworkScores[framework] += score;
-        frameworkCounts[framework] += 1;
+      
+      if (framework && frameworkScores.hasOwnProperty(framework)) {
+        frameworkScores[framework as keyof typeof frameworkScores] += score;
+        frameworkCounts[framework as keyof typeof frameworkCounts]++;
       }
     });
 
-    (Object.keys(frameworkScores) as Array<keyof typeof frameworkScores>).forEach(key => {
+    // Calculate averages
+    Object.keys(frameworkScores).forEach(framework => {
+      const key = framework as keyof typeof frameworkScores;
       if (frameworkCounts[key] > 0) {
         frameworkScores[key] = frameworkScores[key] / frameworkCounts[key];
       }
     });
 
+    // Find strongest framework
     const strongestFramework = Object.entries(frameworkScores)
       .reduce((a, b) => frameworkScores[a[0] as keyof typeof frameworkScores] > frameworkScores[b[0] as keyof typeof frameworkScores] ? a : b)[0];
 
+    // Calculate recent trend
     const recentRecordings = analyzedRecordings.slice(0, 5);
     const olderRecordings = analyzedRecordings.slice(5, 10);
-
-    const recentAvg = recentRecordings.length
+    
+    const recentAvg = recentRecordings.length > 0 
       ? recentRecordings.reduce((acc, r) => acc + (r.coaching_evaluation?.overallScore || 0), 0) / recentRecordings.length
       : 0;
-
-    const olderAvg = olderRecordings.length
+    
+    const olderAvg = olderRecordings.length > 0
       ? olderRecordings.reduce((acc, r) => acc + (r.coaching_evaluation?.overallScore || 0), 0) / olderRecordings.length
       : 0;
 
@@ -82,112 +86,79 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
       learningProgress: Math.min(100, Math.round((analyzedRecordings.length / Math.max(totalCalls, 1)) * 100)),
       callsAnalyzed: analyzedRecordings.length,
       dominantStyle: recentAvg > 7 ? 'Consultative' : recentAvg > 5 ? 'Challenger' : 'Relationship',
-      currentFocusArea:
-        frameworkScores.BANT < 6
-          ? 'Qualification'
-          : frameworkScores.MEDDIC < 6
-            ? 'Champion Development'
-            : 'Impact Quantification',
+      currentFocusArea: frameworkScores.BANT < 6 ? 'Qualification' : frameworkScores.MEDDIC < 6 ? 'Champion Development' : 'Impact Quantification',
       weeklyImprovement,
-      skillLevel:
-        recentAvg > 8
-          ? 'expert'
-          : recentAvg > 6.5
-            ? 'advanced'
-            : recentAvg > 4
-              ? 'intermediate'
-              : 'beginner',
+      skillLevel: recentAvg > 8 ? 'expert' : recentAvg > 6.5 ? 'advanced' : recentAvg > 4 ? 'intermediate' : 'beginner',
       strongestFramework,
-      recentTrend: trendDirection,
+      recentTrend: trendDirection
     };
   };
 
   const profile = userProfile || calculateLearningProfile();
-  const improvementMessage =
-    profile.weeklyImprovement >= 0
-      ? `Your ${profile.strongestFramework} calls outperform your recent average by ${Math.abs(profile.weeklyImprovement)}%.`
-      : `Focus on ${profile.currentFocusArea}; scores dipped ${Math.abs(profile.weeklyImprovement)}% week over week.`;
-
-  if (profile.callsAnalyzed === 0) {
-    return (
-      <Card className="rounded-xl border border-gray-200 shadow-sm">
-        <CardContent className="py-10 text-center space-y-3">
-          <Brain className="mx-auto h-8 w-8 text-red-500" />
-          <p className="text-lg font-semibold text-gray-900">Kick off your AI coaching journey</p>
-          <p className="text-sm text-gray-600">
-            Upload a call and run coaching analysis to see personalized learning insights.
-          </p>
-        </CardContent>
-      </Card>
-    );
-  }
 
   const getSkillLevelColor = (level: string) => {
     switch (level) {
-      case 'expert':
-        return 'bg-purple-100 text-purple-800 border-purple-200';
-      case 'advanced':
-        return 'bg-green-100 text-green-800 border-green-200';
-      case 'intermediate':
-        return 'bg-yellow-100 text-yellow-800 border-yellow-200';
-      case 'beginner':
-        return 'bg-red-100 text-red-800 border-red-200';
-      default:
-        return 'bg-gray-100 text-gray-800 border-gray-200';
+      case 'expert': return 'bg-purple-100 text-purple-800 border-purple-200';
+      case 'advanced': return 'bg-green-100 text-green-800 border-green-200';
+      case 'intermediate': return 'bg-yellow-100 text-yellow-800 border-yellow-200';
+      case 'beginner': return 'bg-blue-100 text-blue-800 border-blue-200';
+      default: return 'bg-gray-100 text-gray-800 border-gray-200';
     }
   };
 
   const getTrendColor = (trend: string) => {
     switch (trend) {
-      case 'improving':
-        return 'text-green-600';
-      case 'declining':
-        return 'text-red-600';
-      case 'stable':
-        return 'text-gray-600';
-      default:
-        return 'text-gray-600';
+      case 'improving': return 'text-green-600';
+      case 'declining': return 'text-red-600';
+      case 'stable': return 'text-gray-600';
+      default: return 'text-gray-600';
     }
   };
 
   const getTrendIcon = (trend: string) => {
     switch (trend) {
-      case 'improving':
-        return <TrendingUp className="w-4 h-4" />;
-      case 'declining':
-        return <TrendingUp className="w-4 h-4 rotate-180" />;
-      case 'stable':
-        return <Target className="w-4 h-4" />;
-      default:
-        return <Target className="w-4 h-4" />;
+      case 'improving': return <TrendingUp className="w-4 h-4" />;
+      case 'declining': return <TrendingUp className="w-4 h-4 rotate-180" />;
+      case 'stable': return <Target className="w-4 h-4" />;
+      default: return <Target className="w-4 h-4" />;
     }
   };
 
   return (
-    <Card className="rounded-xl border border-gray-200 shadow-sm">
-      <CardContent className="space-y-6">
-        <div className="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
+    <Card className="bg-gradient-to-r from-blue-50 to-purple-50 border-blue-200 shadow-lg mb-6">
+      <CardContent className="p-6">
+        <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
-            <div className="p-3 bg-gray-100 rounded-full">
-              <Brain className="w-6 h-6 text-red-600" />
+            <div className="p-2 bg-gradient-to-br from-blue-500 to-purple-600 rounded-xl shadow-lg">
+              <Brain className="w-6 h-6 text-white" />
             </div>
             <div>
-              <h2 className="text-xl font-semibold text-gray-900">Learning Intelligence</h2>
-              <p className="text-sm text-gray-600">AI summary of your recent sales performance</p>
+              <h2 className="text-xl font-bold text-gray-900">AI Learning Intelligence</h2>
+              <p className="text-sm text-gray-600">Your personalized sales coaching progress</p>
             </div>
           </div>
-          <Badge className={cn('border', getSkillLevelColor(profile.skillLevel))}>
+          
+          <Badge className={cn("border", getSkillLevelColor(profile.skillLevel))}>
             <Star className="w-3 h-3 mr-1" />
             {profile.skillLevel} level
           </Badge>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
+          {/* Learning Progress */}
           <div className="text-center">
             <div className="relative inline-flex items-center justify-center mb-2">
               <div className="w-16 h-16">
                 <svg className="transform -rotate-90 w-16 h-16">
-                  <circle cx="32" cy="32" r="28" stroke="currentColor" strokeWidth="4" fill="none" className="text-gray-200" />
+                  <circle
+                    cx="32"
+                    cy="32"
+                    r="28"
+                    stroke="currentColor"
+                    strokeWidth="4"
+                    fill="none"
+                    className="text-gray-200"
+                  />
                   <circle
                     cx="32"
                     cy="32"
@@ -197,12 +168,12 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
                     fill="none"
                     strokeDasharray={`${2 * Math.PI * 28}`}
                     strokeDashoffset={`${2 * Math.PI * 28 * (1 - profile.learningProgress / 100)}`}
-                    className="text-red-600 transition-all duration-1000"
+                    className="text-blue-600 transition-all duration-1000"
                     strokeLinecap="round"
                   />
                 </svg>
                 <div className="absolute inset-0 flex items-center justify-center">
-                  <span className="text-lg font-bold text-red-600">{profile.learningProgress}%</span>
+                  <span className="text-lg font-bold text-blue-600">{profile.learningProgress}%</span>
                 </div>
               </div>
             </div>
@@ -210,6 +181,7 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
             <div className="text-sm font-medium text-gray-900">{profile.callsAnalyzed} calls analyzed</div>
           </div>
 
+          {/* Sales Style */}
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <div className="p-3 bg-gradient-to-br from-green-100 to-green-200 rounded-lg">
@@ -221,6 +193,7 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
             <div className="text-xs text-gray-500">+ Data-Driven</div>
           </div>
 
+          {/* Current Focus */}
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <div className="p-3 bg-gradient-to-br from-orange-100 to-orange-200 rounded-lg">
@@ -232,29 +205,23 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
             <div className="text-xs text-gray-500">Active Goal</div>
           </div>
 
+          {/* Performance Trend */}
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
-              <div
-                className={cn(
-                  'p-3 rounded-lg',
-                  profile.recentTrend === 'improving'
-                    ? 'bg-gradient-to-br from-green-100 to-green-200'
-                    : profile.recentTrend === 'declining'
-                      ? 'bg-gradient-to-br from-red-100 to-red-200'
-                      : 'bg-gradient-to-br from-gray-100 to-gray-200',
-                )}
-              >
-                <div className={getTrendColor(profile.recentTrend)}>{getTrendIcon(profile.recentTrend)}</div>
+              <div className={cn("p-3 rounded-lg", profile.recentTrend === 'improving' ? 'bg-gradient-to-br from-green-100 to-green-200' : profile.recentTrend === 'declining' ? 'bg-gradient-to-br from-red-100 to-red-200' : 'bg-gradient-to-br from-gray-100 to-gray-200')}>
+                <div className={getTrendColor(profile.recentTrend)}>
+                  {getTrendIcon(profile.recentTrend)}
+                </div>
               </div>
             </div>
             <div className="text-xs text-gray-600">Weekly Trend</div>
-            <div className={cn('text-sm font-bold', getTrendColor(profile.recentTrend))}>
-              {profile.weeklyImprovement > 0 ? '+' : ''}
-              {profile.weeklyImprovement}%
+            <div className={cn("text-sm font-bold", getTrendColor(profile.recentTrend))}>
+              {profile.weeklyImprovement > 0 ? '+' : ''}{profile.weeklyImprovement}%
             </div>
             <div className="text-xs text-gray-500 capitalize">{profile.recentTrend}</div>
           </div>
 
+          {/* Strongest Framework */}
           <div className="text-center">
             <div className="flex items-center justify-center mb-2">
               <div className="p-3 bg-gradient-to-br from-purple-100 to-purple-200 rounded-lg">
@@ -267,14 +234,19 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
           </div>
         </div>
 
-        <div className="mt-4 pt-4 border-t border-red-200">
+        {/* Quick Insights */}
+        <div className="mt-4 pt-4 border-t border-blue-200">
           <div className="flex items-center justify-between text-sm">
             <div className="flex items-center space-x-4">
-              <span className="text-gray-600">{improvementMessage}</span>
+              <span className="text-gray-600">
+                🎯 Your {profile.strongestFramework} calls perform {Math.abs(profile.weeklyImprovement)}% better than average
+              </span>
             </div>
             <div className="flex items-center space-x-2">
               <Zap className="w-4 h-4 text-yellow-600" />
-              <span className="text-gray-600 text-xs">AI is learning your patterns - next insight in 2 calls</span>
+              <span className="text-gray-600 text-xs">
+                AI is learning your patterns • Next insight in 2 calls
+              </span>
             </div>
           </div>
         </div>
@@ -282,7 +254,3 @@ export function AILearningDashboard({ recordings, userProfile }: AILearningDashb
     </Card>
   );
 }
-
-
-
-

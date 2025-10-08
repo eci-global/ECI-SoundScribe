@@ -6,7 +6,7 @@ import { Loader2 } from 'lucide-react';
 interface AdminFormShellProps {
   title: string;
   description?: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<any>;
   isSubmitting?: boolean;
   error?: string | null;
   success?: string | null;

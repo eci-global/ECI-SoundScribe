@@ -5,7 +5,7 @@ import { Loader2 } from 'lucide-react';
 interface AdminTableShellProps {
   title: string;
   description?: string;
-  icon?: React.ComponentType<{ className?: string }>;
+  icon?: React.ComponentType<any>;
   loading?: boolean;
   empty?: boolean;
   emptyTitle?: string;
