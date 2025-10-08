@@ -43,7 +43,7 @@ export interface FileOperationsProps {
   onRecordingProcessed: () => void;
 }
 
-export type ContentType = 'sales_call' | 'customer_support' | 'team_meeting' | 'training_session' | 'other';
+export type ContentType = 'sales_call' | 'customer_support' | 'team_meeting' | 'training_session' | 'user_experience' | 'other';
 
 // Utility functions for safe access to coaching evaluation properties
 export const getCoachingScore = (recording: Recording): number => {

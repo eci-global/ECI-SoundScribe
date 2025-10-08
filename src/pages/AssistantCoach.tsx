@@ -283,4 +283,59 @@ function SectionHeader({ title, description }: { title: string; description?: st
   );
 }
 
+// Support Assistant Coach Component
+function SupportAssistantCoach({ recordings }: { recordings: any[] }) {
+  return (
+    <StandardLayout activeSection="assistant">
+      <div className="min-h-screen bg-gradient-to-br from-blue-50 to-indigo-50 font-sans">
+        <div className="container mx-auto p-6 space-y-6">
+        {/* Header */}
+        <header className="text-center mb-6">
+          <div className="flex items-center justify-center gap-3 mb-2">
+            <h1 className="text-4xl font-bold text-gray-800">{
+              supportMode.currentMode === 'support' ? 'AI Support Coach' :
+              supportMode.currentMode === 'ux' ? 'AI UX Coach' :
+              'AI Sales Coach'
+            }</h1>
+            <div className={`px-3 py-1 text-sm rounded-md font-medium ${
+              supportMode.currentMode === 'support' ? 'bg-blue-100 text-blue-700' :
+              supportMode.currentMode === 'ux' ? 'bg-purple-100 text-purple-700' :
+              'bg-emerald-100 text-emerald-700'
+            }`}>
+              {supportMode.currentMode === 'support' ? 'Support Mode' :
+               supportMode.currentMode === 'ux' ? 'UX Mode' :
+               'Sales Mode'}
+            </div>
+          </div>
+          <p className="text-gray-600">{
+            supportMode.currentMode === 'support' ? 'Get personalized coaching on empathy, problem-solving, and customer satisfaction to excel in support interactions' :
+            supportMode.currentMode === 'ux' ? 'Receive targeted guidance on interview techniques, question formulation, and insight extraction to conduct effective user research' :
+            'Access AI-powered coaching on discovery, objection handling, and closing techniques to accelerate sales success'
+          }</p>
+        </header>
+
+        {/* AI Learning Intelligence Dashboard */}
+        <SupportAILearningDashboard recordings={recordings} />
+
+        {/* Two Column Layout */}
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+          {/* Left Column - Smart Recommendations */}
+          <div className="lg:col-span-1">
+            <SupportSmartRecommendations
+              recordings={recordings}
+              onStartPractice={(rec) => console.log('Starting support practice:', rec)}
+            />
+          </div>
+
+          {/* Right Column - Success Patterns */}
+          <div className="lg:col-span-1">
+            <SupportSuccessPatterns recordings={recordings} />
+          </div>
+        </div>
+
+        </div>
+      </div>
+    </StandardLayout>
+  );
+}
 export default AssistantCoach;

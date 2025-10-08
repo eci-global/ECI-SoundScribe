@@ -36,6 +36,7 @@ import {
 import { toast } from 'sonner';
 import diagnoseAIControlCenter from '@/utils/aiControlCenterDiagnostics';
 import { supabase } from '@/integrations/supabase/client';
+import CriteriaBuilder from '@/components/admin/CriteriaBuilder';
 
 interface ScoringRubric {
   id?: string;
@@ -85,6 +86,8 @@ export default function AIScoringRubrics() {
   const [validationResult, setValidationResult] = useState<RubricValidationResult | null>(null);
   const [criteriaJson, setCriteriaJson] = useState('');
   const [scaleDefinitionJson, setScaleDefinitionJson] = useState('');
+  const [criteriaBuilderData, setCriteriaBuilderData] = useState<Record<string, any>>({});
+  const [criteriaValidationErrors, setCriteriaValidationErrors] = useState<string[]>([]);
 
   useEffect(() => {
     loadRubrics();
@@ -197,6 +200,8 @@ export default function AIScoringRubrics() {
       "3": "Strong Performance",
       "4": "Best-in-Class"
     }, null, 2));
+    // Initialize empty criteria builder data
+    setCriteriaBuilderData({});
   };
 
   const handleEdit = (rubric: ScoringRubric) => {
@@ -206,6 +211,8 @@ export default function AIScoringRubrics() {
     setEditForm({ ...rubric });
     setCriteriaJson(JSON.stringify(rubric.criteria || {}, null, 2));
     setScaleDefinitionJson(JSON.stringify(rubric.scale_definition || {}, null, 2));
+    // Initialize criteria builder data
+    setCriteriaBuilderData(rubric.criteria || {});
   };
 
   const handleValidateCriteria = async () => {
@@ -263,13 +270,24 @@ export default function AIScoringRubrics() {
         return;
       }
 
-      // Parse JSON fields
+      // Use criteria builder data if available, otherwise fall back to JSON
       let parsedCriteria, parsedScaleDefinition;
       try {
-        parsedCriteria = JSON.parse(criteriaJson);
+        // Use criteria builder data if it has content, otherwise parse JSON
+        if (Object.keys(criteriaBuilderData).length > 0) {
+          parsedCriteria = criteriaBuilderData;
+        } else {
+          parsedCriteria = JSON.parse(criteriaJson);
+        }
         parsedScaleDefinition = JSON.parse(scaleDefinitionJson);
       } catch (error) {
         toast.error('Invalid JSON in criteria or scale definition');
+        return;
+      }
+
+      // Validate criteria before saving
+      if (criteriaValidationErrors.length > 0) {
+        toast.error('Please fix criteria validation errors before saving');
         return;
       }
 
@@ -713,54 +731,94 @@ export default function AIScoringRubrics() {
             </TabsContent>
 
             <TabsContent value="criteria" className="space-y-4">
-              <div>
-                <Label htmlFor="criteria">Criteria Definition (JSON)</Label>
-                <Textarea
-                  id="criteria"
-                  value={criteriaJson}
-                  onChange={(e) => setCriteriaJson(e.target.value)}
-                  placeholder='{"criterion1": {"name": "Criterion Name", "weight": 25, "description": "..."}, ...}'
-                  rows={12}
-                  className="font-mono text-sm"
-                />
-                <p className="text-xs text-gray-500 mt-1">
-                  Define evaluation criteria as JSON. Each criterion should have name, weight, and description.
-                </p>
-              </div>
+              <CriteriaBuilder
+                initialCriteria={criteriaBuilderData}
+                onCriteriaChange={setCriteriaBuilderData}
+                onValidationChange={(isValid, errors) => {
+                  setCriteriaValidationErrors(errors);
+                  // Update the JSON for backward compatibility
+                  setCriteriaJson(JSON.stringify(criteriaBuilderData, null, 2));
+                }}
+              />
 
-              <Button onClick={handleValidateCriteria} variant="outline">
-                <CheckCircle className="h-4 w-4 mr-2" />
-                Validate Criteria
-              </Button>
-
-              {validationResult && (
-                <Alert className={validationResult.valid ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
-                  {validationResult.valid ? <CheckCircle className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+              {/* Show validation errors if any */}
+              {criteriaValidationErrors.length > 0 && (
+                <Alert variant="destructive">
+                  <AlertTriangle className="h-4 w-4" />
                   <AlertDescription>
-                    <div className="space-y-2">
-                      <div>
-                        <strong>Validation Result:</strong> {validationResult.valid ? 'Valid' : 'Invalid'}
-                      </div>
-                      {validationResult.total_weight && (
-                        <div>Total Weight: {validationResult.total_weight}</div>
-                      )}
-                      {validationResult.criteria_count && (
-                        <div>Criteria Count: {validationResult.criteria_count}</div>
-                      )}
-                      {validationResult.errors && validationResult.errors.length > 0 && (
-                        <div>
-                          <strong>Errors:</strong>
-                          <ul className="list-disc list-inside mt-1">
-                            {validationResult.errors.map((error, index) => (
-                              <li key={index} className="text-sm">{error}</li>
-                            ))}
-                          </ul>
-                        </div>
-                      )}
+                    <div className="space-y-1">
+                      {criteriaValidationErrors.map((error, index) => (
+                        <div key={index} className="text-sm">{error}</div>
+                      ))}
                     </div>
                   </AlertDescription>
                 </Alert>
               )}
+
+              {/* Advanced JSON Editor (Collapsible) */}
+              <details className="group">
+                <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800">
+                  Advanced: Edit JSON directly
+                </summary>
+                <div className="mt-4 space-y-4">
+                  <div>
+                    <Label htmlFor="criteria_json">Criteria Definition (JSON)</Label>
+                    <Textarea
+                      id="criteria_json"
+                      value={criteriaJson}
+                      onChange={(e) => {
+                        setCriteriaJson(e.target.value);
+                        try {
+                          const parsed = JSON.parse(e.target.value);
+                          setCriteriaBuilderData(parsed);
+                        } catch (error) {
+                          // Invalid JSON, keep current data
+                        }
+                      }}
+                      placeholder='{"criterion1": {"name": "Criterion Name", "weight": 25, "description": "..."}, ...}'
+                      rows={8}
+                      className="font-mono text-sm"
+                    />
+                    <p className="text-xs text-gray-500 mt-1">
+                      Advanced users can edit the JSON directly. Changes will be reflected in the visual builder above.
+                    </p>
+                  </div>
+
+                  <Button onClick={handleValidateCriteria} variant="outline">
+                    <CheckCircle className="h-4 w-4 mr-2" />
+                    Validate Criteria
+                  </Button>
+
+                  {validationResult && (
+                    <Alert className={validationResult.valid ? 'border-green-200 bg-green-50' : 'border-red-200 bg-red-50'}>
+                      {validationResult.valid ? <CheckCircle className="h-4 w-4" /> : <AlertTriangle className="h-4 w-4" />}
+                      <AlertDescription>
+                        <div className="space-y-2">
+                          <div>
+                            <strong>Validation Result:</strong> {validationResult.valid ? 'Valid' : 'Invalid'}
+                          </div>
+                          {validationResult.total_weight && (
+                            <div>Total Weight: {validationResult.total_weight}</div>
+                          )}
+                          {validationResult.criteria_count && (
+                            <div>Criteria Count: {validationResult.criteria_count}</div>
+                          )}
+                          {validationResult.errors && validationResult.errors.length > 0 && (
+                            <div>
+                              <strong>Errors:</strong>
+                              <ul className="list-disc list-inside mt-1">
+                                {validationResult.errors.map((error, index) => (
+                                  <li key={index} className="text-sm">{error}</li>
+                                ))}
+                              </ul>
+                            </div>
+                          )}
+                        </div>
+                      </AlertDescription>
+                    </Alert>
+                  )}
+                </div>
+              </details>
             </TabsContent>
 
             <TabsContent value="scale" className="space-y-4">

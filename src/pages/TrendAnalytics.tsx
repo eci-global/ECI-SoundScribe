@@ -230,19 +230,36 @@ export default function TrendAnalytics() {
       <div className="min-h-screen bg-gray-50">
         <div className="mx-auto max-w-7xl px-6 py-8">
           <div className="mb-8">
-            <div className="flex items-center gap-4">
-              <h1 className="flex items-center gap-3 text-3xl font-semibold text-gray-900">
-                <TrendingUp className="h-7 w-7 text-red-600" />
-                {supportMode.supportMode ? 'Support Performance Analytics' : 'Sales Performance Analytics'}
+            <div className="flex items-center gap-4 mb-2">
+              <h1 className="text-display text-eci-gray-800 flex items-center space-x-3">
+                <TrendingUp className={`w-8 h-8 ${
+                  supportMode.currentMode === 'support' ? 'text-blue-600' :
+                  supportMode.currentMode === 'ux' ? 'text-purple-600' :
+                  'text-eci-red'
+                }`} />
+                <span>{
+                  supportMode.currentMode === 'support' ? 'Support Performance Analytics' :
+                  supportMode.currentMode === 'ux' ? 'UX Interview Analytics' :
+                  'Sales Performance Analytics'
+                }</span>
               </h1>
-              {supportMode.supportMode && (
-                <div className="rounded-md bg-gray-200 px-3 py-1 text-sm font-medium text-gray-700">Support mode</div>
-              )}
+              <div className={`px-3 py-1 text-sm rounded-md font-medium ${
+                supportMode.currentMode === 'support' ? 'bg-blue-100 text-blue-700' :
+                supportMode.currentMode === 'ux' ? 'bg-purple-100 text-purple-700' :
+                'bg-emerald-100 text-emerald-700'
+              }`}>
+                {supportMode.currentMode === 'support' ? 'Support Mode' :
+                 supportMode.currentMode === 'ux' ? 'UX Mode' :
+                 'Sales Mode'}
+              </div>
             </div>
-            <p className="mt-2 text-sm text-gray-600">
-              {supportMode.supportMode
-                ? 'Track customer experience performance, coaching impact, and escalation readiness across your team.'
-                : 'Monitor call performance, coaching outcomes, and sales readiness across your organisation.'}
+            <p className="text-body-large text-eci-gray-600">
+              {supportMode.currentMode === 'support'
+                ? 'Track customer satisfaction scores, resolution times, escalation patterns, and service quality metrics to optimize support operations'
+                : supportMode.currentMode === 'ux'
+                ? 'Monitor interview effectiveness, pain point identification, solution recommendations, and user feedback trends to improve product experience'
+                : 'Measure deal progression, coaching effectiveness, objection handling, and sales performance metrics to drive revenue growth'
+              }
             </p>
           </div>
 

@@ -33,6 +33,7 @@ import { BDRTrainingProgram } from '@/types/bdr-training';
 import { toast } from 'sonner';
 import { extractFilenameWithoutExtension } from '@/utils/titleMatcher';
 import { smartParseExcelScorecardData, ExcelParseResult } from '@/utils/excelParser';
+import { validateExcelFile, DEFAULT_SECURITY_CONFIG } from '@/utils/fileSecurity';
 import * as XLSX from 'xlsx';
 
 interface ExcelUploadComponentProps {
@@ -227,16 +228,28 @@ export function ExcelUploadComponent({
   const handleFileSelect = useCallback(async (file: File) => {
     if (!file) return;
 
-    // Validate file type
-    if (!file.name.match(/\.(xlsx|xls|csv)$/i)) {
-      toast.error('Please select an Excel file (.xlsx or .xls) or CSV file (.csv)');
+    // Comprehensive security validation
+    const validation = validateExcelFile(file, {
+      ...DEFAULT_SECURITY_CONFIG,
+      maxFileSize: 5 * 1024 * 1024, // 5MB for this component
+      allowedExtensions: ['.xlsx', '.xls', '.csv'],
+      allowedTypes: [
+        'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'application/vnd.ms-excel',
+        'text/csv'
+      ]
+    });
+
+    if (!validation.isValid) {
+      toast.error(validation.error || 'File validation failed');
       return;
     }
 
-    // Validate file size (5MB limit)
-    if (file.size > 5 * 1024 * 1024) {
-      toast.error('File size must be less than 5MB');
-      return;
+    // Show warnings if any
+    if (validation.warnings && validation.warnings.length > 0) {
+      validation.warnings.forEach(warning => {
+        toast.warning(warning);
+      });
     }
 
     setSelectedFile(file);

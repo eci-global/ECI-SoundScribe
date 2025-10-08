@@ -7,6 +7,13 @@
  */
 
 import * as XLSX from 'xlsx';
+import { 
+  validateExcelFile, 
+  safeProcessExcel, 
+  validateExcelContent,
+  createSecureExcelProcessor,
+  DEFAULT_SECURITY_CONFIG 
+} from './fileSecurity';
 
 // Expected Excel column mappings
 export interface ExcelColumnMapping {
@@ -179,10 +186,55 @@ export async function smartParseExcelScorecardData(
   file: File,
   enableSmartScan: boolean = true
 ): Promise<ExcelParseResult> {
-  if (enableSmartScan) {
-    return await parseWithSmartScan(file);
-  } else {
-    return await parseExcelScorecardData(file);
+  // Validate file security first
+  const validation = validateExcelFile(file);
+  if (!validation.isValid) {
+    return {
+      success: false,
+      data: [],
+      errors: [{
+        type: 'security_error',
+        message: validation.error || 'File validation failed'
+      }],
+      warnings: validation.warnings?.map(w => ({ type: 'security_warning', message: w })) || [],
+      metadata: {
+        filename: file.name,
+        sheetName: '',
+        totalRows: 0,
+        validRows: 0,
+        columnMapping: {}
+      }
+    };
+  }
+
+  // Use secure processing wrapper
+  const secureProcessor = createSecureExcelProcessor(async (file: File) => {
+    if (enableSmartScan) {
+      return await parseWithSmartScan(file);
+    } else {
+      return await parseExcelScorecardData(file);
+    }
+  });
+
+  try {
+    return await secureProcessor(file);
+  } catch (error) {
+    return {
+      success: false,
+      data: [],
+      errors: [{
+        type: 'processing_error',
+        message: error instanceof Error ? error.message : 'Unknown processing error'
+      }],
+      warnings: [],
+      metadata: {
+        filename: file.name,
+        sheetName: '',
+        totalRows: 0,
+        validRows: 0,
+        columnMapping: {}
+      }
+    };
   }
 }
 
@@ -200,12 +252,49 @@ export async function parseWithSmartScan(file: File): Promise<ExcelParseResult> 
       return validation.result;
     }
 
-    // Read and parse Excel file
+    // Read and parse Excel file with security measures
     const arrayBuffer = await file.arrayBuffer();
-    const workbook = XLSX.read(arrayBuffer, { type: 'array' });
+    const workbook = XLSX.read(arrayBuffer, { 
+      type: 'array',
+      // Add security options to xlsx parsing
+      cellDates: false, // Disable automatic date parsing to prevent prototype pollution
+      cellNF: false,    // Disable number format parsing
+      cellStyles: false, // Disable style parsing
+      sheetStubs: false, // Disable stub sheets
+      bookDeps: false,   // Disable dependency tracking
+      bookFiles: false,  // Disable file tracking
+      bookProps: false,  // Disable property parsing
+      bookSheets: false, // Disable sheet metadata
+      bookVBA: false     // Disable VBA parsing
+    });
     const sheetName = workbook.SheetNames[0];
     const worksheet = workbook.Sheets[sheetName];
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+      header: 1,
+      defval: '', // Default value for empty cells
+      raw: false  // Convert all values to strings to prevent prototype pollution
+    }) as any[][];
+
+    // Validate Excel content structure
+    const contentValidation = validateExcelContent(jsonData);
+    if (!contentValidation.isValid) {
+      return {
+        success: false,
+        data: [],
+        errors: [{
+          type: 'content_error',
+          message: contentValidation.error || 'Invalid Excel content structure'
+        }],
+        warnings: contentValidation.warnings?.map(w => ({ type: 'content_warning', message: w })) || [],
+        metadata: {
+          filename: file.name,
+          sheetName: '',
+          totalRows: 0,
+          validRows: 0,
+          columnMapping: {}
+        }
+      };
+    }
 
     console.log('🔍 Smart scanning Excel file:', file.name);
     console.log('📊 File structure:', { rows: jsonData.length, firstRowCols: jsonData[0]?.length });
@@ -1030,12 +1119,24 @@ export async function parseExcelScorecardData(
       };
     }
 
-    // Read Excel file
+    // Read Excel file with security measures
     const arrayBuffer = await file.arrayBuffer();
     let workbook: XLSX.WorkBook;
     
     try {
-      workbook = XLSX.read(arrayBuffer, { type: 'array' });
+      workbook = XLSX.read(arrayBuffer, { 
+        type: 'array',
+        // Add security options to xlsx parsing
+        cellDates: false, // Disable automatic date parsing to prevent prototype pollution
+        cellNF: false,    // Disable number format parsing
+        cellStyles: false, // Disable style parsing
+        sheetStubs: false, // Disable stub sheets
+        bookDeps: false,   // Disable dependency tracking
+        bookFiles: false,  // Disable file tracking
+        bookProps: false,  // Disable property parsing
+        bookSheets: false, // Disable sheet metadata
+        bookVBA: false     // Disable VBA parsing
+      });
     } catch (error) {
       return {
         success: false,
@@ -1078,8 +1179,33 @@ export async function parseExcelScorecardData(
 
     const worksheet = workbook.Sheets[sheetName];
     
-    // Convert to JSON with header row
-    const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1 }) as any[][];
+    // Convert to JSON with header row and security measures
+    const jsonData = XLSX.utils.sheet_to_json(worksheet, { 
+      header: 1,
+      defval: '', // Default value for empty cells
+      raw: false  // Convert all values to strings to prevent prototype pollution
+    }) as any[][];
+
+    // Validate Excel content structure
+    const contentValidation = validateExcelContent(jsonData);
+    if (!contentValidation.isValid) {
+      return {
+        success: false,
+        data: [],
+        errors: [{
+          type: 'content_error',
+          message: contentValidation.error || 'Invalid Excel content structure'
+        }],
+        warnings: contentValidation.warnings?.map(w => ({ type: 'content_warning', message: w })) || [],
+        metadata: {
+          filename: file.name,
+          sheetName: '',
+          totalRows: 0,
+          validRows: 0,
+          columnMapping: {}
+        }
+      };
+    }
     
     if (jsonData.length < 2) {
       return {

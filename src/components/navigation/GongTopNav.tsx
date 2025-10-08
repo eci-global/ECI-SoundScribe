@@ -62,22 +62,29 @@ export default function GongTopNav({
               </div>
             </div>
             
-            {/* Support/Sales Mode Toggle */}
+            {/* Mode Toggle - Sales/Support/UX */}
             <button
-              onClick={() => supportMode.toggleSupportMode()}
+              onClick={() => supportMode.toggleMode()}
               className="flex items-center space-x-2 px-3 py-1.5 rounded-lg bg-eci-charcoal-light hover:bg-eci-charcoal-light/80 transition-all duration-200 border border-eci-gray-600 hover:border-eci-gray-500"
-              title={`Switch to ${supportMode.supportMode ? 'Sales' : 'Support'} Mode`}
+              title={`Switch to ${supportMode.currentMode === 'sales' ? 'Support' : supportMode.currentMode === 'support' ? 'UX' : 'Sales'} Mode`}
             >
               <div className="flex items-center space-x-1.5">
-                {supportMode.supportMode ? (
+                {supportMode.currentMode === 'sales' && (
+                  <>
+                    <TrendingUp className="w-4 h-4 text-emerald-400" />
+                    <span className="text-xs font-medium text-emerald-200">Sales</span>
+                  </>
+                )}
+                {supportMode.currentMode === 'support' && (
                   <>
                     <UserCheck className="w-4 h-4 text-blue-400" />
                     <span className="text-xs font-medium text-blue-200">Support</span>
                   </>
-                ) : (
+                )}
+                {supportMode.currentMode === 'ux' && (
                   <>
-                    <TrendingUp className="w-4 h-4 text-emerald-400" />
-                    <span className="text-xs font-medium text-emerald-200">Sales</span>
+                    <MessageSquare className="w-4 h-4 text-purple-400" />
+                    <span className="text-xs font-medium text-purple-200">UX</span>
                   </>
                 )}
               </div>

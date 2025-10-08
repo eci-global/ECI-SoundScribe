@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Bookmark, 
   Share2, 
@@ -19,6 +19,8 @@ import { SpotlightProvider } from '@/contexts/SpotlightContext';
 import { OutlinePanel } from '@/components/spotlight/panels/OutlinePanel';
 import { AskAnythingPanel } from '@/components/spotlight/panels/AskAnythingPanel';
 import { getTalkTimeRatio, getActionItems } from '@/utils/coachingAccessors';
+import SpeakerConfirmationDialog from '@/components/dialogs/SpeakerConfirmationDialog';
+import { useSpeakerConfirmation } from '@/hooks/useSpeakerConfirmation';
 
 interface ConversationViewProps {
   recording: Recording;
@@ -27,6 +29,25 @@ interface ConversationViewProps {
 
 export default function ConversationView({ recording, onPlay }: ConversationViewProps) {
   const [activeTab, setActiveTab] = useState<'highlights' | 'outline' | 'ask'>('highlights');
+  const { 
+    showConfirmationDialog, 
+    showDialog, 
+    hideDialog, 
+    confirmSpeakers, 
+    shouldShowConfirmation 
+  } = useSpeakerConfirmation();
+
+  // Check if we should show speaker confirmation when recording loads
+  useEffect(() => {
+    if (recording && shouldShowConfirmation(recording)) {
+      // Small delay to let the UI settle before showing the dialog
+      const timer = setTimeout(() => {
+        showDialog(recording);
+      }, 1000);
+      
+      return () => clearTimeout(timer);
+    }
+  }, [recording, shouldShowConfirmation, showDialog]);
 
   const formatDate = (dateString: string) => {
     return new Date(dateString).toLocaleDateString('en-US', {
@@ -210,6 +231,14 @@ export default function ConversationView({ recording, onPlay }: ConversationView
           </div>
         )}
       </div>
+
+      {/* Speaker Confirmation Dialog */}
+      <SpeakerConfirmationDialog
+        recording={recording}
+        isOpen={showConfirmationDialog}
+        onClose={hideDialog}
+        onConfirm={confirmSpeakers}
+      />
     </div>
   );
 }
