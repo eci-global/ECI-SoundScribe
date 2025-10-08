@@ -10,7 +10,7 @@ interface ActivityEvent {
   action: string;
   resource_type: string;
   resource_id: string;
-  details: any;
+  details: { title?: string };
   created_at: string;
 }
 

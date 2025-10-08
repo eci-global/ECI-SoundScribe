@@ -283,7 +283,7 @@ export function SuccessPatterns({ recordings }: SuccessPatternsProps) {
 
   const getPatternColor = (category: string) => {
     switch (category) {
-      case 'timing': return 'text-blue-600 bg-blue-100';
+      case 'timing': return 'text-red-600 bg-red-100';
       case 'technique': return 'text-green-600 bg-green-100';
       case 'framework': return 'text-purple-600 bg-purple-100';
       case 'behavioral': return 'text-orange-600 bg-orange-100';
@@ -362,7 +362,7 @@ export function SuccessPatterns({ recordings }: SuccessPatternsProps) {
       <Card>
         <CardHeader className="pb-3">
           <CardTitle className="text-sm font-semibold flex items-center space-x-2">
-            <BarChart3 className="w-4 h-4 text-blue-600" />
+            <BarChart3 className="w-4 h-4 text-red-600" />
             <span>Performance Benchmarks</span>
           </CardTitle>
         </CardHeader>
@@ -455,3 +455,5 @@ export function SuccessPatterns({ recordings }: SuccessPatternsProps) {
     </div>
   );
 }
+
+
