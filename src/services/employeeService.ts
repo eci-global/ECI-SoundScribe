@@ -1017,6 +1017,9 @@ export class EmployeeService {
         console.warn(`⚠️  Participation record missing recording data:`, item);
         return null;
       }
+      // Extract detection metadata from speaker_segments JSONB field
+      const detectionMetadata = item.speaker_segments || {};
+
       return {
         id: item.recordings.id,
         title: item.recordings.title,
@@ -1026,7 +1029,13 @@ export class EmployeeService {
         overall_score: scoreMap.get(item.recordings.id) ?? 0,
         talk_time_percentage: item.talk_time_percentage,
         strengths: [],
-        improvements: []
+        improvements: [],
+        // AI Detection metadata
+        detection_method: detectionMetadata.detection_method,
+        confidence_score: item.confidence_score,
+        manually_tagged: item.manually_tagged ?? false,
+        detected_name: detectionMetadata.detected_name,
+        name_type: detectionMetadata.name_type
       };
     }).filter(Boolean);
 

@@ -22,6 +22,94 @@ interface EmployeeIdentification {
   confidence: number;
   reasoning: string;
   detected_names: string[];
+  name_type?: 'full_name' | 'first_name_only' | 'unclear';
+}
+
+/**
+ * Extract potential employee names from recording title/filename
+ * Looks for common patterns like "Call with John Smith", "John-Sales-Call", etc.
+ */
+function extractNamesFromTitle(title: string): string[] {
+  if (!title) return [];
+
+  const names: string[] = [];
+
+  // Common patterns for names in titles
+  const patterns = [
+    // "Call with John Smith and Jane Doe"
+    /(?:call|meeting|interview|conversation)\s+(?:with|between)\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)(?:\s+and\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*))?/i,
+    // "John Smith - Sales Call"
+    /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s*[-–]\s*/,
+    // "Interview: John Smith"
+    /(?:interview|call|meeting):\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/i,
+    // "John Smith, Jane Doe - Call"
+    /^([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*),\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s*[-–]/,
+    // "John_Smith_Sales_Call" or "John-Smith-Call"
+    /^([A-Z][a-z]+)[-_]([A-Z][a-z]+)(?:[-_]|$)/,
+  ];
+
+  for (const pattern of patterns) {
+    const match = title.match(pattern);
+    if (match) {
+      for (let i = 1; i < match.length; i++) {
+        if (match[i]) {
+          const name = match[i].trim().replace(/[-_]/g, ' ');
+          if (isValidName(name) && !names.includes(name)) {
+            names.push(name);
+          }
+        }
+      }
+    }
+  }
+
+  // Additional extraction for common separators
+  const separatorPatterns = [
+    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s*[,&]\s*([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/g,
+    /([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)\s+and\s+([A-Z][a-z]+(?:\s+[A-Z][a-z]+)*)/gi
+  ];
+
+  for (const pattern of separatorPatterns) {
+    let match;
+    while ((match = pattern.exec(title)) !== null) {
+      for (let i = 1; i < match.length; i++) {
+        if (match[i]) {
+          const name = match[i].trim();
+          if (isValidName(name) && !names.includes(name)) {
+            names.push(name);
+          }
+        }
+      }
+    }
+  }
+
+  return names;
+}
+
+/**
+ * Validate if a string looks like a person's name
+ */
+function isValidName(name: string): boolean {
+  if (!name || name.length < 2 || name.length > 50) return false;
+
+  // Must start with capital letter
+  if (!/^[A-Z]/.test(name)) return false;
+
+  // Should contain only letters, spaces, hyphens, and apostrophes
+  if (!/^[A-Za-z\s\-']+$/.test(name)) return false;
+
+  // Exclude common words that might be mistaken for names
+  const excludeWords = new Set([
+    'Call', 'Meeting', 'Interview', 'Conversation', 'Sales', 'Support', 'Customer',
+    'Client', 'User', 'Demo', 'Presentation', 'Training', 'Session', 'Review',
+    'Team', 'Group', 'Department', 'Company', 'Organization', 'Business'
+  ]);
+
+  const words = name.split(/\s+/);
+  for (const word of words) {
+    if (excludeWords.has(word)) return false;
+  }
+
+  return true;
 }
 
 Deno.serve(async (req: Request) => {
@@ -170,17 +258,25 @@ ${knownEmployees.slice(0, 20).map(name => `- ${name}`).join('\n')}
 
 INSTRUCTIONS:
 1. Identify who is the ECI employee/representative on this call
-2. Look for names mentioned in introduction, speaker labels, or conversation context
-3. Distinguish between ECI employees vs customers/prospects
-4. If multiple ECI employees are present, identify the primary one
+2. Look for these common introduction patterns:
+   - "Hi, this is [FirstName]" or "My name is [Name]"
+   - "[FirstName] from ECI" or "This is [Name] with ECI Global"
+   - "[FirstName] calling" or "[Name] here from ECI"
+   - Speaker labels like "AGENT:" or "REP:" followed by name
+3. Distinguish between ECI employees vs customers/prospects/external parties
+4. If multiple ECI employees are present, identify the primary one (most talk time)
 5. Match against known employees if possible, but also detect new names
+6. IMPORTANT: Many employees introduce themselves by FIRST NAME ONLY - capture this!
+   - If only first name detected, include it with note in reasoning
+   - Examples: "Hi, this is Sarah", "Michael calling from ECI"
 
 Return a JSON response with:
 {
-  "employee_name": "Full name of the primary ECI employee" or null,
+  "employee_name": "Full name or first name of the primary ECI employee" or null,
   "confidence": 0.0 to 1.0 confidence score,
-  "reasoning": "Brief explanation of how you identified this employee",
-  "detected_names": ["list", "of", "all", "employee", "names", "detected"]
+  "reasoning": "Brief explanation of how you identified this employee (mention if first name only)",
+  "detected_names": ["list", "of", "all", "employee", "names", "detected"],
+  "name_type": "full_name" or "first_name_only" or "unclear"
 }
 
 Focus on accuracy - if unsure, set confidence low and explain why.`;
@@ -250,6 +346,45 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
       reasoning: analysis.reasoning
     });
 
+    // ENHANCEMENT: If AI confidence is low or no employee detected, try extracting from recording title
+    if ((!analysis.employee_name || analysis.confidence < 0.7) && recording.title) {
+      console.log('🏷️ Attempting to extract employee name from recording title:', recording.title);
+
+      const titleNames = extractNamesFromTitle(recording.title);
+      console.log(`📋 Found ${titleNames.length} potential names in title:`, titleNames);
+
+      if (titleNames.length > 0) {
+        // Cross-reference title names with employees table
+        for (const titleName of titleNames) {
+          const { data: titleMatches } = await supabase
+            .from('employees')
+            .select('id, first_name, last_name, employee_code')
+            .eq('status', 'active')
+            .or(`first_name.ilike.${titleName.split(' ')[0]},last_name.ilike.${titleName.split(' ').slice(-1)[0]},and(first_name.ilike.${titleName.split(' ')[0]},last_name.ilike.${titleName.split(' ').slice(-1)[0]})`);
+
+          if (titleMatches && titleMatches.length > 0) {
+            const matchedEmployee = titleMatches[0];
+            const fullName = `${matchedEmployee.first_name} ${matchedEmployee.last_name}`;
+
+            // Boost confidence if title matches an employee
+            if (!analysis.employee_name) {
+              analysis.employee_name = fullName;
+              analysis.confidence = 0.65; // Medium confidence for title-based detection
+              analysis.reasoning = `Extracted from recording title: "${recording.title}"`;
+              analysis.name_type = titleName.split(' ').length > 1 ? 'full_name' : 'first_name_only';
+              console.log(`✅ Extracted employee from title: ${fullName} (confidence: 0.65)`);
+            } else if (fullName.toLowerCase().includes(analysis.employee_name.toLowerCase())) {
+              // Title confirms AI detection - boost confidence
+              analysis.confidence = Math.min(1.0, analysis.confidence + 0.15);
+              analysis.reasoning += ` [Confirmed by title]`;
+              console.log(`✅ Title confirmed AI detection: ${analysis.employee_name} (confidence boosted to ${analysis.confidence})`);
+            }
+            break; // Use first match
+          }
+        }
+      }
+    }
+
     // Update recording with identified employee name (only if high confidence)
     if (analysis.employee_name && analysis.confidence > 0.6) {
       console.log(`💾 Updating recording with employee name: ${analysis.employee_name} (confidence: ${analysis.confidence})`);
@@ -286,23 +421,25 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
 
         // Try different name matching strategies
         let matchedEmployee = null;
+        let detectionMethod = 'exact_match'; // Track how employee was detected
 
         // Strategy 1: Exact full name match
         const { data: exactMatch } = await supabase
           .from('employees')
-          .select('id, first_name, last_name, employee_code')
+          .select('id, first_name, last_name, employee_code, department, team_id')
           .eq('status', 'active')
           .or(`and(first_name.ilike.${nameParts[0]},last_name.ilike.${nameParts.slice(1).join(' ') || nameParts[0]})`);
 
         if (exactMatch && exactMatch.length > 0) {
           matchedEmployee = exactMatch[0];
+          detectionMethod = 'exact_match';
           console.log(`✅ Found exact employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
         } else {
           // Strategy 2: Fuzzy name matching (first name + any part of last name)
           if (nameParts.length >= 2) {
             const { data: fuzzyMatch } = await supabase
               .from('employees')
-              .select('id, first_name, last_name, employee_code')
+              .select('id, first_name, last_name, employee_code, department, team_id')
               .eq('status', 'active')
               .ilike('first_name', `%${nameParts[0]}%`);
 
@@ -316,8 +453,64 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
 
               if (bestMatch) {
                 matchedEmployee = bestMatch;
+                detectionMethod = 'fuzzy_match';
                 console.log(`✅ Found fuzzy employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
               }
+            }
+          }
+
+          // Strategy 3: First name only matching (for cases like "Hi, this is Sarah")
+          if (!matchedEmployee && (nameParts.length === 1 || analysis.name_type === 'first_name_only')) {
+            const firstName = nameParts[0];
+            console.log(`🔍 Attempting first-name-only match for: ${firstName}`);
+
+            const { data: firstNameMatches } = await supabase
+              .from('employees')
+              .select('id, first_name, last_name, employee_code, department, team_id')
+              .eq('status', 'active')
+              .ilike('first_name', firstName);
+
+            if (firstNameMatches && firstNameMatches.length > 0) {
+              if (firstNameMatches.length === 1) {
+                // Unique first name - high confidence
+                matchedEmployee = firstNameMatches[0];
+                detectionMethod = 'first_name_unique';
+                console.log(`✅ Found unique first-name match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+              } else {
+                // Multiple matches - try disambiguation using context
+                console.log(`⚠️ Found ${firstNameMatches.length} employees with first name "${firstName}", attempting disambiguation...`);
+
+                // Disambiguation strategy: Check recent call history for this recording's user
+                if (recording.user_id) {
+                  const { data: recentCalls } = await supabase
+                    .from('employee_call_participation')
+                    .select('employee_id, employees!inner(id, first_name, last_name)')
+                    .in('employee_id', firstNameMatches.map(e => e.id))
+                    .order('created_at', { ascending: false })
+                    .limit(5);
+
+                  if (recentCalls && recentCalls.length > 0) {
+                    // Pick the most recently active employee with this first name
+                    matchedEmployee = firstNameMatches.find(e => e.id === recentCalls[0].employee_id) || firstNameMatches[0];
+                    detectionMethod = 'first_name_context';
+                    console.log(`✅ Selected employee via context: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (recent history)`);
+                  } else {
+                    // No recent history - pick first match but lower confidence
+                    matchedEmployee = firstNameMatches[0];
+                    detectionMethod = 'first_name_ambiguous';
+                    analysis.confidence = Math.min(analysis.confidence, 0.55); // Lower confidence for ambiguous match
+                    console.log(`⚠️ Selected first match (ambiguous): ${matchedEmployee.first_name} ${matchedEmployee.last_name} - confidence reduced`);
+                  }
+                } else {
+                  // No user_id - pick first match but lower confidence
+                  matchedEmployee = firstNameMatches[0];
+                  detectionMethod = 'first_name_ambiguous';
+                  analysis.confidence = Math.min(analysis.confidence, 0.55);
+                  console.log(`⚠️ Selected first match (no context): ${matchedEmployee.first_name} ${matchedEmployee.last_name} - confidence reduced`);
+                }
+              }
+            } else {
+              console.log(`❌ No employees found with first name: ${firstName}`);
             }
           }
         }
@@ -345,7 +538,12 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
                 talk_time_percentage: 0, // Will be calculated later if needed
                 confidence_score: analysis.confidence,
                 manually_tagged: false, // Auto-detected by AI
-                speaker_segments: null // Could be enhanced later with segment analysis
+                speaker_segments: {
+                  detection_method: detectionMethod, // Track how employee was matched
+                  name_type: analysis.name_type || 'unclear',
+                  detected_name: analysis.employee_name,
+                  reasoning: analysis.reasoning
+                } // Store detection metadata
               })
               .select()
               .single();
@@ -364,7 +562,9 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
               response.participation_created = {
                 employee_id: matchedEmployee.id,
                 employee_name: `${matchedEmployee.first_name} ${matchedEmployee.last_name}`,
-                participation_id: participationRecord.id
+                participation_id: participationRecord.id,
+                detection_method: detectionMethod,
+                confidence_score: analysis.confidence
               };
             }
           }

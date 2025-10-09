@@ -24,6 +24,7 @@ import {
 import { EmployeeService } from '@/services/employeeService';
 import type { EmployeeDetailResponse, EmployeeRecording, ScoreTrend, ManagerCoachingNote } from '@/types/employee';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
+import { EmployeeDetectionBadge } from '@/components/employee/EmployeeDetectionBadge';
 
 const EmployeeProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
@@ -270,6 +271,13 @@ const EmployeeProfile: React.FC = () => {
                         <Badge variant={recording.participation_type === 'primary' ? 'default' : 'secondary'}>
                           {recording.participation_type}
                         </Badge>
+                        <EmployeeDetectionBadge
+                          detectionMethod={recording.detection_method}
+                          confidence={recording.confidence_score}
+                          manuallyTagged={recording.manually_tagged}
+                          showTooltip={true}
+                          size="sm"
+                        />
                       </div>
                     </div>
                     <div className="text-right">

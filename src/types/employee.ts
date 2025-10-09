@@ -153,6 +153,12 @@ export interface EmployeeRecording {
   talk_time_percentage: number;
   strengths: string[];
   improvements: string[];
+  // AI Detection metadata
+  detection_method?: 'exact_match' | 'fuzzy_match' | 'first_name_unique' | 'first_name_context' | 'first_name_ambiguous';
+  confidence_score?: number;
+  manually_tagged?: boolean;
+  detected_name?: string;
+  name_type?: 'full_name' | 'first_name_only' | 'unclear';
 }
 
 export interface ScoreTrend {
