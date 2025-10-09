@@ -1270,6 +1270,7 @@ Deno.serve(async (req) => {
           filename: finalAudioFile.name,
           model: 'whisper-1',
           language: 'en',
+          prompt: "This is a sales call or customer support conversation between business professionals. Common terms: ECI Solutions, ECI, ECI Manufacturing, CRM, Outreach, follow-up, prospect, quote, order, customer service.",
           response_format: 'verbose_json',
           temperature: 0  // Deterministic output for consistent results
         });
@@ -1278,8 +1279,41 @@ Deno.serve(async (req) => {
         console.log(`✅ Transcription completed in ${transcriptionDuration}ms`);
         
         transcript = transcriptionResult.text;
-        console.log('📝 Transcript preview:', transcript.substring(0, 200) + '...');
-        
+        console.log('📝 Raw transcript preview:', transcript.substring(0, 200) + '...');
+
+        // Post-process transcript with GPT-4 for accuracy improvements
+        console.log('🔧 Post-processing transcript with GPT-4...');
+        try {
+          const correctionStartTime = Date.now();
+          const response = await chatClient.createChatCompletion({
+            messages: [
+              {
+                role: 'system',
+                content: 'You are a transcript correction assistant for business calls. Fix obvious transcription errors, improve punctuation and capitalization, and correct company/product/person names. IMPORTANT: Maintain all original spoken words and meaning. Only fix errors, do not summarize or change content. Output ONLY the corrected transcript with no additional commentary.'
+              },
+              {
+                role: 'user',
+                content: `Correct this business call transcript. Common terms to watch for: ECI Solutions, ECI, ECI Manufacturing, CRM, Outreach.\n\nTranscript:\n${transcript.substring(0, 8000)}`
+              }
+            ],
+            max_tokens: 4000,
+            temperature: 0.3
+          });
+
+          const correctedTranscript = response.choices?.[0]?.message?.content;
+          if (correctedTranscript && correctedTranscript.length > 50) {
+            transcript = correctedTranscript;
+            const correctionDuration = Date.now() - correctionStartTime;
+            console.log(`✅ Transcript corrected with GPT-4 in ${correctionDuration}ms`);
+            console.log('📝 Corrected transcript preview:', transcript.substring(0, 200) + '...');
+          } else {
+            console.warn('⚠️ GPT-4 correction produced invalid result, using raw transcript');
+          }
+        } catch (correctionError) {
+          console.warn('⚠️ GPT-4 transcript correction failed (non-critical):', correctionError);
+          console.log('📝 Using raw Whisper transcript');
+        }
+
         // Log Whisper segment data for analysis
         if (transcriptionResult.segments && transcriptionResult.segments.length > 0) {
           console.log(`🎵 Whisper provided ${transcriptionResult.segments.length} segments for timing analysis`);
@@ -1801,7 +1835,77 @@ Deno.serve(async (req) => {
         // Don't fail the entire process if training processing fails
       }
     }
-    
+
+    // Step 7: Employee scorecard generation (automatic)
+    console.log('👤 Starting automatic employee scorecard generation...');
+    try {
+      // Check if employee already extracted
+      const { data: existingParticipation } = await supabase
+        .from('employee_call_participation')
+        .select('id, employee_id')
+        .eq('recording_id', recording_id);
+
+      if (!existingParticipation || existingParticipation.length === 0) {
+        // Extract employee from transcript
+        console.log('🔍 Extracting employee name from transcript...');
+        try {
+          const { data: extractResult, error: extractError } = await supabase.functions.invoke(
+            'extract-employee-name',
+            { body: { recording_id } }
+          );
+
+          if (extractError) {
+            console.warn('⚠️ Employee extraction failed:', extractError);
+          } else if (extractResult) {
+            console.log('✅ Employee extracted successfully');
+          }
+        } catch (extractError) {
+          console.warn('⚠️ Employee extraction error (non-critical):', extractError);
+        }
+      } else {
+        console.log(`✅ Employee participation already exists (${existingParticipation.length} record(s))`);
+      }
+
+      // Generate scorecard if participation exists
+      const { data: participationCheck } = await supabase
+        .from('employee_call_participation')
+        .select('id, employee_id')
+        .eq('recording_id', recording_id);
+
+      if (participationCheck && participationCheck.length > 0) {
+        // Check if scorecard already exists
+        const { data: existingScorecards } = await supabase
+          .from('employee_scorecards')
+          .select('id')
+          .eq('recording_id', recording_id);
+
+        if (!existingScorecards || existingScorecards.length === 0) {
+          console.log('📊 Generating employee performance scorecard...');
+          try {
+            const { data: scorecardResult, error: scorecardError } = await supabase.functions.invoke(
+              'generate-employee-scorecard',
+              { body: { recording_id } }
+            );
+
+            if (scorecardError) {
+              console.warn('⚠️ Scorecard generation failed:', scorecardError);
+            } else if (scorecardResult) {
+              console.log('✅ Employee scorecard generated successfully:', scorecardResult.scorecards_created, 'scorecard(s)');
+            }
+          } catch (scorecardError) {
+            console.warn('⚠️ Scorecard generation error (non-critical):', scorecardError);
+          }
+        } else {
+          console.log(`✅ Employee scorecard already exists (${existingScorecards.length} record(s))`);
+        }
+      } else {
+        console.log('ℹ️ No employee participation records found, skipping scorecard generation');
+      }
+    } catch (employeeError) {
+      // Don't fail the entire recording if employee features fail
+      console.warn('⚠️ Employee processing failed (non-critical):', employeeError);
+    }
+
     return createSuccessResponse({
       message: summaryRateLimited 
         ? 'Recording transcribed successfully. AI features rate limited - will retry later.' 
