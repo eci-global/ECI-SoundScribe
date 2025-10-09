@@ -1,12 +1,14 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
 import {
   CheckCircle,
   AlertCircle,
   Brain,
   User,
   Users,
-  HelpCircle
+  HelpCircle,
+  Edit2
 } from 'lucide-react';
 import {
   Tooltip,
@@ -14,6 +16,8 @@ import {
   TooltipProvider,
   TooltipTrigger,
 } from "@/components/ui/tooltip";
+import { EmployeeReassignmentDialog } from './EmployeeReassignmentDialog';
+import { useAuth } from '@/hooks/useAuth';
 
 interface EmployeeDetectionBadgeProps {
   detectionMethod?: 'exact_match' | 'fuzzy_match' | 'first_name_unique' | 'first_name_context' | 'first_name_ambiguous' | 'manual' | null;
@@ -21,6 +25,17 @@ interface EmployeeDetectionBadgeProps {
   manuallyTagged?: boolean;
   showTooltip?: boolean;
   size?: 'sm' | 'md' | 'lg';
+  // For correction functionality
+  enableCorrection?: boolean;
+  participationId?: string;
+  recordingId?: string;
+  currentEmployee?: {
+    id: string;
+    name: string;
+  };
+  detectedName?: string;
+  reasoning?: string;
+  onCorrectionSuccess?: () => void;
 }
 
 export const EmployeeDetectionBadge: React.FC<EmployeeDetectionBadgeProps> = ({
@@ -28,8 +43,21 @@ export const EmployeeDetectionBadge: React.FC<EmployeeDetectionBadgeProps> = ({
   confidence,
   manuallyTagged = false,
   showTooltip = true,
-  size = 'sm'
+  size = 'sm',
+  enableCorrection = false,
+  participationId,
+  recordingId,
+  currentEmployee,
+  detectedName,
+  reasoning,
+  onCorrectionSuccess
 }) => {
+  const [showCorrectionDialog, setShowCorrectionDialog] = useState(false);
+  const { user } = useAuth();
+
+  // Check if user is admin (you may need to adjust this based on your auth system)
+  const isAdmin = user?.email?.includes('@eci') || user?.email?.includes('admin');
+  const canCorrect = enableCorrection && isAdmin && participationId && recordingId && currentEmployee;
   if (manuallyTagged) {
     const badge = (
       <Badge variant="outline" className="bg-blue-50 text-blue-700 border-blue-200">
@@ -119,28 +147,72 @@ export const EmployeeDetectionBadge: React.FC<EmployeeDetectionBadgeProps> = ({
 
   if (!showTooltip) return badge;
 
-  return (
-    <TooltipProvider>
-      <Tooltip>
-        <TooltipTrigger asChild>
-          {badge}
-        </TooltipTrigger>
-        <TooltipContent className="max-w-xs">
-          <div className="space-y-2">
-            <p className="font-semibold">Detection Method</p>
-            <p className="text-sm">{info.description}</p>
-            {confidencePercent && (
-              <p className="text-sm">
-                <strong>Confidence:</strong> {confidencePercent}%
-                {confidencePercent >= 80 && ' (High)'}
-                {confidencePercent >= 60 && confidencePercent < 80 && ' (Medium)'}
-                {confidencePercent < 60 && ' (Low - may need verification)'}
-              </p>
-            )}
+  const tooltipContent = (
+    <div className="space-y-2">
+      <p className="font-semibold">Detection Method</p>
+      <p className="text-sm">{info.description}</p>
+      {confidencePercent && (
+        <p className="text-sm">
+          <strong>Confidence:</strong> {confidencePercent}%
+          {confidencePercent >= 80 && ' (High)'}
+          {confidencePercent >= 60 && confidencePercent < 80 && ' (Medium)'}
+          {confidencePercent < 60 && ' (Low - may need verification)'}
+        </p>
+      )}
+      {canCorrect && (
+        <>
+          <div className="border-t pt-2 mt-2">
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              onClick={(e) => {
+                e.stopPropagation();
+                setShowCorrectionDialog(true);
+              }}
+            >
+              <Edit2 className="h-3 w-3 mr-1" />
+              Correct Employee
+            </Button>
           </div>
-        </TooltipContent>
-      </Tooltip>
-    </TooltipProvider>
+        </>
+      )}
+    </div>
+  );
+
+  return (
+    <>
+      <TooltipProvider>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            {badge}
+          </TooltipTrigger>
+          <TooltipContent className="max-w-xs">
+            {tooltipContent}
+          </TooltipContent>
+        </Tooltip>
+      </TooltipProvider>
+
+      {canCorrect && showCorrectionDialog && (
+        <EmployeeReassignmentDialog
+          open={showCorrectionDialog}
+          onOpenChange={setShowCorrectionDialog}
+          participationId={participationId!}
+          recordingId={recordingId!}
+          currentEmployee={currentEmployee!}
+          detectionInfo={{
+            method: detectionMethod || undefined,
+            confidence: confidence,
+            reasoning: reasoning,
+            detected_name: detectedName
+          }}
+          onSuccess={() => {
+            setShowCorrectionDialog(false);
+            onCorrectionSuccess?.();
+          }}
+        />
+      )}
+    </>
   );
 };
 

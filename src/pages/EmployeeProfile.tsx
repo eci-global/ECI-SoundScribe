@@ -277,6 +277,15 @@ const EmployeeProfile: React.FC = () => {
                           manuallyTagged={recording.manually_tagged}
                           showTooltip={true}
                           size="sm"
+                          enableCorrection={true}
+                          participationId={recording.id}
+                          recordingId={recording.id}
+                          currentEmployee={{
+                            id: employee.id,
+                            name: `${employee.first_name} ${employee.last_name}`
+                          }}
+                          detectedName={recording.detected_name}
+                          onCorrectionSuccess={loadEmployeeData}
                         />
                       </div>
                     </div>
