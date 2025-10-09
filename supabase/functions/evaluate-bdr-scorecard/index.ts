@@ -140,7 +140,7 @@ class AzureOpenAIChatClient {
     this.endpoint = Deno.env.get('AZURE_OPENAI_ENDPOINT') || '';
     this.apiKey = Deno.env.get('AZURE_OPENAI_API_KEY') || '';
     this.apiVersion = Deno.env.get('AZURE_OPENAI_API_VERSION') || '2024-10-01-preview';
-    this.deploymentName = Deno.env.get('AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT') || 'gpt-4o-mini';
+    this.deploymentName = Deno.env.get('AZURE_OPENAI_GPT4O_DEPLOYMENT') || 'gpt-4o';
   }
 
   async createChatCompletion(request: ChatCompletionRequest) {
@@ -693,8 +693,8 @@ CRITICAL: Use the 0-4 scoring scale only. Calculate overallScore as the average 
 
   try {
     console.log('🎯 Generating BDR scorecard evaluation...');
-    
-    const deploymentName = Deno.env.get('AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT') || 'gpt-4o-mini';
+
+    const deploymentName = Deno.env.get('AZURE_OPENAI_GPT4O_DEPLOYMENT') || 'gpt-4o';
     const messages = [
       {
         role: 'system' as const,
@@ -1235,7 +1235,7 @@ serve(async (req) => {
       improvement_areas: evaluation.improvements || [],
       strengths: evaluation.strengths || [],
       coaching_notes: evaluation.coachingNotes,
-      ai_model_version: 'gpt-4o-mini',
+      ai_model_version: 'gpt-4o',
       processing_duration_ms: processingTime,
       confidence_score: evaluation.confidenceScore || 0.8,
       evaluated_at: new Date().toISOString()

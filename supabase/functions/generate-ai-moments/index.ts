@@ -36,10 +36,10 @@ async function logUsage(
     // Calculate cost (Azure OpenAI pricing)
     const pricing = {
       'gpt-4o-mini-2024-07-18': { input: 0.00015, output: 0.0006 },
-      'gpt-4o': { input: 0.005, output: 0.015 }
+      'gpt-4o': { input: 0.0025, output: 0.01 }
     };
-    
-    const modelPricing = pricing[model as keyof typeof pricing] || pricing['gpt-4o-mini-2024-07-18'];
+
+    const modelPricing = pricing[model as keyof typeof pricing] || pricing['gpt-4o'];
     const cost = (promptTokens / 1000) * modelPricing.input + (completionTokens / 1000) * modelPricing.output;
 
     await supabase
@@ -237,7 +237,7 @@ Deno.serve(async (req) => {
       // Log usage
       const promptTokens = Math.ceil((messages[0].content.length + messages[1].content.length) / 4);
       const completionTokens = Math.ceil(momentsText.length / 4);
-      await logUsage(supabase, 'system', recording_id, 'gpt-4o-mini-2024-07-18', promptTokens, completionTokens, 'generate-ai-moments');
+      await logUsage(supabase, 'system', recording_id, 'gpt-4o', promptTokens, completionTokens, 'generate-ai-moments');
 
       console.log(`Successfully generated and saved ${validMoments.length} AI moments for recording ${recording_id} using Azure OpenAI`);
 
@@ -246,7 +246,7 @@ Deno.serve(async (req) => {
         moments: validMoments,
         count: validMoments.length,
         provider: 'azure-openai',
-        model: 'gpt-4o-mini-2024-07-18',
+        model: 'gpt-4o',
         usage: {
           prompt_tokens: promptTokens,
           completion_tokens: completionTokens,

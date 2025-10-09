@@ -330,7 +330,7 @@ Return a JSON response with:
 
 Focus on accuracy - if unsure, set confidence low and explain why.`;
 
-    const deployment = Deno.env.get('AZURE_OPENAI_GPT4O_MINI_DEPLOYMENT') || 'gpt-4o-mini';
+    const deployment = Deno.env.get('AZURE_OPENAI_GPT4O_DEPLOYMENT') || 'gpt-4o';
     console.log('🤖 Sending transcript to AI for employee identification...', {
       deployment,
       transcriptLength: recording.transcript.length,
@@ -435,7 +435,7 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
     }
 
     // Update recording with identified employee name (only if high confidence)
-    if (analysis.employee_name && analysis.confidence > 0.6) {
+    if (analysis.employee_name) {
       console.log(`💾 Updating recording with employee name: ${analysis.employee_name} (confidence: ${analysis.confidence})`);
 
       const { error: updateError } = await supabase
@@ -592,6 +592,12 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
         }
 
         if (matchedEmployee) {
+          // Derive a confidence score for participation based on detection method
+          let confidenceForParticipation = typeof analysis.confidence === 'number' ? analysis.confidence : 0.6;
+          if (detectionMethod === 'exact_match') confidenceForParticipation = 0.95;
+          else if (detectionMethod === 'fuzzy_match') confidenceForParticipation = Math.max(confidenceForParticipation, 0.75);
+          else if (detectionMethod === 'first_name_unique' || detectionMethod === 'first_name_context') confidenceForParticipation = Math.max(confidenceForParticipation, 0.70);
+          else if (detectionMethod === 'first_name_ambiguous') confidenceForParticipation = Math.min(confidenceForParticipation || 0.55, 0.60);
           // Check if participation record already exists
           const { data: existingParticipation } = await supabase
             .from('employee_call_participation')
@@ -612,7 +618,7 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
                 participation_type: 'primary', // AI detected as primary speaker
                 talk_time_seconds: 0, // Will be calculated later if needed
                 talk_time_percentage: 0, // Will be calculated later if needed
-                confidence_score: analysis.confidence,
+                confidence_score: confidenceForParticipation,
                 manually_tagged: false, // Auto-detected by AI
                 speaker_segments: {
                   detection_method: detectionMethod, // Track how employee was matched
@@ -640,7 +646,7 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
                 employee_name: `${matchedEmployee.first_name} ${matchedEmployee.last_name}`,
                 participation_id: participationRecord.id,
                 detection_method: detectionMethod,
-                confidence_score: analysis.confidence
+                confidence_score: confidenceForParticipation
               };
             }
           }
