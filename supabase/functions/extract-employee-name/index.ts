@@ -275,6 +275,122 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
       console.log(`⚠️ Skipping database update - low confidence (${analysis.confidence}) or no employee name identified`);
     }
 
+    // NEW: Create employee_call_participation record to bridge AI detection with employee profiles
+    if (analysis.employee_name && analysis.confidence > 0.6) {
+      console.log(`🔗 Creating employee participation record for: ${analysis.employee_name}`);
+
+      try {
+        // Match AI-detected name against employees table to get UUID
+        const employeeName = analysis.employee_name.trim();
+        const nameParts = employeeName.split(' ');
+
+        // Try different name matching strategies
+        let matchedEmployee = null;
+
+        // Strategy 1: Exact full name match
+        const { data: exactMatch } = await supabase
+          .from('employees')
+          .select('id, first_name, last_name, employee_code')
+          .eq('status', 'active')
+          .or(`and(first_name.ilike.${nameParts[0]},last_name.ilike.${nameParts.slice(1).join(' ') || nameParts[0]})`);
+
+        if (exactMatch && exactMatch.length > 0) {
+          matchedEmployee = exactMatch[0];
+          console.log(`✅ Found exact employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+        } else {
+          // Strategy 2: Fuzzy name matching (first name + any part of last name)
+          if (nameParts.length >= 2) {
+            const { data: fuzzyMatch } = await supabase
+              .from('employees')
+              .select('id, first_name, last_name, employee_code')
+              .eq('status', 'active')
+              .ilike('first_name', `%${nameParts[0]}%`);
+
+            if (fuzzyMatch && fuzzyMatch.length > 0) {
+              // Find best match based on last name similarity
+              const bestMatch = fuzzyMatch.find(emp =>
+                nameParts.slice(1).some(part =>
+                  emp.last_name.toLowerCase().includes(part.toLowerCase())
+                )
+              );
+
+              if (bestMatch) {
+                matchedEmployee = bestMatch;
+                console.log(`✅ Found fuzzy employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+              }
+            }
+          }
+        }
+
+        if (matchedEmployee) {
+          // Check if participation record already exists
+          const { data: existingParticipation } = await supabase
+            .from('employee_call_participation')
+            .select('id')
+            .eq('recording_id', recording_id)
+            .eq('employee_id', matchedEmployee.id)
+            .single();
+
+          if (existingParticipation) {
+            console.log(`ℹ️ Participation record already exists for ${matchedEmployee.first_name} ${matchedEmployee.last_name}`);
+          } else {
+            // Create new participation record
+            const { data: participationRecord, error: participationError } = await supabase
+              .from('employee_call_participation')
+              .insert({
+                recording_id: recording_id,
+                employee_id: matchedEmployee.id,
+                participation_type: 'primary', // AI detected as primary speaker
+                talk_time_seconds: 0, // Will be calculated later if needed
+                talk_time_percentage: 0, // Will be calculated later if needed
+                confidence_score: analysis.confidence,
+                manually_tagged: false, // Auto-detected by AI
+                speaker_segments: null // Could be enhanced later with segment analysis
+              })
+              .select()
+              .single();
+
+            if (participationError) {
+              console.error('❌ Failed to create participation record:', {
+                error: participationError,
+                message: participationError.message,
+                employee_id: matchedEmployee.id,
+                recording_id: recording_id
+              });
+            } else {
+              console.log(`✅ Successfully created participation record for ${matchedEmployee.first_name} ${matchedEmployee.last_name}`);
+
+              // Update the response to include participation info
+              response.participation_created = {
+                employee_id: matchedEmployee.id,
+                employee_name: `${matchedEmployee.first_name} ${matchedEmployee.last_name}`,
+                participation_id: participationRecord.id
+              };
+            }
+          }
+        } else {
+          console.log(`⚠️ Could not match AI-detected name "${analysis.employee_name}" to any employee in database`);
+
+          // Log for manual review - could be a new employee or name variation
+          response.unmatched_employee = {
+            detected_name: analysis.employee_name,
+            confidence: analysis.confidence,
+            suggestion: 'Consider adding this employee to the database or check for name variations'
+          };
+        }
+
+      } catch (participationError) {
+        console.error('❌ Error creating participation record:', {
+          error: participationError.message,
+          stack: participationError.stack,
+          employee_name: analysis.employee_name
+        });
+
+        // Don't fail the entire function if participation creation fails
+        response.participation_error = `Failed to create participation record: ${participationError.message}`;
+      }
+    }
+
     // Try to assign recording to appropriate team based on employee (only if team tables exist)
     if (teamMembers && analysis.employee_name) {
       try {
@@ -306,7 +422,7 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
 
     console.log('🏁 Function execution completed successfully');
 
-    const response = {
+    const response: any = {
       recording_id,
       analysis,
       updated: analysis.employee_name && analysis.confidence > 0.6

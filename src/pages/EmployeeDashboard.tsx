@@ -20,7 +20,7 @@ import {
   Filter
 } from 'lucide-react';
 import { EmployeeService } from '@/services/employeeService';
-import type { TeamPerformanceReport, EmployeeDashboardData } from '@/types/employee';
+import type { Team, Employee } from '@/types/employee';
 import { 
   LineChart, 
   Line, 
@@ -41,8 +41,13 @@ import {
 const EmployeeDashboard: React.FC = () => {
   const [selectedTeam, setSelectedTeam] = useState<string>('all');
   const [timeRange, setTimeRange] = useState<'7d' | '30d' | '90d' | '1y'>('30d');
-  const [teamReports, setTeamReports] = useState<TeamPerformanceReport[]>([]);
   const [loading, setLoading] = useState(true);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [orgStats, setOrgStats] = useState<{ totalEmployees: number; averageScore: number; totalCalls: number; coachingSessions: number }>({ totalEmployees: 0, averageScore: 0, totalCalls: 0, coachingSessions: 0 });
+  const [performanceTrend, setPerformanceTrend] = useState<Array<{ name: string; score: number; calls: number }>>([]);
+  const [teamComparison, setTeamComparison] = useState<Array<{ name: string; averageScore: number; totalCalls: number; memberCount: number }>>([]);
+  const [topPerformers, setTopPerformers] = useState<Array<{ employee: Employee; score: number; calls: number; improvement: number }>>([]);
+  const [improvementAreas, setImprovementAreas] = useState<Array<{ area: string; count: number; trend: 'improving' | 'declining' | 'stable' }>>([]);
 
   useEffect(() => {
     loadDashboardData();
@@ -51,47 +56,50 @@ const EmployeeDashboard: React.FC = () => {
   const loadDashboardData = async () => {
     try {
       setLoading(true);
-      // Load team performance reports
-      const reports = await Promise.all([
-        // This would be replaced with actual team IDs from your system
-        EmployeeService.getTeamPerformanceReport('team-1'),
-        EmployeeService.getTeamPerformanceReport('team-2'),
-        EmployeeService.getTeamPerformanceReport('team-3')
-      ]);
-      setTeamReports(reports);
+      const teamList = await EmployeeService.listTeams();
+      setTeams(teamList);
+      if (selectedTeam === 'all') {
+        const [stats, trend, comparison, top, improvements] = await Promise.all([
+          EmployeeService.getOrgStats(timeRange),
+          EmployeeService.getOrgPerformanceTrend(timeRange),
+          EmployeeService.getTeamComparison(timeRange),
+          EmployeeService.getTopPerformers(timeRange, 5),
+          EmployeeService.getCommonImprovementAreas(timeRange, 5),
+        ]);
+        setOrgStats(stats);
+        setPerformanceTrend(trend.map(d => ({ name: d.date, score: d.score, calls: d.calls })));
+        setTeamComparison(comparison);
+        setTopPerformers(top);
+        setImprovementAreas(improvements);
+      } else {
+        const report = await EmployeeService.getTeamPerformanceReport(selectedTeam);
+        setOrgStats({
+          totalEmployees: report.employees.length,
+          averageScore: report.team_metrics.average_score,
+          totalCalls: report.team_metrics.total_calls,
+          coachingSessions: 0,
+        });
+        setPerformanceTrend([]);
+        setTeamComparison([{ name: report.team.name, averageScore: report.team_metrics.average_score, totalCalls: report.team_metrics.total_calls, memberCount: report.employees.length }]);
+        const top = report.individual_performance
+          .sort((a, b) => b.performance_summary.current_score - a.performance_summary.current_score)
+          .slice(0, 5)
+          .map(ip => ({ employee: ip.employee, score: ip.performance_summary.current_score, calls: ip.performance_summary.total_calls, improvement: ip.performance_summary.score_trend }));
+        setTopPerformers(top);
+        setImprovementAreas(report.team_metrics.improvement_areas.map(area => ({ area, count: 0, trend: 'stable' as const })));
+      }
     } catch (error) {
       console.error('Failed to load dashboard data:', error);
+      setTeams([]);
+      setOrgStats({ totalEmployees: 0, averageScore: 0, totalCalls: 0, coachingSessions: 0 });
+      setPerformanceTrend([]);
+      setTeamComparison([]);
+      setTopPerformers([]);
+      setImprovementAreas([]);
     } finally {
       setLoading(false);
     }
   };
-
-  // Mock data for demonstration
-  const mockPerformanceData = [
-    { name: 'Week 1', score: 3.2, calls: 12 },
-    { name: 'Week 2', score: 3.5, calls: 15 },
-    { name: 'Week 3', score: 3.8, calls: 18 },
-    { name: 'Week 4', score: 4.1, calls: 20 },
-  ];
-
-  const mockTeamComparison = [
-    { name: 'Sales Team', averageScore: 3.8, totalCalls: 156 },
-    { name: 'BDR Team', averageScore: 3.5, totalCalls: 203 },
-    { name: 'Support Team', averageScore: 4.2, totalCalls: 89 },
-  ];
-
-  const mockTopPerformers = [
-    { name: 'Sarah Johnson', score: 4.5, calls: 25, improvement: 0.8 },
-    { name: 'Mike Davis', score: 4.3, calls: 22, improvement: 0.6 },
-    { name: 'Lisa Chen', score: 4.1, calls: 20, improvement: 0.4 },
-  ];
-
-  const mockImprovementAreas = [
-    { area: 'Discovery Questions', count: 12, trend: 'improving' },
-    { area: 'Objection Handling', count: 8, trend: 'stable' },
-    { area: 'Value Articulation', count: 15, trend: 'declining' },
-    { area: 'Talk Time Balance', count: 10, trend: 'improving' },
-  ];
 
   const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
@@ -118,9 +126,9 @@ const EmployeeDashboard: React.FC = () => {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Teams</SelectItem>
-              <SelectItem value="sales">Sales Team</SelectItem>
-              <SelectItem value="bdr">BDR Team</SelectItem>
-              <SelectItem value="support">Support Team</SelectItem>
+              {teams.map(team => (
+                <SelectItem key={team.id} value={team.id}>{team.name}</SelectItem>
+              ))}
             </SelectContent>
           </Select>
           <Select value={timeRange} onValueChange={setTimeRange}>
@@ -149,7 +157,7 @@ const EmployeeDashboard: React.FC = () => {
             <Users className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">24</div>
+            <div className="text-2xl font-bold">{orgStats.totalEmployees}</div>
             <p className="text-xs text-muted-foreground">
               +2 from last month
             </p>
@@ -162,7 +170,7 @@ const EmployeeDashboard: React.FC = () => {
             <BarChart3 className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">3.7</div>
+            <div className="text-2xl font-bold">{orgStats.averageScore.toFixed(1)}</div>
             <p className="text-xs text-muted-foreground">
               <TrendingUp className="inline h-3 w-3 mr-1" />
               +0.3 from last month
@@ -176,7 +184,7 @@ const EmployeeDashboard: React.FC = () => {
             <Calendar className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">448</div>
+            <div className="text-2xl font-bold">{orgStats.totalCalls}</div>
             <p className="text-xs text-muted-foreground">
               +12% from last month
             </p>
@@ -189,7 +197,7 @@ const EmployeeDashboard: React.FC = () => {
             <MessageSquare className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">89</div>
+            <div className="text-2xl font-bold">{orgStats.coachingSessions}</div>
             <p className="text-xs text-muted-foreground">
               +8 this week
             </p>
@@ -216,21 +224,25 @@ const EmployeeDashboard: React.FC = () => {
                 <CardDescription>Average scores over time</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <AreaChart data={mockPerformanceData}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[0, 5]} />
-                    <Tooltip />
-                    <Area 
-                      type="monotone" 
-                      dataKey="score" 
-                      stroke="#2563eb" 
-                      fill="#2563eb"
-                      fillOpacity={0.2}
-                    />
-                  </AreaChart>
-                </ResponsiveContainer>
+                {performanceTrend.length === 0 ? (
+                  <div className="text-sm text-gray-500">No trend data for the selected period.</div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <AreaChart data={performanceTrend}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis domain={[0, 5]} />
+                      <Tooltip />
+                      <Area 
+                        type="monotone" 
+                        dataKey="score" 
+                        stroke="#2563eb" 
+                        fill="#2563eb"
+                        fillOpacity={0.2}
+                      />
+                    </AreaChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
 
@@ -241,15 +253,19 @@ const EmployeeDashboard: React.FC = () => {
                 <CardDescription>Average scores by team</CardDescription>
               </CardHeader>
               <CardContent>
-                <ResponsiveContainer width="100%" height={300}>
-                  <BarChart data={mockTeamComparison}>
-                    <CartesianGrid strokeDasharray="3 3" />
-                    <XAxis dataKey="name" />
-                    <YAxis domain={[0, 5]} />
-                    <Tooltip />
-                    <Bar dataKey="averageScore" fill="#2563eb" />
-                  </BarChart>
-                </ResponsiveContainer>
+                {teamComparison.length === 0 ? (
+                  <div className="text-sm text-gray-500">No team comparison data available.</div>
+                ) : (
+                  <ResponsiveContainer width="100%" height={300}>
+                    <BarChart data={teamComparison}>
+                      <CartesianGrid strokeDasharray="3 3" />
+                      <XAxis dataKey="name" />
+                      <YAxis domain={[0, 5]} />
+                      <Tooltip />
+                      <Bar dataKey="averageScore" fill="#2563eb" />
+                    </BarChart>
+                  </ResponsiveContainer>
+                )}
               </CardContent>
             </Card>
           </div>
@@ -262,14 +278,17 @@ const EmployeeDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
-                {mockTopPerformers.map((performer, index) => (
+                {topPerformers.length === 0 && (
+                  <div className="text-sm text-gray-500">No top performers for the selected period.</div>
+                )}
+                {topPerformers.map((performer, index) => (
                   <div key={index} className="flex items-center justify-between p-4 border rounded-lg">
                     <div className="flex items-center space-x-4">
                       <div className="flex items-center justify-center w-8 h-8 bg-blue-100 text-blue-600 rounded-full font-semibold">
                         {index + 1}
                       </div>
                       <div>
-                        <h4 className="font-medium">{performer.name}</h4>
+                        <h4 className="font-medium">{performer.employee.first_name} {performer.employee.last_name}</h4>
                         <p className="text-sm text-gray-600">{performer.calls} calls</p>
                       </div>
                     </div>
@@ -303,12 +322,7 @@ const EmployeeDashboard: React.FC = () => {
                 <ResponsiveContainer width="100%" height={300}>
                   <PieChart>
                     <Pie
-                      data={[
-                        { name: 'Excellent (4.0+)', value: 8 },
-                        { name: 'Good (3.0-3.9)', value: 12 },
-                        { name: 'Average (2.0-2.9)', value: 3 },
-                        { name: 'Needs Improvement (<2.0)', value: 1 }
-                      ]}
+                      data={teamComparison.map(t => ({ name: t.name, value: Math.max(t.averageScore, 0) }))}
                       cx="50%"
                       cy="50%"
                       labelLine={false}
@@ -317,12 +331,7 @@ const EmployeeDashboard: React.FC = () => {
                       fill="#8884d8"
                       dataKey="value"
                     >
-                      {[
-                        { name: 'Excellent (4.0+)', value: 8 },
-                        { name: 'Good (3.0-3.9)', value: 12 },
-                        { name: 'Average (2.0-2.9)', value: 3 },
-                        { name: 'Needs Improvement (<2.0)', value: 1 }
-                      ].map((entry, index) => (
+                      {teamComparison.map((entry, index) => (
                         <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
                       ))}
                     </Pie>
@@ -340,7 +349,7 @@ const EmployeeDashboard: React.FC = () => {
               </CardHeader>
               <CardContent>
                 <div className="space-y-4">
-                  {mockImprovementAreas.map((area, index) => (
+                  {improvementAreas.map((area, index) => (
                     <div key={index} className="flex items-center justify-between">
                       <div className="flex items-center space-x-2">
                         <Target className="h-4 w-4 text-gray-400" />
@@ -412,7 +421,7 @@ const EmployeeDashboard: React.FC = () => {
             </CardHeader>
             <CardContent>
               <ResponsiveContainer width="100%" height={300}>
-                <LineChart data={mockPerformanceData}>
+                <LineChart data={performanceTrend}>
                   <CartesianGrid strokeDasharray="3 3" />
                   <XAxis dataKey="name" />
                   <YAxis />
@@ -427,7 +436,7 @@ const EmployeeDashboard: React.FC = () => {
         {/* Teams Tab */}
         <TabsContent value="teams" className="space-y-6">
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {mockTeamComparison.map((team, index) => (
+            {teamComparison.map((team, index) => (
               <Card key={index}>
                 <CardHeader>
                   <CardTitle className="flex items-center space-x-2">
@@ -439,7 +448,7 @@ const EmployeeDashboard: React.FC = () => {
                   <div className="space-y-4">
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Average Score</span>
-                      <span className="font-semibold">{team.averageScore}</span>
+                      <span className="font-semibold">{team.averageScore.toFixed(1)}</span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Total Calls</span>
@@ -447,7 +456,7 @@ const EmployeeDashboard: React.FC = () => {
                     </div>
                     <div className="flex justify-between">
                       <span className="text-sm text-gray-600">Team Size</span>
-                      <span className="font-semibold">8 members</span>
+                      <span className="font-semibold">{team.memberCount} members</span>
                     </div>
                     <Button variant="outline" size="sm" className="w-full">
                       View Team Details

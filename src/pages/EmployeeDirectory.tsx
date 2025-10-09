@@ -55,14 +55,6 @@ const EmployeeDirectory: React.FC = () => {
 
   const handleSearch = (term: string) => {
     setSearchTerm(term);
-    // Filter employees by search term
-    const filtered = employees.filter(employee => 
-      `${employee.employee.first_name} ${employee.employee.last_name}`.toLowerCase().includes(term.toLowerCase()) ||
-      employee.employee.email.toLowerCase().includes(term.toLowerCase()) ||
-      employee.employee.role?.toLowerCase().includes(term.toLowerCase()) ||
-      employee.employee.department?.toLowerCase().includes(term.toLowerCase())
-    );
-    setEmployees(filtered);
   };
 
   const handleFilterChange = (key: keyof EmployeeSearchFilters, value: any) => {
@@ -90,7 +82,13 @@ const EmployeeDirectory: React.FC = () => {
     return 'text-gray-600';
   };
 
-  const sortedEmployees = [...employees].sort((a, b) => {
+  const filteredEmployees = employees.filter(employee => {
+    if (!searchTerm) return true;
+    const hay = `${employee.employee.first_name} ${employee.employee.last_name} ${employee.employee.email} ${employee.employee.role || ''} ${employee.employee.department || ''}`.toLowerCase();
+    return hay.includes(searchTerm.toLowerCase());
+  });
+
+  const sortedEmployees = [...filteredEmployees].sort((a, b) => {
     switch (sortBy) {
       case 'score':
         return b.performance_summary.current_score - a.performance_summary.current_score;
@@ -213,7 +211,7 @@ const EmployeeDirectory: React.FC = () => {
             <Card 
               key={employeeData.employee.id} 
               className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate(`/employees/${employeeData.employee.id}`)}
+              onClick={() => navigate(`/employees/profile/${employeeData.employee.id}`)}
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
@@ -283,7 +281,7 @@ const EmployeeDirectory: React.FC = () => {
             <Card 
               key={employeeData.employee.id}
               className="cursor-pointer hover:shadow-md transition-shadow"
-              onClick={() => navigate(`/employees/${employeeData.employee.id}`)}
+              onClick={() => navigate(`/employees/profile/${employeeData.employee.id}`)}
             >
               <CardContent className="p-6">
                 <div className="flex items-center justify-between">

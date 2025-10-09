@@ -26,22 +26,22 @@ import type { EmployeeDetailResponse, EmployeeRecording, ScoreTrend, ManagerCoac
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, BarChart, Bar } from 'recharts';
 
 const EmployeeProfile: React.FC = () => {
-  const { employeeId } = useParams<{ employeeId: string }>();
+  const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState<EmployeeDetailResponse | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (employeeId) {
+    if (id) {
       loadEmployeeData();
     }
-  }, [employeeId]);
+  }, [id]);
 
   const loadEmployeeData = async () => {
     try {
       setLoading(true);
-      const data = await EmployeeService.getEmployeeById(employeeId!);
+      const data = await EmployeeService.getEmployeeById(id!);
       setEmployeeData(data);
     } catch (err) {
       setError(err instanceof Error ? err.message : 'Failed to load employee data');

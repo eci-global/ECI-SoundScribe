@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -35,6 +36,7 @@ import EmployeeScorecardManager from './EmployeeScorecardManager';
 import type { Employee, Team, EmployeeSearchFilters } from '@/types/employee';
 
 const EmployeeManagement: React.FC = () => {
+  const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState<'directory' | 'dashboard' | 'profile' | 'settings'>('directory');
   const [selectedEmployee, setSelectedEmployee] = useState<Employee | null>(null);
   const [teams, setTeams] = useState<Team[]>([]);
@@ -116,7 +118,7 @@ const EmployeeManagement: React.FC = () => {
 
   const handleEmployeeSelect = (employee: Employee) => {
     setSelectedEmployee(employee);
-    setActiveTab('profile');
+    navigate(`/employees/profile/${employee.id}`);
   };
 
   const renderTabContent = () => {
