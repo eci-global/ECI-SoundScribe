@@ -5,16 +5,17 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
+import { AlertDialog, AlertDialogAction, AlertDialogCancel, AlertDialogContent, AlertDialogDescription, AlertDialogFooter, AlertDialogHeader, AlertDialogTitle } from '@/components/ui/alert-dialog';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Textarea } from '@/components/ui/textarea';
-import { 
-  Users, 
-  UserPlus, 
-  Search, 
-  Filter, 
-  BarChart3, 
+import {
+  Users,
+  UserPlus,
+  Search,
+  Filter,
+  BarChart3,
   MessageSquare,
   Target,
   Star,
@@ -24,7 +25,8 @@ import {
   Volume2,
   Settings,
   Download,
-  Upload
+  Upload,
+  Trash2
 } from 'lucide-react';
 import { EmployeeService } from '@/services/employeeService';
 import { supabase } from '@/integrations/supabase/client';
@@ -45,6 +47,8 @@ const EmployeeManagement: React.FC = () => {
   const [newEmployee, setNewEmployee] = useState<Partial<Employee>>({});
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [employeeToDelete, setEmployeeToDelete] = useState<Employee | null>(null);
 
   useEffect(() => {
     loadTeams();
@@ -79,23 +83,23 @@ const EmployeeManagement: React.FC = () => {
       setLoading(true);
       setError(null);
       setSuccess(null);
-      
+
       // Validate required fields
       if (!newEmployee.first_name || !newEmployee.last_name || !newEmployee.email) {
         setError('Please fill in all required fields (First Name, Last Name, Email)');
         return;
       }
-      
+
       const employee = await EmployeeService.createEmployee({
         ...newEmployee,
         status: 'active',
         created_at: new Date().toISOString(),
         updated_at: new Date().toISOString()
       });
-      
+
       setSuccess(`Employee ${employee.first_name} ${employee.last_name} created successfully!`);
       setNewEmployee({});
-      
+
       // Close dialog after a short delay
       setTimeout(() => {
         setShowAddEmployee(false);
@@ -103,7 +107,7 @@ const EmployeeManagement: React.FC = () => {
         // Refresh the directory
         window.location.reload();
       }, 1500);
-      
+
     } catch (error) {
       console.error('Failed to create employee:', error);
       if (error instanceof Error) {
@@ -116,15 +120,57 @@ const EmployeeManagement: React.FC = () => {
     }
   };
 
+  const handleDeleteEmployee = async () => {
+    if (!employeeToDelete) return;
+
+    try {
+      setLoading(true);
+      setError(null);
+
+      await EmployeeService.deleteEmployee(employeeToDelete.id);
+
+      setSuccess(`Employee ${employeeToDelete.first_name} ${employeeToDelete.last_name} deleted successfully!`);
+      setShowDeleteConfirm(false);
+      setEmployeeToDelete(null);
+
+      // If we're viewing the deleted employee's profile, navigate away
+      if (selectedEmployee?.id === employeeToDelete.id) {
+        setSelectedEmployee(null);
+        setActiveTab('directory');
+      }
+
+      // Refresh the directory after a short delay
+      setTimeout(() => {
+        setSuccess(null);
+        window.location.reload();
+      }, 1500);
+
+    } catch (error) {
+      console.error('Failed to delete employee:', error);
+      if (error instanceof Error) {
+        setError(`Failed to delete employee: ${error.message}`);
+      } else {
+        setError('Failed to delete employee. Please try again.');
+      }
+    } finally {
+      setLoading(false);
+    }
+  };
+
   const handleEmployeeSelect = (employee: Employee) => {
     setSelectedEmployee(employee);
     navigate(`/employees/profile/${employee.id}`);
   };
 
+  const handleDeleteClick = (employee: Employee) => {
+    setEmployeeToDelete(employee);
+    setShowDeleteConfirm(true);
+  };
+
   const renderTabContent = () => {
     switch (activeTab) {
       case 'directory':
-        return <EmployeeDirectory />;
+        return <EmployeeDirectory onDeleteEmployee={handleDeleteClick} />;
       case 'dashboard':
         return <EmployeeDashboard />;
       case 'profile':
@@ -140,12 +186,24 @@ const EmployeeManagement: React.FC = () => {
       case 'settings':
         return <EmployeeSettings />;
       default:
-        return <EmployeeDirectory />;
+        return <EmployeeDirectory onDeleteEmployee={handleDeleteClick} />;
     }
   };
 
   return (
     <div className="container mx-auto px-4 py-6">
+      {/* Success/Error Messages */}
+      {error && (
+        <div className="mb-4 bg-red-50 border border-red-200 text-red-700 px-4 py-3 rounded-md">
+          {error}
+        </div>
+      )}
+      {success && (
+        <div className="mb-4 bg-green-50 border border-green-200 text-green-700 px-4 py-3 rounded-md">
+          {success}
+        </div>
+      )}
+
       {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <div>
@@ -301,6 +359,38 @@ const EmployeeManagement: React.FC = () => {
           {renderTabContent()}
         </TabsContent>
       </Tabs>
+
+      {/* Delete Confirmation Dialog */}
+      <AlertDialog open={showDeleteConfirm} onOpenChange={setShowDeleteConfirm}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Delete Employee Profile</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to delete {employeeToDelete?.first_name} {employeeToDelete?.last_name}?
+              <br /><br />
+              <strong className="text-red-600">This action cannot be undone.</strong>
+              <br /><br />
+              This will permanently delete:
+              <ul className="list-disc pl-6 mt-2 space-y-1">
+                <li>Employee profile and personal information</li>
+                <li>All performance scorecards</li>
+                <li>Call participation records</li>
+                <li>Coaching notes and feedback</li>
+              </ul>
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel disabled={loading}>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={handleDeleteEmployee}
+              disabled={loading}
+              className="bg-red-600 hover:bg-red-700 focus:ring-red-600"
+            >
+              {loading ? 'Deleting...' : 'Delete Employee'}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </div>
   );
 };

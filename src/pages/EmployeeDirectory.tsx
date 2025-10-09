@@ -6,12 +6,12 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { 
-  Search, 
-  Filter, 
-  Users, 
-  TrendingUp, 
-  TrendingDown, 
+import {
+  Search,
+  Filter,
+  Users,
+  TrendingUp,
+  TrendingDown,
   Minus,
   BarChart3,
   MessageSquare,
@@ -19,12 +19,17 @@ import {
   Star,
   Target,
   AlertCircle,
-  CheckCircle
+  CheckCircle,
+  Trash2
 } from 'lucide-react';
 import { EmployeeService } from '@/services/employeeService';
-import type { EmployeeListResponse, EmployeeSearchResult, EmployeeSearchFilters } from '@/types/employee';
+import type { Employee, EmployeeListResponse, EmployeeSearchResult, EmployeeSearchFilters } from '@/types/employee';
 
-const EmployeeDirectory: React.FC = () => {
+interface EmployeeDirectoryProps {
+  onDeleteEmployee?: (employee: Employee) => void;
+}
+
+const EmployeeDirectory: React.FC<EmployeeDirectoryProps> = ({ onDeleteEmployee }) => {
   const navigate = useNavigate();
   const [employees, setEmployees] = useState<EmployeeSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
@@ -208,14 +213,16 @@ const EmployeeDirectory: React.FC = () => {
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {sortedEmployees.map((employeeData) => (
-            <Card 
-              key={employeeData.employee.id} 
-              className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => navigate(`/employees/profile/${employeeData.employee.id}`)}
+            <Card
+              key={employeeData.employee.id}
+              className="hover:shadow-lg transition-shadow relative"
             >
               <CardHeader>
                 <div className="flex items-center justify-between">
-                  <div>
+                  <div
+                    className="flex-1 cursor-pointer"
+                    onClick={() => navigate(`/employees/profile/${employeeData.employee.id}`)}
+                  >
                     <CardTitle className="text-lg">
                       {employeeData.employee.first_name} {employeeData.employee.last_name}
                     </CardTitle>
@@ -223,9 +230,24 @@ const EmployeeDirectory: React.FC = () => {
                       {employeeData.employee.role} • {employeeData.employee.department}
                     </CardDescription>
                   </div>
-                  <Badge variant={employeeData.employee.status === 'active' ? 'default' : 'secondary'}>
-                    {employeeData.employee.status}
-                  </Badge>
+                  <div className="flex items-center space-x-2">
+                    <Badge variant={employeeData.employee.status === 'active' ? 'default' : 'secondary'}>
+                      {employeeData.employee.status}
+                    </Badge>
+                    {onDeleteEmployee && (
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          onDeleteEmployee(employeeData.employee);
+                        }}
+                        className="h-8 w-8 p-0 hover:bg-red-50 hover:text-red-600"
+                      >
+                        <Trash2 className="h-4 w-4" />
+                      </Button>
+                    )}
+                  </div>
                 </div>
               </CardHeader>
               <CardContent>

@@ -1,4 +1,17 @@
 import { supabase } from '../integrations/supabase/client';
+
+// Cache RPC availability to avoid repeated 404 spam in dev when migrations aren't applied
+let employeeSummaryRpcAvailable: boolean | undefined;
+const isRpcNotFound = (error: any): boolean => {
+  try {
+    if (!error) return false;
+    if ((error as any).status === 404) return true;
+    const blob = `${(error as any)?.message || ''} ${(error as any)?.code || ''} ${(error as any)?.hint || ''}`.toLowerCase();
+    return blob.includes('404') || blob.includes('not found');
+  } catch {
+    return false;
+  }
+};
 import type {
   Employee,
   Team,
@@ -187,6 +200,20 @@ export class EmployeeService {
     return data;
   }
 
+  /**
+   * Delete employee
+   * Note: This will also cascade delete related records (scorecards, participation, etc.)
+   * based on database foreign key constraints
+   */
+  static async deleteEmployee(employeeId: string): Promise<void> {
+    const { error } = await supabase
+      .from('employees')
+      .delete()
+      .eq('id', employeeId);
+
+    if (error) throw error;
+  }
+
   // =============================================
   // CALL PARTICIPATION TRACKING
   // =============================================
@@ -291,16 +318,32 @@ export class EmployeeService {
    * Get employee performance summary
    */
   static async getEmployeePerformanceSummary(employeeId: string): Promise<EmployeePerformanceSummary> {
+    // If we've already detected the RPC is missing, skip calling it again
+    if (employeeSummaryRpcAvailable === false) {
+      try {
+        return await this.buildSummaryFromScorecards(employeeId);
+      } catch (e) {
+        console.warn('Fallback summary failed; returning defaults:', e);
+        return this.getDefaultPerformanceSummary();
+      }
+    }
+
     try {
       const { data, error } = await supabase
         .rpc('get_employee_performance_summary', { p_employee_id: employeeId });
       if (!error && data && data[0]) {
+        employeeSummaryRpcAvailable = true;
         return data[0];
       }
-      // Fallback to computing from scorecards if RPC missing or empty
+      // If error present and indicates missing function, mark unavailable
+      if (error && isRpcNotFound(error)) {
+        employeeSummaryRpcAvailable = false;
+      }
       return await this.buildSummaryFromScorecards(employeeId);
-    } catch (err) {
-      // Fallback to computing from scorecards if RPC throws
+    } catch (err: any) {
+      if (isRpcNotFound(err)) {
+        employeeSummaryRpcAvailable = false;
+      }
       try {
         return await this.buildSummaryFromScorecards(employeeId);
       } catch (e) {
