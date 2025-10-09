@@ -486,6 +486,15 @@ export class FileProcessor {
       }
 
       await progress.updateProgress('finalizing', 100, 'Results saved');
+
+      // Post-process: ensure employee participation and scorecard are updated
+      try {
+        const { postProcessEmployeeForRecording } = await import('../supabase.js');
+        const postSummary = await postProcessEmployeeForRecording(recordingId);
+        console.log('👤 Employee post-processing summary:', postSummary);
+      } catch (ppErr) {
+        console.warn('⚠️ Employee post-processing failed (non-fatal):', ppErr?.message || ppErr);
+      }
       
       // Complete with appropriate message
       const completionMessage = hasAnyAI 

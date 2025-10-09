@@ -37,6 +37,9 @@ export interface Recording {
   ai_speakers_updated_at?: string;
   transcription_metadata?: Json;
   support_analysis?: Json;
+  // Employee linkage flags (optional)
+  employee_participation_count?: number;
+  employee_linking_pending?: boolean;
 }
 
 export interface FileOperationsProps {

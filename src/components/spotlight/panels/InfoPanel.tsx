@@ -1,15 +1,21 @@
-import React from 'react';
-import { Info, Calendar, Clock, User, FileAudio, Zap, Tag, CheckCircle, AlertCircle, RefreshCw, Star } from 'lucide-react';
+import React, { useState } from 'react';
+import { Info, Calendar, Clock, User, FileAudio, Zap, Tag, CheckCircle, AlertCircle, RefreshCw, Star, Link as LinkIcon } from 'lucide-react';
 import { formatDuration } from '@/utils/mediaDuration';
 import { parseECIAnalysis, hasECIAnalysis, getECIOverallScore, getECIEscalationRisk } from '@/utils/eciAnalysis';
 import { useSupportMode } from '@/contexts/SupportContext';
 import type { Recording } from '@/types/recording';
+import { supabase } from '@/integrations/supabase/client';
+import { useToast } from '@/hooks/use-toast';
 
 interface InfoPanelProps {
   recording?: Recording | null;
 }
 
 export default function InfoPanel({ recording }: InfoPanelProps) {
+  const { toast } = useToast();
+  const [linkOpen, setLinkOpen] = useState(false);
+  const [linking, setLinking] = useState(false);
+  const [employeeIdInput, setEmployeeIdInput] = useState('');
   const supportMode = useSupportMode();
   const eciAnalysis = recording ? parseECIAnalysis(recording) : null;
   const isSupport = recording?.content_type === 'customer_support' || recording?.content_type === 'support_call' || supportMode.supportMode;
@@ -216,6 +222,78 @@ export default function InfoPanel({ recording }: InfoPanelProps) {
                 {recording.ai_next_steps ? 'Generated' : 'Not available'}
               </span>
             </div>
+
+            {/* Employee Linking Status */}
+            <div className="flex justify-between">
+              <span className="text-gray-600 flex items-center gap-1">
+                <User className="w-3 h-3" />
+                Employee Linking
+              </span>
+              {(() => {
+                const participationCount = (recording as any).employee_participation_count || 0;
+                const pending = (recording as any).employee_linking_pending === true;
+                const linked = participationCount > 0;
+                const label = linked ? 'Linked' : pending ? 'Pending' : 'Not linked';
+                const color = linked ? 'text-green-600' : pending ? 'text-yellow-600' : 'text-gray-400';
+                return (
+                  <div className="flex items-center gap-2">
+                    <span className={`font-medium capitalize ${color}`}>{label}</span>
+                    {!linked && (
+                      <button
+                        className="inline-flex items-center gap-1 text-xs px-2 py-1 rounded-md border border-gray-200 hover:bg-gray-50"
+                        onClick={() => setLinkOpen(v => !v)}
+                        type="button"
+                        title="Link employee to this recording"
+                      >
+                        <LinkIcon className="w-3 h-3" /> Link
+                      </button>
+                    )}
+                  </div>
+                );
+              })()}
+            </div>
+
+            {linkOpen && recording?.id && (
+              <div className="mt-2 p-3 bg-gray-50 border border-gray-200 rounded-md space-y-2">
+                <label className="text-xs text-gray-600">Employee ID (UUID)</label>
+                <input
+                  type="text"
+                  placeholder="0af5b943-ff7f-492f-ad95-ed4e572ead5a"
+                  className="w-full text-sm px-2 py-1 border rounded-md"
+                  value={employeeIdInput}
+                  onChange={(e) => setEmployeeIdInput(e.target.value)}
+                />
+                <div className="flex gap-2">
+                  <button
+                    type="button"
+                    disabled={linking || !employeeIdInput}
+                    className={`text-xs px-3 py-1 rounded-md ${linking ? 'bg-gray-200 text-gray-500' : 'bg-eci-blue text-white hover:bg-eci-blue/90'}`}
+                    onClick={async () => {
+                      if (!employeeIdInput) return;
+                      setLinking(true);
+                      try {
+                        const { data, error } = await supabase.functions.invoke('assign-employee-to-recording', {
+                          body: { recording_id: recording.id, employee_id: employeeIdInput }
+                        });
+                        if (error) throw error;
+                        toast({ title: 'Employee linked', description: `Linked to ${data?.employee_name || 'employee'}` });
+                        setLinkOpen(false);
+                        // best-effort refresh by emitting a custom event; parent uses onRecordingUpdate
+                        try { window.dispatchEvent(new CustomEvent('recording-updated')); } catch {}
+                      } catch (err: any) {
+                        toast({ title: 'Link failed', description: err?.message || String(err), variant: 'destructive' });
+                      } finally {
+                        setLinking(false);
+                      }
+                    }}
+                  >
+                    {linking ? 'Linking...' : 'Link Employee'}
+                  </button>
+                  <button type="button" className="text-xs px-3 py-1 rounded-md border" onClick={() => setLinkOpen(false)}>Cancel</button>
+                </div>
+                <p className="text-[11px] text-gray-500">Paste the employee UUID from the employees table. This will create a participation record and generate a scorecard if missing.</p>
+              </div>
+            )}
 
             {recording.enable_coaching && (
               <div className="flex justify-between">

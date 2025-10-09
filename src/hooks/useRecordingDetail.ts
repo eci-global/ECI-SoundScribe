@@ -28,6 +28,9 @@ export interface RecordingDetailData {
   created_at: string;
   updated_at: string;
   ai_generated_at?: string;
+  // Employee linking
+  employee_participation_count?: number;
+  employee_linking_pending?: boolean;
   // Related data
   speaker_segments: any[];
   topic_segments: any[];
@@ -263,6 +266,26 @@ export function useRecordingDetail(recordingId: string) {
         // Transform JSON ai_moments to the expected format
         const transformedAIMoments = transformAIMoments(recording.ai_moments);
 
+        // Determine employee participation status
+        let participationCount = 0;
+        try {
+          const { count: partCount } = await supabase
+            .from('employee_call_participation')
+            .select('id', { count: 'exact', head: true })
+            .eq('recording_id', recording.id || recordingId);
+          participationCount = typeof partCount === 'number' ? partCount : 0;
+        } catch (partErr) {
+          console.warn('useRecordingDetail: participation count failed:', partErr);
+        }
+
+        const statusForPending = (recording.status || '').toLowerCase();
+        const employeeLinkingPending = participationCount === 0 && (
+          statusForPending === 'completed' ||
+          statusForPending === 'transcribed' ||
+          statusForPending === 'processing' ||
+          Boolean(recording.transcript)
+        );
+
         // Transform the data with enhanced safety checks
         const transformedData: RecordingDetailData = {
           id: recording.id || recordingId,
@@ -288,6 +311,8 @@ export function useRecordingDetail(recordingId: string) {
           created_at: recording.created_at || new Date().toISOString(),
           updated_at: recording.updated_at || new Date().toISOString(),
           ai_generated_at: recording.ai_generated_at || undefined,
+          employee_participation_count: participationCount,
+          employee_linking_pending: employeeLinkingPending,
           // Related data with safe array handling
           speaker_segments: Array.isArray(speakerSegments) ? speakerSegments : [],
           topic_segments: Array.isArray(topicSegments) ? topicSegments : [],

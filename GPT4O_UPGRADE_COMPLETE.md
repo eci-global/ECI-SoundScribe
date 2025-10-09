@@ -145,6 +145,19 @@ You'll know the upgrade is working when:
 **Current Model**: gpt-4o
 **Status**: ✅ Live in Production
 
+### Azure OpenAI Deployment Created:
+- **Deployment Name**: `gpt-4o`
+- **Model Version**: 2024-08-06
+- **Capacity**: 150K tokens/minute
+- **Status**: ✅ Succeeded
+- **Created**: 2025-10-09T22:05:29Z
+
+### All Systems Upgraded:
+- ✅ Azure Backend (Summaries & Coaching)
+- ✅ Employee Name Detection
+- ✅ BDR Scorecard Evaluation
+- ✅ AI Moments Generation
+
 Upload your next recording to see the improved analysis quality! 🚀
 
 ---

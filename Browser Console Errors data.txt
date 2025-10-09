@@ -1,33 +1,442 @@
-browser log shows 
-client.ts:79 Using default Supabase URL/key. Set VITE_SUPABASE_URL and VITE_SUPABASE_ANON_KEY for local dev.
-
-client:1102 Refused to load the stylesheet 'https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap' because it violates the following Content Security Policy directive: "style-src 'self' 'unsafe-inline'". Note that 'style-src-elem' was not explicitly set, so 'style-src' is used as a fallback.
-main.tsx:6 main.tsx - Starting application initialization
-main.tsx:12 main.tsx - Root element found: true
-main.tsx:17 main.tsx - Creating React root and rendering App
-main.tsx:21 main.tsx - App rendered successfully
-App.tsx:58 App.tsx - App component initializing
-App.tsx:66 App.tsx - Rendering App component
-EmployeeDirectory.tsx:43 Loading employees with filters: 
-{}
-react-router-dom.js?v=fedafddc:4393 ⚠️ React Router Future Flag Warning: React Router will begin wrapping state updates in `React.startTransition` in v7. You can use the `v7_startTransition` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_starttransition.
-react-router-dom.js?v=fedafddc:4393 ⚠️ React Router Future Flag Warning: Relative route resolution within Splat routes is changing in v7. You can use the `v7_relativeSplatPath` future flag to opt-in early. For more information, see https://reactrouter.com/v6/upgrading/future#v7_relativesplatpath.
-App.tsx:61 App.tsx - useEffect running, setting up global error handler
-useAuth.tsx:26 Auth state changed: SIGNED_IN 
-{hasSession: true, userId: '1fd13984-3457-40ea-9220-20447a1ff9ae', email: 'admin@soundscribe.com'}
-client.ts:84 Supabase connection test - Session data: 
-{session: {…}}
-client.ts:88 Supabase connection test - Success!
-useAuth.tsx:26 Auth state changed: INITIAL_SESSION 
-{hasSession: true, userId: '1fd13984-3457-40ea-9220-20447a1ff9ae', email: 'admin@soundscribe.com'}
-useAuth.tsx:42 Initial session loaded: 
-{hasSession: true, userId: '1fd13984-3457-40ea-9220-20447a1ff9ae', email: 'admin@soundscribe.com'}
-EmployeeDirectory.tsx:45 EmployeeService response: 
-{employees: Array(195), total_count: 195, page: 1, page_size: 195, filters_applied: {…}}
-EmployeeDirectory.tsx:47 Set employees: 
-(195) [{…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, {…}, …]
-﻿
-
-the app shows
-Error Loading Employee
-Failed to load employee data
+2025-10-09T21:48:59.5016275Z 🎯 Process-audio request received
+2025-10-09T21:48:59.503342Z 📊 Request body: {
+2025-10-09T21:48:59.5033605Z   recording_id: '9ed90e4c-3f92-40c7-9e07-75277116caad',
+2025-10-09T21:48:59.5033657Z   file_url: 'https://qinkldgvejheppheykfl.supabase.co/storage/v1/object/public/recordings/1fd13984-3457-40ea-9220-20447a1ff9ae/1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav',
+2025-10-09T21:48:59.5033684Z   file_size: 7187246,
+2025-10-09T21:48:59.5033706Z   is_large_file: true,
+2025-10-09T21:48:59.5033727Z   file_type: 'audio'
+2025-10-09T21:48:59.5033747Z }
+2025-10-09T21:48:59.5033775Z 📥 Processing: recording=9ed90e4c-3f92-40c7-9e07-75277116caad, size=6.9MB, type=audio
+2025-10-09T21:48:59.5061292Z ✅ Process request accepted for recording: 9ed90e4c-3f92-40c7-9e07-75277116caad
+2025-10-09T21:48:59.5061473Z 🚀 Starting full processor for 9ed90e4c-3f92-40c7-9e07-75277116caad
+2025-10-09T21:48:59.9741496Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (0%)
+2025-10-09T21:48:59.9765603Z 🚀 Starting processing for recording: 9ed90e4c-3f92-40c7-9e07-75277116caad
+2025-10-09T21:48:59.976582Z 🔧 Performing FFmpeg warm-up check...
+2025-10-09T21:48:59.9765853Z 🔍 Getting audio info for: dummy
+2025-10-09T21:48:59.9765879Z ✅ FFmpeg warm-up successful
+2025-10-09T21:48:59.9766075Z 🚀 Starting standard processing for recording: 9ed90e4c-3f92-40c7-9e07-75277116caad
+2025-10-09T21:48:59.9766107Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Validating recording... (0%)
+2025-10-09T21:48:59.9799195Z ❌ FFprobe error: No input specified
+2025-10-09T21:48:59.9799387Z ❌ FFprobe path: /node_modules/ffprobe-static/bin/linux/x64/ffprobe
+2025-10-09T21:48:59.9799414Z ❌ File path: dummy
+2025-10-09T21:49:00.3274016Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (0%)
+2025-10-09T21:49:00.9550391Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Recording validated (3%)
+2025-10-09T21:49:01.266225Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (3%)
+2025-10-09T21:49:01.5706067Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Downloading file from storage... (5%)
+2025-10-09T21:49:01.8791708Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (5%)
+2025-10-09T21:49:02.1738673Z 📥 Downloading file: recordings/1fd13984-3457-40ea-9220-20447a1ff9ae/1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:05.9622148Z ✅ File downloaded to: /tmp/9ed90e4c-3f92-40c7-9e07-75277116caad_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav (7187246 bytes)
+2025-10-09T21:49:05.9630028Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: File downloaded (6.9MB) (15%)
+2025-10-09T21:49:06.2620326Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (15%)
+2025-10-09T21:49:06.5466202Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Validating file format... (15%)
+2025-10-09T21:49:06.8310887Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (15%)
+2025-10-09T21:49:07.1147466Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Optimizing audio for AI processing... (20%)
+2025-10-09T21:49:07.398035Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (20%)
+2025-10-09T21:49:07.6992548Z 🎵 Optimizing 6.9MB audio file for standard processing
+2025-10-09T21:49:07.6997911Z 🎵 Starting audio compression for 1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav (6.85 MB)
+2025-10-09T21:49:07.7073578Z 📝 Wrote input file: /tmp/input_1760046547699_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:07.7489685Z 🔧 FFmpeg compression command: ffmpeg -i /tmp/input_1760046547699_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav -y -acodec pcm_s16le -ac 1 -ar 16000 -f wav -acodec pcm_s16le -ar 16000 -ac 1 -f wav /tmp/compressed_1760046547699_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:07.7611402Z 📊 Compression progress: 0%
+2025-10-09T21:49:07.8509772Z 📊 Compression progress: 99.99777382012466%
+2025-10-09T21:49:07.8532471Z ✅ Audio compression completed: /tmp/compressed_1760046547699_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:07.8660605Z 🧹 Cleaned up temp file: /tmp/input_1760046547699_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:07.8685551Z 🧹 Cleaned up temp file: /tmp/compressed_1760046547699_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:07.8688603Z 📊 Compression ratio: 2.00x (6.85 MB → 13.71 MB)
+2025-10-09T21:49:07.8718931Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Audio optimized: 6.9MB → 13.7MB (2.0x) (23%)
+2025-10-09T21:49:08.1707557Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (23%)
+2025-10-09T21:49:08.4572041Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: File preprocessing complete (25%)
+2025-10-09T21:49:08.7474184Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (25%)
+2025-10-09T21:49:09.0426688Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Analyzing audio duration... (25%)
+2025-10-09T21:49:09.3285245Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (25%)
+2025-10-09T21:49:09.6279442Z 📝 Wrote buffer to temp file: /tmp/duration_check_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav (14374478 bytes)
+2025-10-09T21:49:09.6279765Z 🔍 Getting audio info for: /tmp/duration_check_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:09.6459741Z ✅ Audio info extracted: { duration: 449.2, bitrate: 256001, sampleRate: 16000, format: 'wav' }
+2025-10-09T21:49:09.6462237Z 📊 Audio duration detected: 449.2s (7.5 minutes)
+2025-10-09T21:49:09.6487449Z 🧹 Cleaned up temp file: /tmp/duration_check_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:09.6487649Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Starting AI transcription... (30%)
+2025-10-09T21:49:09.937446Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (30%)
+2025-10-09T21:49:10.2312702Z 🎯 Using standard transcription strategy for 13.7MB file
+2025-10-09T21:49:10.2313059Z 📊 Audio duration: 7.5 minutes
+2025-10-09T21:49:10.2313089Z 📄 Standard transcription: direct processing
+2025-10-09T21:49:10.2321747Z 🎤 Starting transcription for 1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav (14374478 bytes)
+2025-10-09T21:49:10.2321964Z 🌐 Whisper URL: https://northcentralus.api.cognitive.microsoft.com/openai/deployments/whisper-1/audio/transcriptions?api-version=2024-10-01-preview
+2025-10-09T21:49:10.2322175Z 🔑 Using API version: 2024-10-01-preview
+2025-10-09T21:49:10.2322206Z 🎯 Deployment: whisper-1
+2025-10-09T21:49:20.9129156Z ✅ Transcription completed successfully in 10681ms
+2025-10-09T21:49:20.9134208Z 🔍 Transcription result structure: {
+2025-10-09T21:49:20.9134346Z   hasData: true,
+2025-10-09T21:49:20.913437Z   dataKeys: [ 'text' ],
+2025-10-09T21:49:20.9134395Z   duration: undefined,
+2025-10-09T21:49:20.9134416Z   textLength: 3149
+2025-10-09T21:49:20.9134436Z }
+2025-10-09T21:49:20.9134467Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Transcription complete (3149 characters) (70%)
+2025-10-09T21:49:21.721619Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (70%)
+2025-10-09T21:49:22.0087837Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Generating AI insights... (70%)
+2025-10-09T21:49:22.3352406Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (70%)
+2025-10-09T21:49:22.622125Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Generating summary... (75%)
+2025-10-09T21:49:22.9355112Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (75%)
+2025-10-09T21:49:23.2153572Z 🤖 Starting chat completion generation (estimated 894 tokens)
+2025-10-09T21:49:23.2154071Z 🤖 Chat Completion URL: https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-10-01-preview
+2025-10-09T21:49:23.215411Z 🤖 Using chat deployment: gpt-4o (gpt-4o for completions)
+2025-10-09T21:49:23.250599Z ❌ Chat Completion attempt 1/3 failed: {
+2025-10-09T21:49:23.2506275Z   error: {
+2025-10-09T21:49:23.2506317Z     code: 'DeploymentNotFound',
+2025-10-09T21:49:23.2506424Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:49:23.2506448Z   }
+2025-10-09T21:49:23.250647Z }
+2025-10-09T21:49:23.2508274Z ❌ Chat completion failed after 35ms: {
+2025-10-09T21:49:23.2508433Z   error: {
+2025-10-09T21:49:23.2508458Z     code: 'DeploymentNotFound',
+2025-10-09T21:49:23.2508505Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:49:23.2508528Z   }
+2025-10-09T21:49:23.250855Z }
+2025-10-09T21:49:23.250953Z ❌ Summary generation failed: {
+2025-10-09T21:49:23.2509846Z   error: {
+2025-10-09T21:49:23.250987Z     code: 'DeploymentNotFound',
+2025-10-09T21:49:23.2509897Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:49:23.2509916Z   }
+2025-10-09T21:49:23.2509981Z }
+2025-10-09T21:49:23.2510332Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Generating coaching insights... (85%)
+2025-10-09T21:49:23.5510512Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (85%)
+2025-10-09T21:49:23.8201455Z 🤖 Starting chat completion generation (estimated 940 tokens)
+2025-10-09T21:49:23.8201759Z 🤖 Chat Completion URL: https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-10-01-preview
+2025-10-09T21:49:23.8201796Z 🤖 Using chat deployment: gpt-4o (gpt-4o for completions)
+2025-10-09T21:49:23.8573219Z ❌ Chat Completion attempt 1/3 failed: {
+2025-10-09T21:49:23.8573536Z   error: {
+2025-10-09T21:49:23.8573567Z     code: 'DeploymentNotFound',
+2025-10-09T21:49:23.8573598Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:49:23.8573649Z   }
+2025-10-09T21:49:23.8573673Z }
+2025-10-09T21:49:23.8574388Z ❌ Chat completion failed after 38ms: {
+2025-10-09T21:49:23.8574453Z   error: {
+2025-10-09T21:49:23.8574481Z     code: 'DeploymentNotFound',
+2025-10-09T21:49:23.8574511Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:49:23.857453Z   }
+2025-10-09T21:49:23.8574547Z }
+2025-10-09T21:49:23.8574575Z ❌ Coaching evaluation failed: {
+2025-10-09T21:49:23.8574597Z   error: {
+2025-10-09T21:49:23.8574616Z     code: 'DeploymentNotFound',
+2025-10-09T21:49:23.8574688Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:49:23.8574708Z   }
+2025-10-09T21:49:23.8574726Z }
+2025-10-09T21:49:23.8575253Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: AI analysis partially failed - transcript available (90%)
+2025-10-09T21:49:24.1467363Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (90%)
+2025-10-09T21:49:24.4186604Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Saving results... (90%)
+2025-10-09T21:49:24.7204653Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (90%)
+2025-10-09T21:49:25.0260736Z 🔍 Debug - Temp files available: [
+2025-10-09T21:49:25.0261044Z   '/tmp/9ed90e4c-3f92-40c7-9e07-75277116caad_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav'
+2025-10-09T21:49:25.026108Z ]
+2025-10-09T21:49:25.0263703Z 🔍 Debug - Transcription result structure: {
+2025-10-09T21:49:25.0263839Z   hasData: true,
+2025-10-09T21:49:25.0263866Z   dataKeys: [ 'text' ],
+2025-10-09T21:49:25.0263891Z   duration: undefined,
+2025-10-09T21:49:25.0263917Z   segments: 0
+2025-10-09T21:49:25.0264373Z }
+2025-10-09T21:49:25.0264575Z 📊 Initial duration from transcription: null
+2025-10-09T21:49:25.0264605Z 📊 Using pre-extracted audio duration: 449 seconds
+2025-10-09T21:49:25.0264951Z 📊 Final duration value: 449
+2025-10-09T21:49:25.0267457Z 💾 Saving AI results: {
+2025-10-09T21:49:25.0267557Z   hasTranscript: true,
+2025-10-09T21:49:25.0267649Z   hasSummary: false,
+2025-10-09T21:49:25.0267671Z   duration: 449,
+2025-10-09T21:49:25.0267692Z   durationSource: 'ffmpeg'
+2025-10-09T21:49:25.0267712Z }
+2025-10-09T21:49:25.0273473Z 💾 updateRecordingWithAI - Input results: {
+2025-10-09T21:49:25.0273581Z   recordingId: '9ed90e4c-3f92-40c7-9e07-75277116caad',
+2025-10-09T21:49:25.0273607Z   hasTranscript: true,
+2025-10-09T21:49:25.027363Z   hasSummary: false,
+2025-10-09T21:49:25.027365Z   duration: 449,
+2025-10-09T21:49:25.0273672Z   durationType: 'number',
+2025-10-09T21:49:25.0273694Z   resultKeys: [
+2025-10-09T21:49:25.0273752Z     'transcript',
+2025-10-09T21:49:25.0273774Z     'ai_summary',
+2025-10-09T21:49:25.0273797Z     'duration',
+2025-10-09T21:49:25.0273821Z     'ai_insights',
+2025-10-09T21:49:25.0273843Z     'ai_generated_at',
+2025-10-09T21:49:25.0273866Z     'processing_metadata'
+2025-10-09T21:49:25.0273886Z   ]
+2025-10-09T21:49:25.0273908Z }
+2025-10-09T21:49:25.0274505Z 💾 updateRecordingWithAI - Final update data: {
+2025-10-09T21:49:25.0274553Z   recordingId: '9ed90e4c-3f92-40c7-9e07-75277116caad',
+2025-10-09T21:49:25.0274575Z   status: 'completed',
+2025-10-09T21:49:25.0274626Z   hasTranscript: true,
+2025-10-09T21:49:25.0274646Z   hasSummary: false,
+2025-10-09T21:49:25.0274666Z   duration: 449,
+2025-10-09T21:49:25.0274689Z   durationType: 'number'
+2025-10-09T21:49:25.0274709Z }
+2025-10-09T21:49:25.4561754Z ✅ updateRecordingWithAI - Success response: {
+2025-10-09T21:49:25.4562054Z   recordingId: '9ed90e4c-3f92-40c7-9e07-75277116caad',
+2025-10-09T21:49:25.4562087Z   returnedData: {
+2025-10-09T21:49:25.4562124Z     id: '9ed90e4c-3f92-40c7-9e07-75277116caad',
+2025-10-09T21:49:25.456215Z     status: 'completed',
+2025-10-09T21:49:25.4562174Z     hasTranscript: true,
+2025-10-09T21:49:25.4562268Z     hasSummary: false,
+2025-10-09T21:49:25.4562291Z     duration: 449,
+2025-10-09T21:49:25.4562312Z     durationType: 'number'
+2025-10-09T21:49:25.4562331Z   }
+2025-10-09T21:49:25.456235Z }
+2025-10-09T21:49:25.4562378Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad with AI analysis results
+2025-10-09T21:49:25.4562404Z 📊 Progress Update [9ed90e4c-3f92-40c7-9e07-75277116caad]: Results saved (100%)
+2025-10-09T21:49:25.7501014Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: processing (100%)
+2025-10-09T21:49:29.9964416Z postProcessEmployeeForRecording: extract-employee-name failed: FunctionsHttpError: Edge Function returned a non-2xx status code
+2025-10-09T21:49:29.9964952Z     at FunctionsClient.<anonymous> (/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js:92:27)
+2025-10-09T21:49:29.9964992Z     at Generator.next (<anonymous>)
+2025-10-09T21:49:29.9965018Z     at fulfilled (/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js:5:58)
+2025-10-09T21:49:29.9965048Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-10-09T21:49:29.9965073Z   context: Response {
+2025-10-09T21:49:29.9965096Z     [Symbol(realm)]: null,
+2025-10-09T21:49:29.9965198Z     [Symbol(state)]: {
+2025-10-09T21:49:29.9965224Z       aborted: false,
+2025-10-09T21:49:29.9965246Z       rangeRequested: false,
+2025-10-09T21:49:29.9965267Z       timingAllowPassed: true,
+2025-10-09T21:49:29.9965289Z       requestIncludesCredentials: true,
+2025-10-09T21:49:29.9965311Z       type: 'default',
+2025-10-09T21:49:29.9965332Z       status: 500,
+2025-10-09T21:49:29.9965354Z       timingInfo: [Object],
+2025-10-09T21:49:29.9965376Z       cacheState: '',
+2025-10-09T21:49:29.9965398Z       statusText: 'Internal Server Error',
+2025-10-09T21:49:29.9965424Z       headersList: [HeadersList],
+2025-10-09T21:49:29.9965446Z       urlList: [Array],
+2025-10-09T21:49:29.996549Z       body: [Object]
+2025-10-09T21:49:29.996551Z     },
+2025-10-09T21:49:29.9965533Z     [Symbol(headers)]: HeadersList {
+2025-10-09T21:49:29.9965558Z       cookies: [Array],
+2025-10-09T21:49:29.9965582Z       [Symbol(headers map)]: [Map],
+2025-10-09T21:49:29.9965605Z       [Symbol(headers map sorted)]: null
+2025-10-09T21:49:29.9965625Z     }
+2025-10-09T21:49:29.9965647Z   }
+2025-10-09T21:49:29.9965669Z }
+2025-10-09T21:49:30.3006813Z 👤 Employee post-processing summary: {
+2025-10-09T21:49:30.3007394Z   participationChecked: true,
+2025-10-09T21:49:30.3007434Z   participationCreated: false,
+2025-10-09T21:49:30.300756Z   scorecardCreated: false
+2025-10-09T21:49:30.3007587Z }
+2025-10-09T21:49:30.3010163Z ✅ Processing Complete [9ed90e4c-3f92-40c7-9e07-75277116caad]: 100%
+2025-10-09T21:49:30.6038863Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: completed (100%)
+2025-10-09T21:49:30.9108141Z 🧹 Cleaned up temp file: /tmp/9ed90e4c-3f92-40c7-9e07-75277116caad_1760046536303_0198519d-4fec-e7b1-d1b7-31d3d105e12f.wav
+2025-10-09T21:49:30.9109232Z ✅ Processing completed with partial AI failure - transcript available for recording: 9ed90e4c-3f92-40c7-9e07-75277116caad
+2025-10-09T21:49:30.9109967Z 🎉 Processing completed successfully for 9ed90e4c-3f92-40c7-9e07-75277116caad
+2025-10-09T21:49:31.2131191Z ✅ Updated recording 9ed90e4c-3f92-40c7-9e07-75277116caad status to: completed (100%)
+2025-10-09T21:51:06.934Z No new trace in the past 1 min(s).
+2025-10-09T21:52:06.934Z No new trace in the past 2 min(s).
+2025-10-09T21:52:15.1671989Z 🎯 Process-audio request received
+2025-10-09T21:52:15.16783Z 📊 Request body: {
+2025-10-09T21:52:15.1678373Z   recording_id: 'de8bc41d-8a23-4067-9311-5aa973179f06',
+2025-10-09T21:52:15.1678409Z   file_url: 'https://qinkldgvejheppheykfl.supabase.co/storage/v1/object/public/recordings/1fd13984-3457-40ea-9220-20447a1ff9ae/1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav',
+2025-10-09T21:52:15.1678436Z   file_size: 4857646,
+2025-10-09T21:52:15.167846Z   is_large_file: true,
+2025-10-09T21:52:15.1678484Z   file_type: 'audio'
+2025-10-09T21:52:15.1678507Z }
+2025-10-09T21:52:15.1678538Z 📥 Processing: recording=de8bc41d-8a23-4067-9311-5aa973179f06, size=4.6MB, type=audio
+2025-10-09T21:52:15.1694819Z ✅ Process request accepted for recording: de8bc41d-8a23-4067-9311-5aa973179f06
+2025-10-09T21:52:15.169503Z 🚀 Starting full processor for de8bc41d-8a23-4067-9311-5aa973179f06
+2025-10-09T21:52:15.5995612Z ❌ FFprobe error: No input specified
+2025-10-09T21:52:15.5996261Z ❌ FFprobe path: /node_modules/ffprobe-static/bin/linux/x64/ffprobe
+2025-10-09T21:52:15.5996291Z ❌ File path: dummy
+2025-10-09T21:52:15.5996903Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (0%)
+2025-10-09T21:52:15.5996946Z 🚀 Starting processing for recording: de8bc41d-8a23-4067-9311-5aa973179f06
+2025-10-09T21:52:15.5996977Z 🔧 Performing FFmpeg warm-up check...
+2025-10-09T21:52:15.5997006Z 🔍 Getting audio info for: dummy
+2025-10-09T21:52:15.599703Z ✅ FFmpeg warm-up successful
+2025-10-09T21:52:15.5997059Z 🚀 Starting standard processing for recording: de8bc41d-8a23-4067-9311-5aa973179f06
+2025-10-09T21:52:15.5997087Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Validating recording... (0%)
+2025-10-09T21:52:15.9180517Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (0%)
+2025-10-09T21:52:16.5117018Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Recording validated (3%)
+2025-10-09T21:52:16.8568662Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (3%)
+2025-10-09T21:52:17.1581433Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Downloading file from storage... (5%)
+2025-10-09T21:52:17.4707198Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (5%)
+2025-10-09T21:52:17.7645139Z 📥 Downloading file: recordings/1fd13984-3457-40ea-9220-20447a1ff9ae/1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:21.6880967Z ✅ File downloaded to: /tmp/de8bc41d-8a23-4067-9311-5aa973179f06_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav (4857646 bytes)
+2025-10-09T21:52:21.6881519Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: File downloaded (4.6MB) (15%)
+2025-10-09T21:52:21.9857783Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (15%)
+2025-10-09T21:52:22.2655512Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Validating file format... (15%)
+2025-10-09T21:52:22.5575138Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (15%)
+2025-10-09T21:52:22.854798Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Optimizing audio for AI processing... (20%)
+2025-10-09T21:52:23.1617796Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (20%)
+2025-10-09T21:52:23.4603894Z 🎵 Optimizing 4.6MB audio file for standard processing
+2025-10-09T21:52:23.4621891Z 🎵 Starting audio compression for 1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav (4.63 MB)
+2025-10-09T21:52:23.4673679Z 📝 Wrote input file: /tmp/input_1760046743462_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:23.4821725Z 🔧 FFmpeg compression command: ffmpeg -i /tmp/input_1760046743462_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav -y -acodec pcm_s16le -ac 1 -ar 16000 -f wav -acodec pcm_s16le -ar 16000 -ac 1 -f wav /tmp/compressed_1760046743462_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:23.4983772Z 📊 Compression progress: 0%
+2025-10-09T21:52:23.554427Z 📊 Compression progress: 99.99670619235836%
+2025-10-09T21:52:23.5560047Z ✅ Audio compression completed: /tmp/compressed_1760046743462_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:23.5660615Z 🧹 Cleaned up temp file: /tmp/input_1760046743462_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:23.5677547Z 🧹 Cleaned up temp file: /tmp/compressed_1760046743462_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:23.5678379Z 📊 Compression ratio: 2.00x (4.63 MB → 9.27 MB)
+2025-10-09T21:52:23.5726773Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Audio optimized: 4.6MB → 9.3MB (2.0x) (23%)
+2025-10-09T21:52:23.8751349Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (23%)
+2025-10-09T21:52:24.1740036Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: File preprocessing complete (25%)
+2025-10-09T21:52:24.4757015Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (25%)
+2025-10-09T21:52:24.7611255Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Analyzing audio duration... (25%)
+2025-10-09T21:52:25.0575893Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (25%)
+2025-10-09T21:52:25.35483Z 📝 Wrote buffer to temp file: /tmp/duration_check_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav (9715278 bytes)
+2025-10-09T21:52:25.3548909Z 🔍 Getting audio info for: /tmp/duration_check_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:25.3715551Z ✅ Audio info extracted: { duration: 303.6, bitrate: 256002, sampleRate: 16000, format: 'wav' }
+2025-10-09T21:52:25.3716043Z 📊 Audio duration detected: 303.6s (5.1 minutes)
+2025-10-09T21:52:25.3736876Z 🧹 Cleaned up temp file: /tmp/duration_check_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:25.3737468Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Starting AI transcription... (30%)
+2025-10-09T21:52:25.6742255Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (30%)
+2025-10-09T21:52:25.9817129Z 🎯 Using standard transcription strategy for 9.3MB file
+2025-10-09T21:52:25.9817658Z 📊 Audio duration: 5.1 minutes
+2025-10-09T21:52:25.9817692Z 📄 Standard transcription: direct processing
+2025-10-09T21:52:25.9817722Z 🎤 Starting transcription for 1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav (9715278 bytes)
+2025-10-09T21:52:25.9821001Z 🌐 Whisper URL: https://northcentralus.api.cognitive.microsoft.com/openai/deployments/whisper-1/audio/transcriptions?api-version=2024-10-01-preview
+2025-10-09T21:52:25.9821164Z 🔑 Using API version: 2024-10-01-preview
+2025-10-09T21:52:25.9821196Z 🎯 Deployment: whisper-1
+2025-10-09T21:52:34.2045997Z ✅ Transcription completed successfully in 8222ms
+2025-10-09T21:52:34.2049932Z 🔍 Transcription result structure: {
+2025-10-09T21:52:34.2050095Z   hasData: true,
+2025-10-09T21:52:34.2050123Z   dataKeys: [ 'text' ],
+2025-10-09T21:52:34.2050145Z   duration: undefined,
+2025-10-09T21:52:34.2050167Z   textLength: 2602
+2025-10-09T21:52:34.2050187Z }
+2025-10-09T21:52:34.2050214Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Transcription complete (2602 characters) (70%)
+2025-10-09T21:52:34.523297Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (70%)
+2025-10-09T21:52:34.8082616Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Generating AI insights... (70%)
+2025-10-09T21:52:35.1014799Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (70%)
+2025-10-09T21:52:35.3818931Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Generating summary... (75%)
+2025-10-09T21:52:35.6747003Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (75%)
+2025-10-09T21:52:35.9679023Z 🤖 Starting chat completion generation (estimated 757 tokens)
+2025-10-09T21:52:35.9679545Z 🤖 Chat Completion URL: https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-10-01-preview
+2025-10-09T21:52:35.9679584Z 🤖 Using chat deployment: gpt-4o (gpt-4o for completions)
+2025-10-09T21:52:35.9984462Z ❌ Chat Completion attempt 1/3 failed: {
+2025-10-09T21:52:35.9985012Z   error: {
+2025-10-09T21:52:35.9985048Z     code: 'DeploymentNotFound',
+2025-10-09T21:52:35.9985084Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:52:35.9985186Z   }
+2025-10-09T21:52:35.9985208Z }
+2025-10-09T21:52:35.99908Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Generating coaching insights... (85%)
+2025-10-09T21:52:35.9999035Z ❌ Chat completion failed after 31ms: {
+2025-10-09T21:52:35.9999275Z   error: {
+2025-10-09T21:52:35.9999301Z     code: 'DeploymentNotFound',
+2025-10-09T21:52:35.9999329Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:52:35.999935Z   }
+2025-10-09T21:52:35.9999371Z }
+2025-10-09T21:52:35.9999392Z ❌ Summary generation failed: {
+2025-10-09T21:52:35.9999411Z   error: {
+2025-10-09T21:52:35.9999432Z     code: 'DeploymentNotFound',
+2025-10-09T21:52:35.9999458Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:52:35.9999479Z   }
+2025-10-09T21:52:35.99995Z }
+2025-10-09T21:52:36.3327612Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (85%)
+2025-10-09T21:52:36.6224339Z 🤖 Starting chat completion generation (estimated 804 tokens)
+2025-10-09T21:52:36.6224871Z 🤖 Chat Completion URL: https://eastus.api.cognitive.microsoft.com/openai/deployments/gpt-4o/chat/completions?api-version=2024-10-01-preview
+2025-10-09T21:52:36.6224913Z 🤖 Using chat deployment: gpt-4o (gpt-4o for completions)
+2025-10-09T21:52:36.6454328Z ❌ Chat Completion attempt 1/3 failed: {
+2025-10-09T21:52:36.6454787Z   error: {
+2025-10-09T21:52:36.6454896Z     code: 'DeploymentNotFound',
+2025-10-09T21:52:36.6454927Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:52:36.6454947Z   }
+2025-10-09T21:52:36.6454968Z }
+2025-10-09T21:52:36.6456311Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: AI analysis partially failed - transcript available (90%)
+2025-10-09T21:52:36.6456601Z ❌ Chat completion failed after 23ms: {
+2025-10-09T21:52:36.6456642Z   error: {
+2025-10-09T21:52:36.6456673Z     code: 'DeploymentNotFound',
+2025-10-09T21:52:36.6456709Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:52:36.6456728Z   }
+2025-10-09T21:52:36.6456748Z }
+2025-10-09T21:52:36.6456774Z ❌ Coaching evaluation failed: {
+2025-10-09T21:52:36.6456796Z   error: {
+2025-10-09T21:52:36.6456817Z     code: 'DeploymentNotFound',
+2025-10-09T21:52:36.6456849Z     message: 'The API deployment for this resource does not exist. If you created the deployment within the last 5 minutes, please wait a moment and try again.'
+2025-10-09T21:52:36.6456908Z   }
+2025-10-09T21:52:36.6456931Z }
+2025-10-09T21:52:36.9486697Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (90%)
+2025-10-09T21:52:37.2357154Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Saving results... (90%)
+2025-10-09T21:52:37.5374027Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (90%)
+2025-10-09T21:52:37.8265059Z 🔍 Debug - Temp files available: [
+2025-10-09T21:52:37.8266125Z   '/tmp/de8bc41d-8a23-4067-9311-5aa973179f06_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav'
+2025-10-09T21:52:37.8266183Z ]
+2025-10-09T21:52:37.8266562Z 🔍 Debug - Transcription result structure: {
+2025-10-09T21:52:37.8267028Z   hasData: true,
+2025-10-09T21:52:37.8267062Z   dataKeys: [ 'text' ],
+2025-10-09T21:52:37.8267087Z   duration: undefined,
+2025-10-09T21:52:37.826711Z   segments: 0
+2025-10-09T21:52:37.826713Z }
+2025-10-09T21:52:37.8267156Z 📊 Initial duration from transcription: null
+2025-10-09T21:52:37.8267181Z 📊 Using pre-extracted audio duration: 304 seconds
+2025-10-09T21:52:37.8267205Z 📊 Final duration value: 304
+2025-10-09T21:52:37.8267381Z 💾 Saving AI results: {
+2025-10-09T21:52:37.8267408Z   hasTranscript: true,
+2025-10-09T21:52:37.826743Z   hasSummary: false,
+2025-10-09T21:52:37.8267451Z   duration: 304,
+2025-10-09T21:52:37.8267473Z   durationSource: 'ffmpeg'
+2025-10-09T21:52:37.8267494Z }
+2025-10-09T21:52:37.8273938Z 💾 updateRecordingWithAI - Input results: {
+2025-10-09T21:52:37.8274086Z   recordingId: 'de8bc41d-8a23-4067-9311-5aa973179f06',
+2025-10-09T21:52:37.8274115Z   hasTranscript: true,
+2025-10-09T21:52:37.8274141Z   hasSummary: false,
+2025-10-09T21:52:37.8274199Z   duration: 304,
+2025-10-09T21:52:37.8274223Z   durationType: 'number',
+2025-10-09T21:52:37.8274243Z   resultKeys: [
+2025-10-09T21:52:37.8274264Z     'transcript',
+2025-10-09T21:52:37.8274285Z     'ai_summary',
+2025-10-09T21:52:37.8274305Z     'duration',
+2025-10-09T21:52:37.827433Z     'ai_insights',
+2025-10-09T21:52:37.8274352Z     'ai_generated_at',
+2025-10-09T21:52:37.8274374Z     'processing_metadata'
+2025-10-09T21:52:37.8274395Z   ]
+2025-10-09T21:52:37.8274413Z }
+2025-10-09T21:52:37.8280945Z 💾 updateRecordingWithAI - Final update data: {
+2025-10-09T21:52:37.8281116Z   recordingId: 'de8bc41d-8a23-4067-9311-5aa973179f06',
+2025-10-09T21:52:37.8281143Z   status: 'completed',
+2025-10-09T21:52:37.8281166Z   hasTranscript: true,
+2025-10-09T21:52:37.8281227Z   hasSummary: false,
+2025-10-09T21:52:37.8281249Z   duration: 304,
+2025-10-09T21:52:37.8281274Z   durationType: 'number'
+2025-10-09T21:52:37.8281296Z }
+2025-10-09T21:52:38.1286982Z ✅ updateRecordingWithAI - Success response: {
+2025-10-09T21:52:38.1287532Z   recordingId: 'de8bc41d-8a23-4067-9311-5aa973179f06',
+2025-10-09T21:52:38.1287566Z   returnedData: {
+2025-10-09T21:52:38.1287603Z     id: 'de8bc41d-8a23-4067-9311-5aa973179f06',
+2025-10-09T21:52:38.1287701Z     status: 'completed',
+2025-10-09T21:52:38.1287723Z     hasTranscript: true,
+2025-10-09T21:52:38.1287744Z     hasSummary: false,
+2025-10-09T21:52:38.1287764Z     duration: 304,
+2025-10-09T21:52:38.1287784Z     durationType: 'number'
+2025-10-09T21:52:38.1287805Z   }
+2025-10-09T21:52:38.1287827Z }
+2025-10-09T21:52:38.1287855Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 with AI analysis results
+2025-10-09T21:52:38.1287885Z 📊 Progress Update [de8bc41d-8a23-4067-9311-5aa973179f06]: Results saved (100%)
+2025-10-09T21:52:38.4254074Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: processing (100%)
+2025-10-09T21:52:41.9616482Z postProcessEmployeeForRecording: extract-employee-name failed: FunctionsHttpError: Edge Function returned a non-2xx status code
+2025-10-09T21:52:41.9616978Z     at FunctionsClient.<anonymous> (/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js:92:27)
+2025-10-09T21:52:41.9617012Z     at Generator.next (<anonymous>)
+2025-10-09T21:52:41.9617038Z     at fulfilled (/node_modules/@supabase/functions-js/dist/main/FunctionsClient.js:5:58)
+2025-10-09T21:52:41.9617065Z     at process.processTicksAndRejections (node:internal/process/task_queues:95:5) {
+2025-10-09T21:52:41.9617092Z   context: Response {
+2025-10-09T21:52:41.961712Z     [Symbol(realm)]: null,
+2025-10-09T21:52:41.9617146Z     [Symbol(state)]: {
+2025-10-09T21:52:41.9617171Z       aborted: false,
+2025-10-09T21:52:41.9617278Z       rangeRequested: false,
+2025-10-09T21:52:41.9617304Z       timingAllowPassed: true,
+2025-10-09T21:52:41.9617328Z       requestIncludesCredentials: true,
+2025-10-09T21:52:41.9617349Z       type: 'default',
+2025-10-09T21:52:41.961737Z       status: 500,
+2025-10-09T21:52:41.9617391Z       timingInfo: [Object],
+2025-10-09T21:52:41.9617413Z       cacheState: '',
+2025-10-09T21:52:41.9617437Z       statusText: 'Internal Server Error',
+2025-10-09T21:52:41.9617458Z       headersList: [HeadersList],
+2025-10-09T21:52:41.9617479Z       urlList: [Array],
+2025-10-09T21:52:41.9617499Z       body: [Object]
+2025-10-09T21:52:41.9617541Z     },
+2025-10-09T21:52:41.9617566Z     [Symbol(headers)]: HeadersList {
+2025-10-09T21:52:41.9617587Z       cookies: [Array],
+2025-10-09T21:52:41.9617608Z       [Symbol(headers map)]: [Map],
+2025-10-09T21:52:41.9617632Z       [Symbol(headers map sorted)]: null
+2025-10-09T21:52:41.9617651Z     }
+2025-10-09T21:52:41.9617671Z   }
+2025-10-09T21:52:41.9617693Z }
+2025-10-09T21:52:42.2756727Z 👤 Employee post-processing summary: {
+2025-10-09T21:52:42.2757249Z   participationChecked: true,
+2025-10-09T21:52:42.2757279Z   participationCreated: false,
+2025-10-09T21:52:42.2757303Z   scorecardCreated: false
+2025-10-09T21:52:42.2757324Z }
+2025-10-09T21:52:42.2757352Z ✅ Processing Complete [de8bc41d-8a23-4067-9311-5aa973179f06]: 100%
+2025-10-09T21:52:42.5749856Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: completed (100%)
+2025-10-09T21:52:42.864234Z 🧹 Cleaned up temp file: /tmp/de8bc41d-8a23-4067-9311-5aa973179f06_1760046732609_0198516e-42c7-4144-a1c6-cb298948fb0d.wav
+2025-10-09T21:52:42.864287Z ✅ Processing completed with partial AI failure - transcript available for recording: de8bc41d-8a23-4067-9311-5aa973179f06
+2025-10-09T21:52:42.8643608Z 🎉 Processing completed successfully for de8bc41d-8a23-4067-9311-5aa973179f06
+2025-10-09T21:52:43.1674793Z ✅ Updated recording de8bc41d-8a23-4067-9311-5aa973179f06 status to: completed (100%)
+2025-10-09T21:54:15.622Z No new trace in the past 1 min(s).
+2025-10-09T21:55:15.622Z No new trace in the past 2 min(s).

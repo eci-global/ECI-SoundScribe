@@ -154,11 +154,13 @@ export interface EmployeeRecording {
   strengths: string[];
   improvements: string[];
   // AI Detection metadata
+  participation_id?: string; // employee_call_participation.id - needed for corrections
   detection_method?: 'exact_match' | 'fuzzy_match' | 'first_name_unique' | 'first_name_context' | 'first_name_ambiguous';
   confidence_score?: number;
   manually_tagged?: boolean;
   detected_name?: string;
   name_type?: 'full_name' | 'first_name_only' | 'unclear';
+  reasoning?: string;
 }
 
 export interface ScoreTrend {

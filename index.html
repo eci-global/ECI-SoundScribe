@@ -7,22 +7,21 @@
     <meta name="description" content="Lovable Generated Project" />
     <meta name="author" content="Lovable" />
     
-    <!-- Security Headers -->
+    <!-- Security: deliver minimal CSP via meta (server headers recommended in prod) -->
     <meta http-equiv="Content-Security-Policy"
           content="default-src 'self';
                    script-src 'self' 'unsafe-inline' 'unsafe-eval';
-                   style-src 'self' 'unsafe-inline';
+                   style-src 'self' 'unsafe-inline' https://fonts.googleapis.com;
+                   style-src-elem 'self' 'unsafe-inline' https://fonts.googleapis.com;
                    img-src 'self' data: https:;
-                   font-src 'self' data:;
+                   font-src 'self' data: https://fonts.gstatic.com;
+                   media-src 'self' https://*.supabase.co;
                    connect-src 'self' https://*.supabase.co https://*.supabase.in https://*.azurewebsites.net https://*.azure.com https://*.openai.azure.com;
                    object-src 'none';
                    base-uri 'self';
-                   form-action 'self';
-                   frame-ancestors 'none';" />
-    <meta http-equiv="X-Content-Type-Options" content="nosniff" />
-    <meta http-equiv="X-Frame-Options" content="DENY" />
-    <meta http-equiv="X-XSS-Protection" content="1; mode=block" />
-    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin" />
+                   form-action 'self';" />
+    <!-- The following are best set via real HTTP headers; kept minimal here to avoid console warnings -->
+    <!-- X-Frame-Options removed (ignored in meta). Use server header instead. -->
 
     <meta property="og:title" content="echo-ai-scribe-app" />
     <meta property="og:description" content="Lovable Generated Project" />
