@@ -1,0 +1,85 @@
+// Temporary fix for EmployeeService.getEmployeeById to bypass complex analytics
+// This will help identify if the issue is in the analytics data fetching
+
+// In src/services/employeeService.ts, replace the getEmployeeById method with this simplified version:
+
+static async getEmployeeById(employeeId: string): Promise<EmployeeDetailResponse> {
+  console.log('🔍 getEmployeeById called with ID:', employeeId);
+
+  // Try to get basic employee data first
+  let employee: any | null = null;
+
+  try {
+    // 1) Try plain UUID id
+    const basicRes = await supabase
+      .from('employees')
+      .select('*')
+      .eq('id', employeeId)
+      .single();
+
+    if (!basicRes.error && basicRes.data) {
+      employee = basicRes.data;
+      console.log('✅ Found employee by UUID:', employee.first_name, employee.last_name);
+    } else {
+      console.log('❌ UUID lookup failed:', basicRes.error);
+
+      // 2) Fallback: try legacy employee_id code
+      const codeRes = await supabase
+        .from('employees')
+        .select('*')
+        .eq('employee_code', employeeId)  // Use employee_code instead of employee_id
+        .single();
+
+      if (!codeRes.error && codeRes.data) {
+        employee = codeRes.data;
+        console.log('✅ Found employee by code:', employee.first_name, employee.last_name);
+      } else {
+        console.log('❌ Code lookup failed:', codeRes.error);
+        throw basicRes.error || codeRes.error || new Error('Employee not found');
+      }
+    }
+  } catch (error) {
+    console.error('❌ Employee lookup failed:', error);
+    throw error;
+  }
+
+  // Return simplified data with mock analytics to test UI
+  const mockAnalytics = {
+    employee,
+    performance_summary: {
+      employee_name: `${employee.first_name} ${employee.last_name}`,
+      total_calls: 0,
+      current_score: 0,
+      score_trend: 0,
+      recent_strengths: [],
+      recent_improvements: [],
+      coaching_notes_count: 0,
+      last_evaluation_date: new Date().toISOString()
+    },
+    recent_recordings: [],
+    score_trends: [],
+    coaching_history: []
+  };
+
+  const mockDashboard = {
+    employee,
+    performance_metrics: {
+      total_calls: 0,
+      average_score: 0,
+      score_improvement: 0,
+      coaching_sessions: 0,
+      manager_feedback_count: 0
+    },
+    recent_scores: [],
+    strengths_analysis: { top_strengths: [], strength_frequency: {} },
+    improvement_areas: { top_improvements: [], improvement_frequency: {} },
+    coaching_effectiveness: {
+      coaching_notes_count: 0,
+      action_items_completed: 0,
+      follow_up_rate: 0
+    }
+  };
+
+  console.log('✅ Returning mock data for employee:', employee.first_name, employee.last_name);
+  return { employee, analytics: mockAnalytics, dashboard_data: mockDashboard };
+}
