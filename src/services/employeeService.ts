@@ -280,7 +280,7 @@ export class EmployeeService {
         recordings:recording_id(title, created_at, duration)
       `)
       .eq('employee_id', employeeId)
-      .order('evaluation_date', { ascending: false })
+      .order('evaluated_at', { ascending: false })
       .limit(limit);
 
     if (error) throw error;
@@ -442,7 +442,7 @@ export class EmployeeService {
 
     const [employeeCountRes, scorecardsRes, coachingNotesRes] = await Promise.all([
       supabase.from('employees').select('*', { count: 'exact', head: true }).eq('status', 'active'),
-      supabase.from('employee_scorecards').select('overall_score, evaluation_date').gte('evaluation_date', startDate.toISOString()),
+      supabase.from('employee_scorecards').select('overall_score, evaluated_at').gte('evaluated_at', startDate.toISOString()),
       supabase.from('manager_coaching_notes').select('id, created_at').gte('created_at', startDate.toISOString()),
     ]);
 
@@ -463,14 +463,14 @@ export class EmployeeService {
     const startDate = this.getStartDate(timeRange);
     const { data, error } = await supabase
       .from('employee_scorecards')
-      .select('evaluation_date, overall_score')
-      .gte('evaluation_date', startDate.toISOString())
-      .order('evaluation_date', { ascending: true });
+      .select('evaluated_at, overall_score')
+      .gte('evaluated_at', startDate.toISOString())
+      .order('evaluated_at', { ascending: true });
     if (error) throw error;
 
     const grouped: Record<string, { sum: number; count: number }> = {};
     for (const row of data || []) {
-      const day = new Date(row.evaluation_date).toISOString().slice(0, 10);
+      const day = new Date(row.evaluated_at).toISOString().slice(0, 10);
       if (!grouped[day]) grouped[day] = { sum: 0, count: 0 };
       grouped[day].sum += row.overall_score || 0;
       grouped[day].count += 1;
@@ -504,9 +504,9 @@ export class EmployeeService {
       }
       const { data: sc, error: scErr } = await supabase
         .from('employee_scorecards')
-        .select('overall_score, employee_id, evaluation_date')
+        .select('overall_score, employee_id, evaluated_at')
         .in('employee_id', ids)
-        .gte('evaluation_date', startDate.toISOString());
+        .gte('evaluated_at', startDate.toISOString());
       if (scErr) throw scErr;
       const count = sc?.length || 0;
       const avg = count > 0 ? (sc!.reduce((s: number, r: any) => s + (r.overall_score || 0), 0) / count) : 0;
@@ -522,15 +522,15 @@ export class EmployeeService {
     const startDate = this.getStartDate(timeRange);
     const { data, error } = await supabase
       .from('employee_scorecards')
-      .select('employee_id, overall_score, evaluation_date')
-      .gte('evaluation_date', startDate.toISOString());
+      .select('employee_id, overall_score, evaluated_at')
+      .gte('evaluated_at', startDate.toISOString());
     if (error) throw error;
 
     const byEmp: Record<string, { scores: Array<{ date: string; score: number }>; count: number; avg: number } > = {};
     for (const row of data || []) {
       const key = row.employee_id;
       if (!byEmp[key]) byEmp[key] = { scores: [], count: 0, avg: 0 };
-      byEmp[key].scores.push({ date: row.evaluation_date, score: row.overall_score || 0 });
+      byEmp[key].scores.push({ date: row.evaluated_at, score: row.overall_score || 0 });
       byEmp[key].count += 1;
     }
     for (const key of Object.keys(byEmp)) {
@@ -573,8 +573,8 @@ export class EmployeeService {
     const startDate = this.getStartDate(timeRange);
     const { data, error } = await supabase
       .from('employee_scorecards')
-      .select('improvements, evaluation_date')
-      .gte('evaluation_date', startDate.toISOString());
+      .select('improvements, evaluated_at')
+      .gte('evaluated_at', startDate.toISOString());
     if (error) throw error;
     const counts: Record<string, number> = {};
     for (const row of data || []) {
@@ -689,12 +689,12 @@ export class EmployeeService {
     if (recIds.length > 0) {
       const { data: sc, error: scErr } = await supabase
         .from('employee_scorecards')
-        .select('recording_id, participation_id, overall_score, evaluation_date')
+        .select('recording_id, participation_id, overall_score, evaluated_at')
         .in('recording_id', recIds)
         .eq('employee_id', employeeId)
-        .order('evaluation_date', { ascending: false });
+        .order('evaluated_at', { ascending: false });
       if (scErr) throw scErr;
-      // Prefer participation_id match, else latest by evaluation_date
+      // Prefer participation_id match, else latest by evaluated_at
       const latestByRecording = new Map<string, { score: number; participation_id?: string }>();
       for (const row of sc || []) {
         if (!latestByRecording.has(row.recording_id)) {
@@ -721,12 +721,12 @@ export class EmployeeService {
       const { data: sc2, error: scErr2 } = await supabase
         .from('employee_scorecards')
         .select(`
-          evaluation_date,
+          evaluated_at,
           overall_score,
           recordings:recording_id(id, title, created_at, duration)
         `)
         .eq('employee_id', employeeId)
-        .order('evaluation_date', { ascending: false })
+        .order('evaluated_at', { ascending: false })
         .limit(10);
       if (!scErr2 && sc2) {
         mapped = sc2
@@ -751,14 +751,14 @@ export class EmployeeService {
   private static async getEmployeeScoreTrends(employeeId: string) {
     const { data, error } = await supabase
       .from('employee_scorecards')
-      .select('evaluation_date, overall_score')
+      .select('evaluated_at, overall_score')
       .eq('employee_id', employeeId)
-      .order('evaluation_date', { ascending: true })
+      .order('evaluated_at', { ascending: true })
       .limit(30);
 
     if (error) throw error;
     return data?.map(item => ({
-      date: item.evaluation_date,
+      date: item.evaluated_at,
       score: item.overall_score,
       period: 'daily' as const
     })) || [];
@@ -768,17 +768,17 @@ export class EmployeeService {
     const { data, error } = await supabase
       .from('employee_scorecards')
       .select(`
-        evaluation_date,
+        evaluated_at,
         overall_score,
         recordings:recording_id(title)
       `)
       .eq('employee_id', employeeId)
-      .order('evaluation_date', { ascending: false })
+      .order('evaluated_at', { ascending: false })
       .limit(10);
 
     if (error) throw error;
     return data?.map(item => ({
-      date: item.evaluation_date,
+      date: item.evaluated_at,
       score: item.overall_score,
       recording_title: item.recordings.title
     })) || [];
@@ -789,7 +789,7 @@ export class EmployeeService {
       .from('employee_scorecards')
       .select('strengths')
       .eq('employee_id', employeeId)
-      .order('evaluation_date', { ascending: false })
+      .order('evaluated_at', { ascending: false })
       .limit(20);
 
     if (error) throw error;
@@ -811,7 +811,7 @@ export class EmployeeService {
       .from('employee_scorecards')
       .select('improvements')
       .eq('employee_id', employeeId)
-      .order('evaluation_date', { ascending: false })
+      .order('evaluated_at', { ascending: false })
       .limit(20);
 
     if (error) throw error;
@@ -831,14 +831,13 @@ export class EmployeeService {
   private static async getEmployeeCoachingEffectiveness(employeeId: string) {
     const { data, error } = await supabase
       .from('manager_coaching_notes')
-      .select('status, action_items')
+      .select('status')
       .eq('employee_id', employeeId);
 
     if (error) throw error;
 
     const totalNotes = data?.length || 0;
     const completedNotes = data?.filter(note => note.status === 'completed').length || 0;
-    const totalActionItems = data?.reduce((sum, note) => sum + (note.action_items?.length || 0), 0) || 0;
 
     return {
       coaching_notes_count: totalNotes,
@@ -997,10 +996,10 @@ export class EmployeeService {
     if (recIds.length > 0) {
       const { data: sc, error: scErr } = await supabase
         .from('employee_scorecards')
-        .select('recording_id, participation_id, overall_score, evaluation_date')
+        .select('recording_id, participation_id, overall_score, evaluated_at')
         .in('recording_id', recIds)
         .eq('employee_id', employeeId)  // Only use UUID for related tables
-        .order('evaluation_date', { ascending: false });
+        .order('evaluated_at', { ascending: false });
       if (!scErr) {
         const latestByRecording = new Map<string, { score: number; participation_id?: string }>();
         for (const row of sc || []) {
@@ -1031,11 +1030,13 @@ export class EmployeeService {
         strengths: [],
         improvements: [],
         // AI Detection metadata
+        participation_id: item.id, // employee_call_participation.id
         detection_method: detectionMetadata.detection_method,
         confidence_score: item.confidence_score,
         manually_tagged: item.manually_tagged ?? false,
         detected_name: detectionMetadata.detected_name,
-        name_type: detectionMetadata.name_type
+        name_type: detectionMetadata.name_type,
+        reasoning: detectionMetadata.reasoning
       };
     }).filter(Boolean);
 
@@ -1045,12 +1046,12 @@ export class EmployeeService {
       const { data: sc2, error: scErr2 } = await supabase
         .from('employee_scorecards')
         .select(`
-          evaluation_date,
+          evaluated_at,
           overall_score,
           recordings:recording_id(id, title, created_at, duration)
         `)
         .eq('employee_id', employeeId)  // Only use UUID for related tables
-        .order('evaluation_date', { ascending: false })
+        .order('evaluated_at', { ascending: false })
         .limit(10);
       if (!scErr2 && sc2) {
         mapped = sc2
@@ -1098,10 +1099,10 @@ export class EmployeeService {
             const recordingIds = nameMatches.map(r => r.id);
             const { data: fallbackScores } = await supabase
               .from('employee_scorecards')
-              .select('recording_id, overall_score, evaluation_date')
+              .select('recording_id, overall_score, evaluated_at')
               .in('recording_id', recordingIds)
               .eq('employee_id', employeeId)
-              .order('evaluation_date', { ascending: false });
+              .order('evaluated_at', { ascending: false });
 
             const scoreMap = new Map(
               (fallbackScores || []).map(s => [s.recording_id, s.overall_score])
@@ -1219,13 +1220,12 @@ export class EmployeeService {
     // Related tables use UUID foreign keys, so only query with employeeId (UUID)
     const { data, error } = await supabase
       .from('manager_coaching_notes')
-      .select('status, action_items')
+      .select('status')
       .eq('employee_id', employeeId);  // Only use UUID for related tables
     if (error) throw error;
 
     const totalNotes = data?.length || 0;
     const completedNotes = data?.filter(note => note.status === 'completed').length || 0;
-    const totalActionItems = data?.reduce((sum, note) => sum + (note.action_items?.length || 0), 0) || 0;
 
     return {
       coaching_notes_count: totalNotes,
