@@ -54,7 +54,7 @@ serve(async (req) => {
     const azureEndpoint = Deno.env.get('AZURE_OPENAI_ENDPOINT')
     const azureApiKey = Deno.env.get('AZURE_OPENAI_API_KEY')
     const azureApiVersion = '2024-10-01-preview'
-    const deploymentName = 'gpt-4o-mini'
+    const deploymentName = Deno.env.get('AZURE_OPENAI_GPT4O_DEPLOYMENT') || 'gpt-4o'
 
     if (!azureEndpoint || !azureApiKey) {
       throw new Error('Azure OpenAI configuration missing')
@@ -265,7 +265,7 @@ EVALUATION RULES:
         }
       },
       metadata: {
-        model: 'gpt-4o-mini',
+        model: 'gpt-4o',
         processingTime,
         segmentsAnalyzed: whisper_segments?.length || 0,
         transcriptLength: transcript.length

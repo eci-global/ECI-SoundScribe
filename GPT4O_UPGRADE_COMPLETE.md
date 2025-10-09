@@ -72,20 +72,42 @@ Look for these log lines during processing:
 
 ---
 
+## 🆕 ECI Quality Framework Upgrade (2025-10-09 - Later)
+
+After discovering the ECI Quality Framework Analysis was not loading in support mode, we identified that the `analyze-support-call` function was still using `gpt-4o-mini`.
+
+### What Was Fixed:
+1. **Updated `analyze-support-call` Edge Function** to use GPT-4o
+   - Changed deployment reference from hardcoded `'gpt-4o-mini'` to environment variable
+   - Updated model metadata to reflect `'gpt-4o'`
+
+2. **Deployed Updated Function**
+   ```bash
+   npx supabase functions deploy analyze-support-call
+   ```
+
+### Impact:
+- ✅ **Better ECI Behavior Analysis**: More accurate YES/NO/UNCERTAIN ratings
+- ✅ **Richer Evidence**: More specific timestamps and contextual quotes
+- ✅ **Improved Coaching**: More actionable feedback and recommendations
+- ✅ **Better Escalation Detection**: More nuanced risk assessment
+
+### Files Changed:
+- `supabase/functions/analyze-support-call/index.ts` (lines 57, 268)
+
+---
+
 ## 📋 What's Still Using GPT-4o-mini:
 
-These components were **NOT changed** (they're separate from Azure backend):
+These components were **NOT changed**:
 
-1. **Supabase Edge Functions**:
-   - `extract-employee-name` (employee detection)
-   - `evaluate-bdr-scorecard` (BDR scoring)
-   - `analyze-support-call` (support analysis)
-   - Various other Edge Functions
-
-2. **Frontend**:
+1. **Frontend**:
    - Sales framework generation (`src/services/salesFrameworkService.ts`)
 
-These continue to use `gpt-4o-mini` and are independent of the Azure backend upgrade.
+2. **Other Edge Functions**:
+   - Various utility functions that don't require GPT-4o's advanced reasoning
+
+All critical AI analysis functions now use GPT-4o for maximum quality.
 
 ---
 
@@ -157,6 +179,7 @@ You'll know the upgrade is working when:
 - ✅ Employee Name Detection
 - ✅ BDR Scorecard Evaluation
 - ✅ AI Moments Generation
+- ✅ **ECI Quality Framework Analysis (Support Calls)**
 
 Upload your next recording to see the improved analysis quality! 🚀
 
