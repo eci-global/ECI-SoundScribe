@@ -112,6 +112,55 @@ function isValidName(name: string): boolean {
   return true;
 }
 
+/**
+ * Calculate Levenshtein distance between two strings (edit distance)
+ * Used for fuzzy name matching to handle typos and speech-to-text errors
+ */
+function levenshteinDistance(str1: string, str2: string): number {
+  const s1 = str1.toLowerCase();
+  const s2 = str2.toLowerCase();
+
+  const len1 = s1.length;
+  const len2 = s2.length;
+
+  // Create a matrix to store distances
+  const matrix: number[][] = [];
+
+  // Initialize first row and column
+  for (let i = 0; i <= len1; i++) {
+    matrix[i] = [i];
+  }
+  for (let j = 0; j <= len2; j++) {
+    matrix[0][j] = j;
+  }
+
+  // Fill in the rest of the matrix
+  for (let i = 1; i <= len1; i++) {
+    for (let j = 1; j <= len2; j++) {
+      if (s1[i - 1] === s2[j - 1]) {
+        matrix[i][j] = matrix[i - 1][j - 1];
+      } else {
+        matrix[i][j] = Math.min(
+          matrix[i - 1][j - 1] + 1, // substitution
+          matrix[i][j - 1] + 1,     // insertion
+          matrix[i - 1][j] + 1      // deletion
+        );
+      }
+    }
+  }
+
+  return matrix[len1][len2];
+}
+
+/**
+ * Check if two names are similar enough (for fuzzy matching)
+ * Handles common typos like "Milan" vs "Millan", "Sara" vs "Sarah"
+ */
+function areNamesSimilar(name1: string, name2: string, maxDistance: number = 1): boolean {
+  const distance = levenshteinDistance(name1, name2);
+  return distance <= maxDistance;
+}
+
 Deno.serve(async (req: Request) => {
   // Handle CORS preflight
   if (req.method === 'OPTIONS') {
@@ -435,82 +484,109 @@ Focus on accuracy - if unsure, set confidence low and explain why.`;
           detectionMethod = 'exact_match';
           console.log(`✅ Found exact employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
         } else {
-          // Strategy 2: Fuzzy name matching (first name + any part of last name)
+          // Strategy 2: Fuzzy name matching with Levenshtein distance (handles typos like "Milan" vs "Millan")
           if (nameParts.length >= 2) {
-            const { data: fuzzyMatch } = await supabase
+            console.log(`🔍 Attempting fuzzy match for: ${nameParts[0]} ${nameParts.slice(1).join(' ')}`);
+
+            // Get all active employees to compare against
+            const { data: allEmployees } = await supabase
               .from('employees')
               .select('id, first_name, last_name, employee_code, department, team_id')
-              .eq('status', 'active')
-              .ilike('first_name', `%${nameParts[0]}%`);
+              .eq('status', 'active');
 
-            if (fuzzyMatch && fuzzyMatch.length > 0) {
-              // Find best match based on last name similarity
-              const bestMatch = fuzzyMatch.find(emp =>
-                nameParts.slice(1).some(part =>
-                  emp.last_name.toLowerCase().includes(part.toLowerCase())
-                )
+            if (allEmployees && allEmployees.length > 0) {
+              // Find employees with similar first names (Levenshtein distance <= 1)
+              const fuzzyFirstNameMatches = allEmployees.filter(emp =>
+                areNamesSimilar(emp.first_name, nameParts[0], 1)
               );
 
-              if (bestMatch) {
-                matchedEmployee = bestMatch;
-                detectionMethod = 'fuzzy_match';
-                console.log(`✅ Found fuzzy employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+              console.log(`📋 Found ${fuzzyFirstNameMatches.length} employees with similar first name to "${nameParts[0]}"`);
+
+              if (fuzzyFirstNameMatches.length > 0) {
+                // If we have a last name, match it too
+                const lastName = nameParts.slice(1).join(' ');
+                const bestMatch = fuzzyFirstNameMatches.find(emp =>
+                  areNamesSimilar(emp.last_name, lastName, 1) ||
+                  emp.last_name.toLowerCase().includes(lastName.toLowerCase())
+                );
+
+                if (bestMatch) {
+                  matchedEmployee = bestMatch;
+                  detectionMethod = 'fuzzy_match';
+                  console.log(`✅ Found fuzzy employee match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+                  console.log(`   - Detected: "${nameParts.join(' ')}" -> Matched: "${matchedEmployee.first_name} ${matchedEmployee.last_name}"`);
+                } else if (fuzzyFirstNameMatches.length === 1) {
+                  // Only one match with similar first name - use it even without last name match
+                  matchedEmployee = fuzzyFirstNameMatches[0];
+                  detectionMethod = 'fuzzy_match';
+                  console.log(`✅ Found single fuzzy first name match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+                }
               }
             }
           }
 
-          // Strategy 3: First name only matching (for cases like "Hi, this is Sarah")
+          // Strategy 3: First name only matching with fuzzy logic (for cases like "Hi, this is Sarah" or "Millan speaking")
           if (!matchedEmployee && (nameParts.length === 1 || analysis.name_type === 'first_name_only')) {
             const firstName = nameParts[0];
             console.log(`🔍 Attempting first-name-only match for: ${firstName}`);
 
-            const { data: firstNameMatches } = await supabase
+            // Get all active employees
+            const { data: allEmployees } = await supabase
               .from('employees')
               .select('id, first_name, last_name, employee_code, department, team_id')
-              .eq('status', 'active')
-              .ilike('first_name', firstName);
+              .eq('status', 'active');
 
-            if (firstNameMatches && firstNameMatches.length > 0) {
-              if (firstNameMatches.length === 1) {
-                // Unique first name - high confidence
-                matchedEmployee = firstNameMatches[0];
-                detectionMethod = 'first_name_unique';
-                console.log(`✅ Found unique first-name match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
-              } else {
-                // Multiple matches - try disambiguation using context
-                console.log(`⚠️ Found ${firstNameMatches.length} employees with first name "${firstName}", attempting disambiguation...`);
+            if (allEmployees && allEmployees.length > 0) {
+              // Find employees with exact OR similar first names (Levenshtein distance <= 1)
+              const firstNameMatches = allEmployees.filter(emp =>
+                emp.first_name.toLowerCase() === firstName.toLowerCase() ||
+                areNamesSimilar(emp.first_name, firstName, 1)
+              );
 
-                // Disambiguation strategy: Check recent call history for this recording's user
-                if (recording.user_id) {
-                  const { data: recentCalls } = await supabase
-                    .from('employee_call_participation')
-                    .select('employee_id, employees!inner(id, first_name, last_name)')
-                    .in('employee_id', firstNameMatches.map(e => e.id))
-                    .order('created_at', { ascending: false })
-                    .limit(5);
+              console.log(`📋 Found ${firstNameMatches.length} employees with first name matching "${firstName}" (exact or similar)`);
 
-                  if (recentCalls && recentCalls.length > 0) {
-                    // Pick the most recently active employee with this first name
-                    matchedEmployee = firstNameMatches.find(e => e.id === recentCalls[0].employee_id) || firstNameMatches[0];
-                    detectionMethod = 'first_name_context';
-                    console.log(`✅ Selected employee via context: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (recent history)`);
+              if (firstNameMatches && firstNameMatches.length > 0) {
+                if (firstNameMatches.length === 1) {
+                  // Unique first name - high confidence
+                  matchedEmployee = firstNameMatches[0];
+                  detectionMethod = 'first_name_unique';
+                  console.log(`✅ Found unique first-name match: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (${matchedEmployee.id})`);
+                } else {
+                  // Multiple matches - try disambiguation using context
+                  console.log(`⚠️ Found ${firstNameMatches.length} employees with first name "${firstName}", attempting disambiguation...`);
+
+                  // Disambiguation strategy: Check recent call history for this recording's user
+                  if (recording.user_id) {
+                    const { data: recentCalls } = await supabase
+                      .from('employee_call_participation')
+                      .select('employee_id, employees!inner(id, first_name, last_name)')
+                      .in('employee_id', firstNameMatches.map(e => e.id))
+                      .order('created_at', { ascending: false })
+                      .limit(5);
+
+                    if (recentCalls && recentCalls.length > 0) {
+                      // Pick the most recently active employee with this first name
+                      matchedEmployee = firstNameMatches.find(e => e.id === recentCalls[0].employee_id) || firstNameMatches[0];
+                      detectionMethod = 'first_name_context';
+                      console.log(`✅ Selected employee via context: ${matchedEmployee.first_name} ${matchedEmployee.last_name} (recent history)`);
+                    } else {
+                      // No recent history - pick first match but lower confidence
+                      matchedEmployee = firstNameMatches[0];
+                      detectionMethod = 'first_name_ambiguous';
+                      analysis.confidence = Math.min(analysis.confidence, 0.55); // Lower confidence for ambiguous match
+                      console.log(`⚠️ Selected first match (ambiguous): ${matchedEmployee.first_name} ${matchedEmployee.last_name} - confidence reduced`);
+                    }
                   } else {
-                    // No recent history - pick first match but lower confidence
+                    // No user_id - pick first match but lower confidence
                     matchedEmployee = firstNameMatches[0];
                     detectionMethod = 'first_name_ambiguous';
-                    analysis.confidence = Math.min(analysis.confidence, 0.55); // Lower confidence for ambiguous match
-                    console.log(`⚠️ Selected first match (ambiguous): ${matchedEmployee.first_name} ${matchedEmployee.last_name} - confidence reduced`);
+                    analysis.confidence = Math.min(analysis.confidence, 0.55);
+                    console.log(`⚠️ Selected first match (no context): ${matchedEmployee.first_name} ${matchedEmployee.last_name} - confidence reduced`);
                   }
-                } else {
-                  // No user_id - pick first match but lower confidence
-                  matchedEmployee = firstNameMatches[0];
-                  detectionMethod = 'first_name_ambiguous';
-                  analysis.confidence = Math.min(analysis.confidence, 0.55);
-                  console.log(`⚠️ Selected first match (no context): ${matchedEmployee.first_name} ${matchedEmployee.last_name} - confidence reduced`);
                 }
+              } else {
+                console.log(`❌ No employees found with first name: ${firstName}`);
               }
-            } else {
-              console.log(`❌ No employees found with first name: ${firstName}`);
             }
           }
         }
