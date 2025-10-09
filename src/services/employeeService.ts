@@ -407,6 +407,79 @@ export class EmployeeService {
     return data;
   }
 
+  /**
+   * Calculate employee's rank within their team based on average scorecard performance
+   */
+  static async calculateEmployeeTeamRank(employeeId: string): Promise<{ rank: number; totalMembers: number; teamId: string | null }> {
+    try {
+      // Get employee's team_id
+      const { data: employee, error: empError } = await supabase
+        .from('employees')
+        .select('team_id')
+        .eq('id', employeeId)
+        .single();
+
+      if (empError || !employee?.team_id) {
+        console.warn('Employee has no team assigned:', empError);
+        return { rank: 0, totalMembers: 0, teamId: null };
+      }
+
+      const teamId = employee.team_id;
+
+      // Get all active employees in the same team
+      const { data: teamMembers, error: membersError } = await supabase
+        .from('employees')
+        .select('id, first_name, last_name')
+        .eq('team_id', teamId)
+        .eq('status', 'active');
+
+      if (membersError || !teamMembers || teamMembers.length === 0) {
+        console.warn('Failed to fetch team members:', membersError);
+        return { rank: 0, totalMembers: 0, teamId };
+      }
+
+      // Calculate average score for each team member
+      const memberScores = await Promise.all(
+        teamMembers.map(async (member) => {
+          const { data: scorecards } = await supabase
+            .from('employee_scorecards')
+            .select('overall_score')
+            .eq('employee_id', member.id)
+            .order('evaluated_at', { ascending: false })
+            .limit(10); // Use last 10 scorecards for average
+
+          const scores = scorecards?.map(s => s.overall_score) || [];
+          const averageScore = scores.length > 0
+            ? scores.reduce((sum, score) => sum + score, 0) / scores.length
+            : 0;
+
+          return {
+            employeeId: member.id,
+            name: `${member.first_name} ${member.last_name}`,
+            averageScore
+          };
+        })
+      );
+
+      // Sort by average score (descending) - higher scores = better rank
+      memberScores.sort((a, b) => b.averageScore - a.averageScore);
+
+      // Find employee's rank (1-indexed)
+      const rank = memberScores.findIndex(m => m.employeeId === employeeId) + 1;
+
+      console.log(`📊 Team rank calculated: ${rank}/${memberScores.length} for employee ${employeeId}`);
+
+      return {
+        rank: rank > 0 ? rank : 0,
+        totalMembers: memberScores.length,
+        teamId
+      };
+    } catch (error) {
+      console.error('Error calculating team rank:', error);
+      return { rank: 0, totalMembers: 0, teamId: null };
+    }
+  }
+
   // =============================================
   // ANALYTICS AND REPORTING
   // =============================================

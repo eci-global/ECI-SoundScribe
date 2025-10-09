@@ -24,6 +24,7 @@ import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
 import { toast } from 'sonner';
 import type { BDRScorecardEvaluation } from '@/types/bdr-training';
+import { EmployeeService } from '@/services/employeeService';
 
 interface ManagerFeedbackModalProps {
   isOpen: boolean;
@@ -222,6 +223,41 @@ const ManagerFeedbackModal: React.FC<ManagerFeedbackModalProps> = ({
         .single();
 
       if (error) throw error;
+
+      // Also create a coaching note for the employee profile
+      try {
+        // Get employee_id from recording via employee_call_participation
+        const { data: participation } = await supabase
+          .from('employee_call_participation')
+          .select('employee_id')
+          .eq('recording_id', recordingId)
+          .eq('participation_type', 'primary')
+          .single();
+
+        if (participation?.employee_id) {
+          const managerId = (await supabase.auth.getUser()).data.user?.id;
+
+          // Create coaching note with the corrected feedback
+          await EmployeeService.createCoachingNote({
+            employee_id: participation.employee_id,
+            manager_id: managerId,
+            recording_id: recordingId,
+            note_type: 'feedback',
+            title: `Manager Feedback - Score Adjusted from ${originalOverallScore.toFixed(1)} to ${newOverallScore.toFixed(1)}`,
+            content: managerNotes || coachingNotesCorrection || `Manager reviewed and adjusted AI evaluation. Reason: ${changeReason}`,
+            priority: isHighVariance() ? 'high' : 'medium',
+            action_items: Object.entries(criteriaAdjustmentsData).map(([criteria, adj]) =>
+              `${getCriteriaDisplayName(criteria)}: Score adjusted to ${adj.score}/4`
+            ),
+            status: 'open'
+          });
+
+          console.log('✅ Coaching note created for employee profile');
+        }
+      } catch (coachingNoteError) {
+        console.warn('⚠️ Failed to create coaching note (non-critical):', coachingNoteError);
+        // Don't fail the whole operation if coaching note creation fails
+      }
 
       toast.success('Manager feedback submitted successfully!');
       onFeedbackSubmitted?.();

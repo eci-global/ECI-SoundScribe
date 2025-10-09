@@ -30,12 +30,14 @@ const EmployeeProfile: React.FC = () => {
   const { id } = useParams<{ id: string }>();
   const navigate = useNavigate();
   const [employeeData, setEmployeeData] = useState<EmployeeDetailResponse | null>(null);
+  const [teamRank, setTeamRank] = useState<{ rank: number; totalMembers: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if (id) {
       loadEmployeeData();
+      loadTeamRank();
     }
   }, [id]);
 
@@ -48,6 +50,16 @@ const EmployeeProfile: React.FC = () => {
       setError(err instanceof Error ? err.message : 'Failed to load employee data');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const loadTeamRank = async () => {
+    try {
+      const rankData = await EmployeeService.calculateEmployeeTeamRank(id!);
+      setTeamRank(rankData);
+    } catch (err) {
+      console.warn('Failed to load team rank:', err);
+      // Non-critical error, don't show to user
     }
   };
 
@@ -158,10 +170,21 @@ const EmployeeProfile: React.FC = () => {
             <Award className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            <div className="text-2xl font-bold">#3</div>
-            <p className="text-xs text-muted-foreground">
-              Out of 12 team members
-            </p>
+            {teamRank && teamRank.rank > 0 ? (
+              <>
+                <div className="text-2xl font-bold">#{teamRank.rank}</div>
+                <p className="text-xs text-muted-foreground">
+                  Out of {teamRank.totalMembers} team member{teamRank.totalMembers !== 1 ? 's' : ''}
+                </p>
+              </>
+            ) : (
+              <>
+                <div className="text-2xl font-bold text-gray-400">N/A</div>
+                <p className="text-xs text-muted-foreground">
+                  No team assigned
+                </p>
+              </>
+            )}
           </CardContent>
         </Card>
       </div>
@@ -278,13 +301,14 @@ const EmployeeProfile: React.FC = () => {
                           showTooltip={true}
                           size="sm"
                           enableCorrection={true}
-                          participationId={recording.id}
+                          participationId={recording.participation_id}
                           recordingId={recording.id}
                           currentEmployee={{
                             id: employee.id,
                             name: `${employee.first_name} ${employee.last_name}`
                           }}
                           detectedName={recording.detected_name}
+                          reasoning={recording.reasoning}
                           onCorrectionSuccess={loadEmployeeData}
                         />
                       </div>

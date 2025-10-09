@@ -220,3 +220,72 @@ export async function logProcessingActivity(recordingId, activity, details = nul
     console.warn('Error logging processing activity:', error);
   }
 }
+
+/**
+ * After a recording is processed, ensure employee linkage and scorecard creation.
+ * - Creates employee_call_participation via Edge Function if missing
+ * - Generates employee_scorecards via Edge Function if participation exists and no scorecard yet
+ * Non-fatal: logs warnings and returns a summary.
+ */
+export async function postProcessEmployeeForRecording(recordingId) {
+  const summary = { participationChecked: false, participationCreated: false, scorecardCreated: false };
+  try {
+    // Check existing participation
+    const { data: existingParticipation, error: partErr } = await supabase
+      .from('employee_call_participation')
+      .select('id, employee_id')
+      .eq('recording_id', recordingId);
+    if (partErr) {
+      console.warn('postProcessEmployeeForRecording: participation check failed:', partErr.message);
+    }
+    summary.participationChecked = true;
+
+    if (!existingParticipation || existingParticipation.length === 0) {
+      try {
+        const { data: extractData, error: extractError } = await supabase.functions.invoke('extract-employee-name', {
+          body: { recording_id: recordingId }
+        });
+        if (extractError) {
+          console.warn('postProcessEmployeeForRecording: extract-employee-name failed:', extractError);
+        } else {
+          summary.participationCreated = !!extractData?.participation_created;
+        }
+      } catch (invErr) {
+        console.warn('postProcessEmployeeForRecording: invoke extract-employee-name error:', invErr?.message || invErr);
+      }
+    }
+
+    // Re-check participation before scorecard
+    const { data: partCheck } = await supabase
+      .from('employee_call_participation')
+      .select('id, employee_id')
+      .eq('recording_id', recordingId);
+    if (partCheck && partCheck.length > 0) {
+      // Check if scorecard already exists
+      const { data: existingScorecards, error: scErr } = await supabase
+        .from('employee_scorecards')
+        .select('id')
+        .eq('recording_id', recordingId);
+      if (scErr) {
+        console.warn('postProcessEmployeeForRecording: scorecard check failed:', scErr.message);
+      }
+      if (!existingScorecards || existingScorecards.length === 0) {
+        try {
+          const { data: scData, error: scError } = await supabase.functions.invoke('generate-employee-scorecard', {
+            body: { recording_id: recordingId }
+          });
+          if (scError) {
+            console.warn('postProcessEmployeeForRecording: generate-employee-scorecard failed:', scError);
+          } else {
+            summary.scorecardCreated = (scData?.scorecards_created || 0) > 0;
+          }
+        } catch (invErr2) {
+          console.warn('postProcessEmployeeForRecording: invoke generate-employee-scorecard error:', invErr2?.message || invErr2);
+        }
+      }
+    }
+  } catch (e) {
+    console.warn('postProcessEmployeeForRecording: unexpected error:', e?.message || e);
+  }
+  return summary;
+}
