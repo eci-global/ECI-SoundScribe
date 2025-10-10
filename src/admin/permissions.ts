@@ -53,6 +53,7 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionKey[]> = {
   '/admin/analytics': ['admin.analytics.view'],
   '/admin/bdr-training': ['admin.bdr.manage'],
   '/admin/bdr-scorecard-history': ['admin.bdr.manage'],
+  '/admin/feedback-analytics': ['admin.bdr.manage'],
   '/admin/roles-access': ['admin.roles.manage'],
   '/admin/support-settings': ['admin.support.manage'],
 };

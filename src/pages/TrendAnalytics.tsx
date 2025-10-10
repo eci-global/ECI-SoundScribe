@@ -137,13 +137,14 @@ export default function TrendAnalytics() {
   }, [user?.id]);
 
   // Filter recordings by current mode (sales/support/ux)
+  // Include recordings without content_type in all modes (they show up everywhere)
   const modeFilteredRecordings = useMemo(() => {
     if (supportMode.currentMode === 'sales') {
       return recordings.filter(r => r.content_type === 'sales_call' || !r.content_type);
     } else if (supportMode.currentMode === 'support') {
-      return recordings.filter(r => r.content_type === 'customer_support');
+      return recordings.filter(r => r.content_type === 'customer_support' || !r.content_type);
     } else if (supportMode.currentMode === 'ux') {
-      return recordings.filter(r => r.content_type === 'user_experience');
+      return recordings.filter(r => r.content_type === 'user_experience' || !r.content_type);
     }
     return recordings;
   }, [recordings, supportMode.currentMode]);

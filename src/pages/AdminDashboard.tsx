@@ -36,17 +36,7 @@ export default function AdminDashboard() {
     );
   }
 
-  if (!isAdmin) {
-    return (
-      <AdminLayout>
-        <div className="text-center py-12">
-          <h2 className="text-2xl font-bold text-gray-900 mb-4">Access Denied</h2>
-          <p className="text-gray-600">You don't have permission to access the admin dashboard.</p>
-        </div>
-      </AdminLayout>
-    );
-  }
-
+  // Check route-specific permissions instead of blanket admin check
   const req = getRoutePermissions(location.pathname);
   const allowed = req.length === 0 || req.every(hasPermission);
 
