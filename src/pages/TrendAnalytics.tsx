@@ -136,15 +136,27 @@ export default function TrendAnalytics() {
     };
   }, [user?.id]);
 
-  const baseEmployeeSummaries: EmployeeSummary[] = useMemo(() => buildEmployeeSummaries(recordings), [recordings]);
+  // Filter recordings by current mode (sales/support/ux)
+  const modeFilteredRecordings = useMemo(() => {
+    if (supportMode.currentMode === 'sales') {
+      return recordings.filter(r => r.content_type === 'sales_call' || !r.content_type);
+    } else if (supportMode.currentMode === 'support') {
+      return recordings.filter(r => r.content_type === 'customer_support');
+    } else if (supportMode.currentMode === 'ux') {
+      return recordings.filter(r => r.content_type === 'user_experience');
+    }
+    return recordings;
+  }, [recordings, supportMode.currentMode]);
+
+  const baseEmployeeSummaries: EmployeeSummary[] = useMemo(() => buildEmployeeSummaries(modeFilteredRecordings), [modeFilteredRecordings]);
 
   const employeeTeamsMap = useMemo(() => {
     return new Map(baseEmployeeSummaries.map(summary => [summary.employeeId, summary.team] as const));
   }, [baseEmployeeSummaries]);
 
   const filteredRecordings = useMemo(
-    () => filterRecordings(recordings, filters, employeeTeamsMap),
-    [recordings, filters, employeeTeamsMap],
+    () => filterRecordings(modeFilteredRecordings, filters, employeeTeamsMap),
+    [modeFilteredRecordings, filters, employeeTeamsMap],
   );
 
   const filteredEmployeeSummaries = useMemo(
