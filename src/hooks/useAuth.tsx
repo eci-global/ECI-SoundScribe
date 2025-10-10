@@ -27,28 +27,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   useEffect(() => {
     // Set up auth state listener first
     const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      async (event, session) => {
+      (event, session) => {
         console.log('Auth state changed:', event, {
           hasSession: !!session,
           userId: session?.user?.id,
           email: session?.user?.email
         });
-
-        // Initialize new users (especially for SSO)
-        if (event === 'SIGNED_IN' && session?.user) {
-          try {
-            console.log('Initializing new user...');
-            const { error } = await supabase.rpc('initialize_new_user');
-            if (error) {
-              console.error('Error initializing user:', error);
-            } else {
-              console.log('User initialized successfully');
-            }
-          } catch (error) {
-            console.error('Exception initializing user:', error);
-          }
-        }
-
         setSession(session);
         setUser(session?.user ?? null);
         setLoading(false);

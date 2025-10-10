@@ -22,6 +22,10 @@ interface WebhookPayload {
       name?: string;
       firstName?: string;
       lastName?: string;
+      custom_claims?: {
+        firstName?: string;
+        lastName?: string;
+      };
     };
   };
   schema: string;
@@ -62,13 +66,18 @@ serve(async (req) => {
 
     const { id: userId, email, raw_user_meta_data } = payload.record;
 
-    // Extract user name from metadata
+    // Extract user name from metadata (check custom_claims first for Okta SSO)
     const fullName =
       raw_user_meta_data?.full_name ||
       raw_user_meta_data?.name ||
+      (raw_user_meta_data?.custom_claims?.firstName && raw_user_meta_data?.custom_claims?.lastName
+        ? `${raw_user_meta_data.custom_claims.firstName} ${raw_user_meta_data.custom_claims.lastName}`
+        : null) ||
       (raw_user_meta_data?.firstName && raw_user_meta_data?.lastName
         ? `${raw_user_meta_data.firstName} ${raw_user_meta_data.lastName}`
         : null) ||
+      raw_user_meta_data?.custom_claims?.firstName ||
+      raw_user_meta_data?.firstName ||
       email.split("@")[0]; // fallback to email username
 
     console.log(`Processing new user: ${userId} (${email})`);
