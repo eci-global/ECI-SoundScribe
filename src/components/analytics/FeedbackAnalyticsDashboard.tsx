@@ -4,17 +4,18 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { 
-  BarChart3, 
-  TrendingUp, 
-  TrendingDown, 
-  Target, 
+import {
+  BarChart3,
+  TrendingUp,
+  TrendingDown,
+  Target,
   AlertTriangle,
   CheckCircle,
   Users,
   Calendar,
   Filter,
-  RefreshCw
+  RefreshCw,
+  ExternalLink
 } from 'lucide-react';
 import { cn } from '@/lib/utils';
 import { supabase } from '@/integrations/supabase/client';
@@ -23,6 +24,7 @@ import { toast } from 'sonner';
 interface FeedbackCorrection {
   id: string;
   recordingId: string;
+  recordingTitle: string;
   managerName: string;
   originalScore: number;
   correctedScore: number;
@@ -72,109 +74,10 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
     try {
       setLoading(true);
 
-      // Check if we're in demo mode (no database tables)
-      const isDemoMode = true; // Set to false when manager_feedback_corrections table exists
-      
-      if (isDemoMode) {
-        // Demo mode - generate mock analytics data
-        console.log('🎭 Demo Mode: Loading mock analytics data');
-        
-        const mockData: FeedbackAnalyticsData = {
-          totalCorrections: 15,
-          highVarianceCorrections: 3,
-          averageVariance: 0.8,
-          alignmentTrend: 12.5,
-          criteriaBreakdown: {
-            opening: {
-              totalAdjustments: 8,
-              averageVariance: 0.6,
-              mostCommonReason: 'too_lenient'
-            },
-            objection_handling: {
-              totalAdjustments: 12,
-              averageVariance: 1.2,
-              mostCommonReason: 'missed_context'
-            },
-            qualification: {
-              totalAdjustments: 6,
-              averageVariance: 0.4,
-              mostCommonReason: 'too_strict'
-            },
-            tone_and_energy: {
-              totalAdjustments: 4,
-              averageVariance: 0.3,
-              mostCommonReason: 'inaccurate_assessment'
-            }
-          },
-          corrections: [
-            {
-              id: 'demo-1',
-              recordingId: 'demo-recording-1',
-              managerName: 'Sarah Johnson',
-              originalScore: 2.8,
-              correctedScore: 3.2,
-              variance: 0.4,
-              reason: 'too_lenient',
-              createdAt: new Date(Date.now() - 2 * 60 * 60 * 1000).toISOString(),
-              highVariance: false
-            },
-            {
-              id: 'demo-2',
-              recordingId: 'demo-recording-2',
-              managerName: 'Mike Chen',
-              originalScore: 3.5,
-              correctedScore: 2.8,
-              variance: 0.7,
-              reason: 'missed_context',
-              createdAt: new Date(Date.now() - 5 * 60 * 60 * 1000).toISOString(),
-              highVariance: false
-            },
-            {
-              id: 'demo-3',
-              recordingId: 'demo-recording-3',
-              managerName: 'Lisa Rodriguez',
-              originalScore: 2.1,
-              correctedScore: 3.0,
-              variance: 0.9,
-              reason: 'too_strict',
-              createdAt: new Date(Date.now() - 8 * 60 * 60 * 1000).toISOString(),
-              highVariance: false
-            }
-          ],
-          managerPerformance: [
-            {
-              managerId: 'demo-manager-1',
-              managerName: 'Sarah Johnson',
-              totalCorrections: 8,
-              averageVariance: 0.6,
-              highVarianceCount: 1
-            },
-            {
-              managerId: 'demo-manager-2',
-              managerName: 'Mike Chen',
-              totalCorrections: 5,
-              averageVariance: 0.9,
-              highVarianceCount: 2
-            },
-            {
-              managerId: 'demo-manager-3',
-              managerName: 'Lisa Rodriguez',
-              totalCorrections: 2,
-              averageVariance: 0.4,
-              highVarianceCount: 0
-            }
-          ]
-        };
-
-        setData(mockData);
-        setLoading(false);
-        return;
-      }
-
       // Calculate date range
       let startDate: Date;
       let endDate: Date = new Date();
-      
+
       if (customDateRange) {
         startDate = new Date(customDateRange.from);
         endDate = new Date(customDateRange.to);
@@ -184,67 +87,81 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
         startDate.setDate(startDate.getDate() - days);
       }
 
-      // Build query filters (commented out since we're in demo mode)
-      // let query = supabase
-      //   .from('manager_feedback_corrections')
-      //   .select(`
-      //     id,
-      //     recording_id,
-      //     manager_id,
-      //     change_reason,
-      //     score_variance,
-      //     high_variance,
-      //     corrected_overall_score,
-      //     original_overall_score,
-      //     criteria_adjustments,
-      //     original_ai_scores,
-      //     created_at,
-      //     profiles!manager_feedback_corrections_manager_id_fkey(name)
-      //   `, { count: 'exact' })
-      //   .gte('created_at', startDate.toISOString())
-      //   .order('created_at', { ascending: false })
-      //   .range(0, MAX_ANALYTICS_RECORDS - 1);
+      // Build query for real-time data
+      let query = supabase
+        .from('manager_feedback_corrections')
+        .select(`
+          id,
+          recording_id,
+          manager_id,
+          change_reason,
+          score_variance,
+          high_variance,
+          corrected_overall_score,
+          original_overall_score,
+          criteria_adjustments,
+          original_ai_scores,
+          created_at,
+          profiles!manager_feedback_corrections_manager_id_fkey(full_name),
+          recordings!manager_feedback_corrections_recording_id_fkey(title)
+        `, { count: 'exact' })
+        .gte('created_at', startDate.toISOString())
+        .lte('created_at', endDate.toISOString())
+        .order('created_at', { ascending: false })
+        .limit(MAX_ANALYTICS_RECORDS);
 
-      // if (selectedManager !== 'all') {
-      //   query = query.eq('manager_id', selectedManager);
-      // }
+      if (selectedManager !== 'all') {
+        query = query.eq('manager_id', selectedManager);
+      }
 
-      // const { data: corrections, error, count } = await query;
+      const { data: corrections, error, count } = await query;
 
-      // if (error) throw error;
+      if (error) throw error;
 
-      // Process analytics data (commented out since we're in demo mode)
-      // const normalizedCorrections: FeedbackCorrection[] = (corrections || []).map((c: any) => ({
-      //   id: c.id,
-      //   recordingId: c.recording_id,
-      //   managerName: c.profiles?.name || 'Unknown',
-      //   originalScore: c.original_overall_score ?? 0,
-      //   correctedScore: c.corrected_overall_score ?? 0,
-      //   variance: c.score_variance ?? Math.abs((c.corrected_overall_score ?? 0) - (c.original_overall_score ?? 0)),
-      //   reason: c.change_reason,
-      //   createdAt: c.created_at,
-      //   highVariance: Boolean(c.high_variance)
-      // }));
+      // Process real-time analytics data
+      const normalizedCorrections: FeedbackCorrection[] = (corrections || []).map((c: any) => ({
+        id: c.id,
+        recordingId: c.recording_id,
+        recordingTitle: c.recordings?.title || 'Untitled Recording',
+        managerName: c.profiles?.full_name || 'Unknown',
+        originalScore: c.original_overall_score ?? 0,
+        correctedScore: c.corrected_overall_score ?? 0,
+        variance: c.score_variance ?? Math.abs((c.corrected_overall_score ?? 0) - (c.original_overall_score ?? 0)),
+        reason: c.change_reason,
+        createdAt: c.created_at,
+        highVariance: Boolean(c.high_variance)
+      }));
 
-      // const totalCorrections = typeof count === 'number' ? count : normalizedCorrections.length;
+      const totalCorrections = typeof count === 'number' ? count : normalizedCorrections.length;
 
-      // const analyticsData: FeedbackAnalyticsData = {
-      //   totalCorrections,
-      //   highVarianceCorrections: normalizedCorrections.filter(c => c.highVariance).length,
-      //   averageVariance: normalizedCorrections.length > 0
-      //     ? normalizedCorrections.reduce((sum, c) => sum + c.variance, 0) / normalizedCorrections.length
-      //     : 0,
-      //   alignmentTrend: calculateAlignmentTrend(normalizedCorrections),
-      //   criteriaBreakdown: calculateCriteriaBreakdown(corrections || []),
-      //   corrections: normalizedCorrections,
-      //   managerPerformance: calculateManagerPerformance(corrections || [])
-      // };
+      const analyticsData: FeedbackAnalyticsData = {
+        totalCorrections,
+        highVarianceCorrections: normalizedCorrections.filter(c => c.highVariance).length,
+        averageVariance: normalizedCorrections.length > 0
+          ? normalizedCorrections.reduce((sum, c) => sum + c.variance, 0) / normalizedCorrections.length
+          : 0,
+        alignmentTrend: calculateAlignmentTrend(normalizedCorrections),
+        criteriaBreakdown: calculateCriteriaBreakdown(corrections || []),
+        corrections: normalizedCorrections,
+        managerPerformance: calculateManagerPerformance(corrections || [])
+      };
 
-      // setData(analyticsData);
+      setData(analyticsData);
 
     } catch (error) {
       console.error('Error loading analytics data:', error);
       toast.error('Failed to load analytics data');
+
+      // Set empty data on error to prevent crash
+      setData({
+        totalCorrections: 0,
+        highVarianceCorrections: 0,
+        averageVariance: 0,
+        alignmentTrend: 0,
+        criteriaBreakdown: {},
+        corrections: [],
+        managerPerformance: []
+      });
     } finally {
       setLoading(false);
     }
@@ -399,25 +316,88 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
 
   return (
     <div className="space-y-6">
-      {/* Header */}
-      <div className="flex items-center justify-between">
+      {/* Statistics Cards */}
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4 mb-8">
+        <Card className="bg-white shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-caption text-eci-gray-500">Total Corrections</p>
+                <p className="mt-2 text-title font-semibold text-eci-gray-900">{data.totalCorrections}</p>
+                <p className="text-xs text-eci-gray-600">Last {timeRange === '7d' ? '7' : timeRange === '30d' ? '30' : '90'} days</p>
+              </div>
+              <Target className="h-8 w-8 text-blue-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-caption text-eci-gray-500">High Variance</p>
+                <p className="mt-2 text-title font-semibold text-orange-600">{data.highVarianceCorrections}</p>
+                <p className="text-xs text-eci-gray-600">
+                  {data.totalCorrections > 0
+                    ? ((data.highVarianceCorrections / data.totalCorrections) * 100).toFixed(1) + '%'
+                    : '0%'}
+                </p>
+              </div>
+              <AlertTriangle className="h-8 w-8 text-orange-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-caption text-eci-gray-500">Avg Variance</p>
+                <p className="mt-2 text-title font-semibold text-eci-gray-900">{data.averageVariance.toFixed(2)}</p>
+                <p className="text-xs text-eci-gray-600">Score difference</p>
+              </div>
+              <BarChart3 className="h-8 w-8 text-purple-500" />
+            </div>
+          </CardContent>
+        </Card>
+
+        <Card className="bg-white shadow-sm">
+          <CardContent className="p-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <p className="text-caption text-eci-gray-500">Alignment Trend</p>
+                <p className={cn(
+                  "mt-2 text-title font-semibold",
+                  data.alignmentTrend > 0 ? "text-green-600" : "text-red-600"
+                )}>
+                  {data.alignmentTrend > 0 ? '+' : ''}{data.alignmentTrend.toFixed(1)}%
+                </p>
+                <p className="text-xs text-eci-gray-600">
+                  {data.alignmentTrend > 0 ? 'Improving' : 'Declining'}
+                </p>
+              </div>
+              <TrendingUp className={cn(
+                "h-8 w-8",
+                data.alignmentTrend > 0 ? "text-green-500" : "text-red-500"
+              )} />
+            </div>
+          </CardContent>
+        </Card>
+      </div>
+
+      {/* Header with filters */}
+      <div className="flex items-center justify-between mb-4">
         <div>
-          <h2 className="text-2xl font-bold">Feedback Analytics</h2>
-          <p className="text-gray-600">AI vs Manager scoring alignment trends</p>
-          <div className="mt-2 flex items-center gap-2">
-            <Badge variant="outline" className="bg-blue-50 text-blue-600 border-blue-200">
-              🎭 Demo Mode
-            </Badge>
-            <span className="text-sm text-gray-500">
-              {customDateRange 
-                ? `${customDateRange.from} to ${customDateRange.to}`
-                : timeRange === '7d' ? 'Last 7 days' 
-                : timeRange === '30d' ? 'Last 30 days' 
-                : timeRange === '90d' ? 'Last 90 days' 
-                : 'Custom Range'
-              }
-            </span>
-          </div>
+          <h2 className="text-2xl font-bold">Detailed Analytics</h2>
+          <p className="text-sm text-gray-500">
+            {customDateRange
+              ? `${customDateRange.from} to ${customDateRange.to}`
+              : timeRange === '7d' ? 'Last 7 days'
+              : timeRange === '30d' ? 'Last 30 days'
+              : timeRange === '90d' ? 'Last 90 days'
+              : 'Custom Range'
+            }
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <Select value={timeRange} onValueChange={(value) => {
@@ -462,76 +442,6 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
         </div>
       </div>
 
-      {/* Key Metrics */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Total Corrections</p>
-                <p className="text-2xl font-bold">{data.totalCorrections}</p>
-              </div>
-              <Target className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">High Variance</p>
-                <p className="text-2xl font-bold text-orange-600">{data.highVarianceCorrections}</p>
-                <p className="text-xs text-gray-500">
-                  {data.totalCorrections > 0 ? 
-                    ((data.highVarianceCorrections / data.totalCorrections) * 100).toFixed(1) + '%' : 
-                    '0%'
-                  }
-                </p>
-              </div>
-              <AlertTriangle className="h-8 w-8 text-orange-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Avg Variance</p>
-                <p className="text-2xl font-bold">{data.averageVariance.toFixed(2)}</p>
-              </div>
-              <BarChart3 className="h-8 w-8 text-green-600" />
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center justify-between">
-              <div>
-                <p className="text-sm font-medium text-gray-600">Alignment Trend</p>
-                <p className={cn(
-                  "text-2xl font-bold",
-                  data.alignmentTrend > 0 ? "text-green-600" : "text-red-600"
-                )}>
-                  {data.alignmentTrend > 0 ? '+' : ''}{data.alignmentTrend.toFixed(1)}%
-                </p>
-                <div className="flex items-center gap-1">
-                  {data.alignmentTrend > 0 ? (
-                    <TrendingUp className="h-3 w-3 text-green-600" />
-                  ) : (
-                    <TrendingDown className="h-3 w-3 text-red-600" />
-                  )}
-                  <span className="text-xs text-gray-500">vs previous period</span>
-                </div>
-              </div>
-              <TrendingUp className="h-8 w-8 text-blue-600" />
-            </div>
-          </CardContent>
-        </Card>
-      </div>
-
       {/* Criteria Breakdown */}
       <Card>
         <CardHeader>
@@ -569,19 +479,30 @@ const FeedbackAnalyticsDashboard: React.FC = () => {
         <CardContent>
           <div className="space-y-3">
             {pagedCorrections.map((correction) => (
-              <div key={correction.id} className="flex items-center justify-between p-3 border rounded-lg">
-                <div className="flex-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-medium">{correction.managerName}</span>
+              <div key={correction.id} className="flex items-start justify-between p-4 border rounded-lg hover:border-gray-300 transition-colors">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <a
+                      href={`/recording/${correction.recordingId}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="font-medium text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-1"
+                    >
+                      {correction.recordingTitle}
+                      <ExternalLink className="h-3 w-3" />
+                    </a>
+                  </div>
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-sm text-gray-700">{correction.managerName}</span>
                     <Badge variant="outline" className="text-xs">
                       {getReasonLabel(correction.reason)}
                     </Badge>
                   </div>
                   <p className="text-sm text-gray-600">
-                    {correction.originalScore.toFixed(1)} → {correction.correctedScore.toFixed(1)}
+                    Score: {correction.originalScore.toFixed(1)} → {correction.correctedScore.toFixed(1)}
                   </p>
                 </div>
-                <div className="flex items-center gap-2">
+                <div className="flex flex-col items-end gap-2 ml-4">
                   <Badge variant={getVarianceBadgeVariant(correction.variance)}>
                     {correction.variance.toFixed(2)} variance
                   </Badge>

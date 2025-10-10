@@ -145,6 +145,7 @@ export const adminRouteMap: Record<string, React.ComponentType<any>> = {
   '/admin/analytics': AdvancedAnalyticsPage,
   '/admin/bdr-training': BDRTrainingSettings,
   '/admin/bdr-scorecard-history': BDRScorecardUploadHistory,
+  '/admin/feedback-analytics': FeedbackAnalytics,
   '/admin/ai-control': AIControlCenter,
   '/admin/ai-prompts': AIPromptManagement,
   '/admin/ai-models': AIModelConfiguration,
