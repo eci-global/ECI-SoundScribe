@@ -37,7 +37,7 @@ import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import AllRecordings from "./pages/admin/AllRecordings";
-// OktaCallback component no longer needed - Supabase handles SSO callbacks automatically
+import { AuthCallback } from "./components/auth/AuthCallback";
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
 
@@ -77,7 +77,7 @@ const App = () => {
               <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
-                  {/* Supabase handles SSO callbacks automatically at /auth/callback - no custom component needed */}
+                  <Route path="/auth/callback" element={<AuthCallback />} />
                   <Route path="/processing" element={<Navigate to="/uploads?tab=queue" replace />} />
                   <Route path="/uploads" element={<UploadsImport />} />
                   <Route path="/notifications" element={<NotificationsInbox />} />
