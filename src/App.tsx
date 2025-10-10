@@ -37,6 +37,7 @@ import EmployeeProfile from "./pages/EmployeeProfile";
 import EmployeeDashboard from "./pages/EmployeeDashboard";
 import AdminLayout from "./components/admin/AdminLayout";
 import AllRecordings from "./pages/admin/AllRecordings";
+// OktaCallback component no longer needed - Supabase handles SSO callbacks automatically
 import { SidebarProvider } from "@/contexts/SidebarContext";
 import { setupGlobalErrorHandler } from '@/utils/globalErrorHandler';
 
@@ -76,6 +77,7 @@ const App = () => {
               <BrowserRouter>
                 <Routes>
                   <Route path="/" element={<Index />} />
+                  {/* Supabase handles SSO callbacks automatically at /auth/callback - no custom component needed */}
                   <Route path="/processing" element={<Navigate to="/uploads?tab=queue" replace />} />
                   <Route path="/uploads" element={<UploadsImport />} />
                   <Route path="/notifications" element={<NotificationsInbox />} />
@@ -96,7 +98,7 @@ const App = () => {
                   <Route path="/debug/duration" element={<DurationDebug />} />
                   <Route path="/admin" element={<AdminDashboard />} />
                   <Route path="/admin/sign-in" element={<AdminSignIn />} />
-                  <Route path="/admin/library" element={<AllRecordings />} />
+                  <Route path="/admin/library" element={<AdminDashboard />} />
                   <Route path="/admin/create-users" element={<CreateUsers />} />
                   <Route path="/admin/recordings" element={<AdminDashboard />} />
                   <Route path="/admin/files" element={<AdminDashboard />} />
@@ -107,13 +109,12 @@ const App = () => {
                   <Route path="/admin/access" element={<AdminDashboard />} />
                   <Route path="/admin/tools" element={<AdminDashboard />} />
                   <Route path="/admin/audit" element={<AdminDashboard />} />
-                  <Route path="/admin/targeting" element={<AdminDashboard />} />
-                  <Route path="/admin/automations" element={<AdminDashboard />} />
+                                    <Route path="/admin/automations" element={<AdminDashboard />} />
                   <Route path="/admin/integrations" element={<AdminDashboard />} />
                   <Route path="/admin/organization-outreach" element={<AdminDashboard />} />
                   <Route path="/admin/analytics" element={<AdminDashboard />} />
                   <Route path="/admin/bdr-training" element={<AdminLayout><BDRTrainingSettings /></AdminLayout>} />
-                  <Route path="/admin/all-recordings" element={<AllRecordings />} />
+                  <Route path="/admin/all-recordings" element={<AdminDashboard />} />
                   <Route path="/admin/bdr-scorecard-history" element={<AdminDashboard />} />
                   <Route path="/admin/privacy" element={<AdminDashboard />} />
                   <Route path="/admin/activity" element={<AdminDashboard />} />
@@ -122,6 +123,9 @@ const App = () => {
                   <Route path="/admin/ai-models" element={<AdminDashboard />} />
                   <Route path="/admin/ai-scoring" element={<AdminDashboard />} />
                   <Route path="/admin/ai-experiments" element={<AdminDashboard />} />
+                  <Route path="/admin/roles-access" element={<AdminDashboard />} />
+                  <Route path="/admin/sso-management" element={<AdminDashboard />} />
+                  <Route path="/admin/support-settings" element={<AdminDashboard />} />
                   <Route path="/admin/feedback-analytics" element={<AdminLayout><FeedbackAnalytics /></AdminLayout>} />
                   <Route path="/feedback-test" element={<FeedbackSystemTest />} />
                   {/* Employee Management Routes */}
@@ -142,3 +146,5 @@ const App = () => {
 };
 
 export default App;
+
+

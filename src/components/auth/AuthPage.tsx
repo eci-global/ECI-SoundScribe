@@ -12,10 +12,12 @@ import { useToast } from '@/hooks/use-toast';
 
 export default function AuthPage() {
   console.log('AuthPage.tsx - AuthPage component rendering');
-  const { signIn, signUp, loading } = useAuth();
+  const { signIn, signUp, loading, signInWithSSO, checkSsoRequired, isSSOEnabled } = useAuth();
   const { toast } = useToast();
   const [authError, setAuthError] = useState<string | null>(null);
-  
+  const [ssoRequired, setSsoRequired] = useState(false);
+  const [checkingSSO, setCheckingSSO] = useState(false);
+
   console.log('AuthPage.tsx - loading:', loading);
 
   const [signInData, setSignInData] = useState({
@@ -29,12 +31,64 @@ export default function AuthPage() {
     fullName: ''
   });
 
+  // Check SSO requirement when email changes
+  const handleEmailChange = async (email: string, field: 'signIn' | 'signUp') => {
+    if (field === 'signIn') {
+      setSignInData({ ...signInData, email });
+    } else {
+      setSignUpData({ ...signUpData, email });
+    }
+
+    // Check if SSO is required for this email
+    if (email.includes('@') && email.includes('.')) {
+      setCheckingSSO(true);
+      const result = await checkSsoRequired(email);
+      setSsoRequired(result.required);
+      if (result.required) {
+        setAuthError(result.message || null);
+      } else {
+        setAuthError(null);
+      }
+      setCheckingSSO(false);
+    } else {
+      setSsoRequired(false);
+    }
+  };
+
+  const handleSSOSignIn = async () => {
+    try {
+      setAuthError(null);
+
+      if (!signInData.email) {
+        setAuthError('Please enter your email address');
+        return;
+      }
+
+      await signInWithSSO(signInData.email);
+      // User will be redirected to SSO provider (Okta)
+    } catch (error) {
+      console.error('SSO sign in failed:', error);
+      setAuthError('Failed to initiate SSO sign in');
+      toast({
+        title: "SSO Sign In Failed",
+        description: "Failed to initiate SSO sign in. Please try again.",
+        variant: "destructive"
+      });
+    }
+  };
+
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
     setAuthError(null);
 
     if (!signInData.email || !signInData.password) {
       setAuthError('Please fill in all fields');
+      return;
+    }
+
+    // Prevent password login if SSO is required
+    if (ssoRequired) {
+      setAuthError('SSO authentication is required for this account. Please use "Sign in with Okta".');
       return;
     }
 
@@ -167,6 +221,41 @@ export default function AuthPage() {
               </TabsList>
               
               <TabsContent value="signin">
+                {/* SSO Button - Show if SSO is configured in Supabase */}
+                {isSSOEnabled && (
+                  <div className="space-y-4 mb-6">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      className="w-full"
+                      onClick={handleSSOSignIn}
+                      disabled={loading || checkingSSO || !signInData.email}
+                    >
+                      {checkingSSO ? (
+                        <>
+                          <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                          Checking...
+                        </>
+                      ) : (
+                        <>
+                          <Shield className="mr-2 h-4 w-4" />
+                          Sign in with SSO
+                        </>
+                      )}
+                    </Button>
+                    <div className="relative">
+                      <div className="absolute inset-0 flex items-center">
+                        <span className="w-full border-t" />
+                      </div>
+                      <div className="relative flex justify-center text-xs uppercase">
+                        <span className="bg-white px-2 text-muted-foreground">
+                          Or continue with email
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                )}
+
                 <form onSubmit={handleSignIn} className="space-y-4">
                   <div className="space-y-2">
                     <Label htmlFor="email">Email</Label>
@@ -175,33 +264,39 @@ export default function AuthPage() {
                       type="email"
                       placeholder="Enter your email"
                       value={signInData.email}
-                      onChange={(e) => setSignInData({ ...signInData, email: e.target.value })}
+                      onChange={(e) => handleEmailChange(e.target.value, 'signIn')}
                       required
                       disabled={loading}
                     />
                   </div>
-                  
-                  <div className="space-y-2">
-                    <Label htmlFor="password">Password</Label>
-                    <Input
-                      id="password"
-                      type="password"
-                      placeholder="Enter your password"
-                      value={signInData.password}
-                      onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
-                      required
-                      disabled={loading}
-                    />
-                  </div>
-                  
-                  <Button 
-                    type="submit" 
-                    className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
-                    disabled={loading}
-                  >
-                    {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
-                    Sign In
-                  </Button>
+
+                  {/* Only show password field if SSO not required */}
+                  {!ssoRequired && (
+                    <div className="space-y-2">
+                      <Label htmlFor="password">Password</Label>
+                      <Input
+                        id="password"
+                        type="password"
+                        placeholder="Enter your password"
+                        value={signInData.password}
+                        onChange={(e) => setSignInData({ ...signInData, password: e.target.value })}
+                        required
+                        disabled={loading}
+                      />
+                    </div>
+                  )}
+
+                  {/* Only show password sign in button if SSO not required */}
+                  {!ssoRequired && (
+                    <Button
+                      type="submit"
+                      className="w-full bg-gradient-to-r from-blue-500 to-purple-600 hover:from-blue-600 hover:to-purple-700"
+                      disabled={loading || checkingSSO}
+                    >
+                      {loading && <Loader2 className="mr-2 h-4 w-4 animate-spin" />}
+                      Sign In
+                    </Button>
+                  )}
                 </form>
               </TabsContent>
               

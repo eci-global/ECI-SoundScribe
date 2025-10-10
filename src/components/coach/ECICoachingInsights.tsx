@@ -38,6 +38,7 @@ import {
 } from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
 import { useSpotlight } from '@/contexts/SpotlightContext';
+import { useSupportModeShowScores } from '@/hooks/useOrganizationSettings';
 
 interface ECICoachingInsightsProps {
   recording: Recording;
@@ -56,6 +57,9 @@ const ECICoachingInsights: React.FC<ECICoachingInsightsProps> = ({
 
   // Access spotlight context for media player seeking
   const { seek } = useSpotlight();
+
+  // Get organization setting for score visibility
+  const { showScores } = useSupportModeShowScores();
 
   // Parse ECI analysis from recording
   const analysis: ECIAnalysisResult | null = useMemo(() => {
@@ -516,18 +520,44 @@ const ECICoachingInsights: React.FC<ECICoachingInsightsProps> = ({
               {icon}
               <div>
                 <h3 className="font-semibold text-gray-900">{title}</h3>
-                <p className="text-sm text-gray-600">Weight: {weight}% of overall ECI score</p>
+                {showScores && (
+                  <p className="text-sm text-gray-600">Weight: {weight}% of overall ECI score</p>
+                )}
               </div>
             </div>
             <div className="flex items-center gap-3">
-              <div className="text-right">
-                <div className={cn('text-lg font-bold px-2 py-1 rounded border', getScoreColor(sectionScore))}>
-                  {sectionScore}%
+              {showScores ? (
+                // Scores visible: Show percentage and Y/N/U counts
+                <div className="text-right">
+                  <div className={cn('text-lg font-bold px-2 py-1 rounded border', getScoreColor(sectionScore))}>
+                    {sectionScore}%
+                  </div>
+                  <div className="text-xs text-gray-500 mt-1">
+                    {yesCount}Y / {noCount}N / {uncertainCount}U
+                  </div>
                 </div>
-                <div className="text-xs text-gray-500 mt-1">
-                  {yesCount}Y / {noCount}N / {uncertainCount}U
+              ) : (
+                // Scores hidden: Show qualitative indicator
+                <div className="text-right">
+                  <Badge
+                    variant="outline"
+                    className={cn(
+                      'text-sm font-medium',
+                      sectionScore >= 80
+                        ? 'text-green-700 border-green-300'
+                        : sectionScore >= 60
+                        ? 'text-yellow-700 border-yellow-300'
+                        : 'text-orange-700 border-orange-300'
+                    )}
+                  >
+                    {sectionScore >= 80
+                      ? 'Strong Performance'
+                      : sectionScore >= 60
+                      ? 'Good Progress'
+                      : 'Needs Improvement'}
+                  </Badge>
                 </div>
-              </div>
+              )}
               {expandedSections.has(sectionId) ? <ChevronUp className="w-5 h-5" /> : <ChevronDown className="w-5 h-5" />}
             </div>
           </div>
@@ -546,6 +576,68 @@ const ECICoachingInsights: React.FC<ECICoachingInsightsProps> = ({
 
   return (
     <div className={cn('space-y-4', className)}>
+      {/* Overall Coaching Summary */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="text-lg flex items-center gap-2">
+            <MessageSquare className="h-5 w-5 text-indigo-600" />
+            Coaching Summary
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="space-y-4">
+          {analysis.summary.briefOverallCoaching && (
+            <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
+              <h4 className="font-medium text-indigo-800 mb-1">Brief Overview</h4>
+              <p className="text-sm text-indigo-700">{analysis.summary.briefOverallCoaching}</p>
+            </div>
+          )}
+
+          {analysis.summary.detailedOverallCoaching && (
+            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
+              <h4 className="font-medium text-gray-800 mb-2">Detailed Analysis</h4>
+              <p className="text-sm text-gray-700">{analysis.summary.detailedOverallCoaching}</p>
+            </div>
+          )}
+
+          {/* Strengths and Improvements */}
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {analysis.summary.strengths.length > 0 && (
+              <div>
+                <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
+                  <TrendingUp className="w-4 h-4" />
+                  Demonstrated Strengths
+                </h4>
+                <ul className="space-y-1">
+                  {analysis.summary.strengths.map((strength, idx) => (
+                    <li key={idx} className="text-sm text-green-700 flex items-start gap-2">
+                      <CheckCircle className="w-3 h-3 text-green-600 mt-1 flex-shrink-0" />
+                      {strength}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {analysis.summary.improvementAreas.length > 0 && (
+              <div>
+                <h4 className="font-medium text-orange-800 mb-2 flex items-center gap-2">
+                  <Target className="w-4 h-4" />
+                  Improvement Opportunities
+                </h4>
+                <ul className="space-y-1">
+                  {analysis.summary.improvementAreas.map((area, idx) => (
+                    <li key={idx} className="text-sm text-orange-700 flex items-start gap-2">
+                      <AlertTriangle className="w-3 h-3 text-orange-600 mt-1 flex-shrink-0" />
+                      {area}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
       {/* ECI Overview Header */}
       <Card>
         <CardHeader className="pb-3">
@@ -643,68 +735,6 @@ const ECICoachingInsights: React.FC<ECICoachingInsightsProps> = ({
           'flow'
         )}
       </div>
-
-      {/* Overall Coaching Summary */}
-      <Card>
-        <CardHeader>
-          <CardTitle className="text-lg flex items-center gap-2">
-            <MessageSquare className="h-5 w-5 text-indigo-600" />
-            Coaching Summary
-          </CardTitle>
-        </CardHeader>
-        <CardContent className="space-y-4">
-          {analysis.summary.briefOverallCoaching && (
-            <div className="p-3 bg-indigo-50 rounded-lg border border-indigo-200">
-              <h4 className="font-medium text-indigo-800 mb-1">Brief Overview</h4>
-              <p className="text-sm text-indigo-700">{analysis.summary.briefOverallCoaching}</p>
-            </div>
-          )}
-
-          {analysis.summary.detailedOverallCoaching && (
-            <div className="p-3 bg-gray-50 rounded-lg border border-gray-200">
-              <h4 className="font-medium text-gray-800 mb-2">Detailed Analysis</h4>
-              <p className="text-sm text-gray-700">{analysis.summary.detailedOverallCoaching}</p>
-            </div>
-          )}
-
-          {/* Strengths and Improvements */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {analysis.summary.strengths.length > 0 && (
-              <div>
-                <h4 className="font-medium text-green-800 mb-2 flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4" />
-                  Demonstrated Strengths
-                </h4>
-                <ul className="space-y-1">
-                  {analysis.summary.strengths.map((strength, idx) => (
-                    <li key={idx} className="text-sm text-green-700 flex items-start gap-2">
-                      <CheckCircle className="w-3 h-3 text-green-600 mt-1 flex-shrink-0" />
-                      {strength}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-
-            {analysis.summary.improvementAreas.length > 0 && (
-              <div>
-                <h4 className="font-medium text-orange-800 mb-2 flex items-center gap-2">
-                  <Target className="w-4 h-4" />
-                  Improvement Opportunities
-                </h4>
-                <ul className="space-y-1">
-                  {analysis.summary.improvementAreas.map((area, idx) => (
-                    <li key={idx} className="text-sm text-orange-700 flex items-start gap-2">
-                      <AlertTriangle className="w-3 h-3 text-orange-600 mt-1 flex-shrink-0" />
-                      {area}
-                    </li>
-                  ))}
-                </ul>
-              </div>
-            )}
-          </div>
-        </CardContent>
-      </Card>
     </div>
   );
 };

@@ -39,10 +39,19 @@ import { Badge } from '@/components/ui/badge';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import {
+  Accordion,
+  AccordionContent,
+  AccordionItem,
+  AccordionTrigger,
+} from '@/components/ui/accordion';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { cn } from '@/lib/utils';
 import { formatDuration } from '@/utils/mediaDuration';
 import { useSentimentAnalysisV2 } from '@/hooks/useSentimentAnalysisV2';
 import { useSpotlight } from '@/contexts/SpotlightContext';
 import { useSupportMode } from '@/contexts/SupportContext';
+import { useSupportModeShowScores } from '@/hooks/useOrganizationSettings';
 import {
   parseECIAnalysis,
   getECIOverallScore,
@@ -51,6 +60,18 @@ import {
   type ECIAnalysisResult
 } from '@/utils/eciAnalysis';
 import type { Recording } from '@/types/recording';
+import HeroMetricCard from '@/components/analytics/HeroMetricCard';
+import HorizontalBarChart from '@/components/analytics/HorizontalBarChart';
+import InsightCard from '@/components/analytics/InsightCard';
+import ActionCard from '@/components/analytics/ActionCard';
+import {
+  getMetricStatus,
+  formatTrend,
+  getStatusSubtitle,
+  calculateResolutionTime,
+  getEscalationStatus,
+  calculateSectionScore
+} from '@/utils/performanceMetrics';
 
 interface AnalyticsPanelProps {
   recording?: Recording | null;
@@ -99,6 +120,7 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
 
   const { seek } = useSpotlight();
   const supportMode = useSupportMode();
+  const { showScores } = useSupportModeShowScores();
 
   // Mode detection logic
   const isSupport = React.useMemo(() => {
@@ -969,68 +991,95 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
 
           {/* Support Mode Analytics Sections */}
           {isSupport && (
-            <>
-              {/* Service Delivery Intelligence */}
-              <section className="space-y-4">
-                <div className="flex items-center gap-2 mb-4">
-                  <Shield className="w-5 h-5 text-blue-600" />
-                  <h3 className="text-lg font-semibold text-foreground">Service Delivery Intelligence</h3>
-                  <Badge variant="outline" className="text-xs">
-                    ECI Framework
-                  </Badge>
+            <Tabs defaultValue="overview" className="w-full">
+              <TabsList className="grid w-full grid-cols-4 mb-6">
+                <TabsTrigger value="overview" className="gap-2">
+                  <Shield className="w-4 h-4" />
+                  Overview
+                </TabsTrigger>
+                <TabsTrigger value="eci-details" className="gap-2">
+                  <BarChart2 className="w-4 h-4" />
+                  ECI Details
+                </TabsTrigger>
+                <TabsTrigger value="insights" className="gap-2">
+                  <Brain className="w-4 h-4" />
+                  AI Insights
+                </TabsTrigger>
+                <TabsTrigger value="actions" className="gap-2">
+                  <Target className="w-4 h-4" />
+                  Actions
+                </TabsTrigger>
+              </TabsList>
+
+              {/* Tab 1: Overview */}
+              <TabsContent value="overview" className="space-y-6">
+                {/* Performance Overview - Hero Section */}
+                <section className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-blue-600" />
+                    <h3 className="text-lg font-semibold text-foreground">Performance Overview</h3>
+                    <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                      ECI Framework
+                    </Badge>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                  {/* Service Quality Score */}
-                  <Card className="bg-gradient-to-br from-blue-50 to-blue-100 border-blue-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-blue-600 rounded-lg">
-                          <Star className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-blue-900">
-                            {eciAnalysis ? getECIOverallScore(eciAnalysis) : performanceMetrics.sentimentScore}%
-                          </div>
-                          <div className="text-sm text-blue-700">Service Quality</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                  {/* Service Quality */}
+                  {(() => {
+                    const score = eciAnalysis ? getECIOverallScore(eciAnalysis) : performanceMetrics.sentimentScore;
+                    const status = getMetricStatus(score);
+                    const displayValue = showScores ? `${score}%` : (
+                      score >= 85 ? 'Excellent' : score >= 70 ? 'Good' : score >= 50 ? 'Fair' : 'Needs Attention'
+                    );
+
+                    return (
+                      <HeroMetricCard
+                        icon={Star}
+                        label="Service Quality"
+                        value={displayValue}
+                        score={showScores ? score : undefined}
+                        trend={formatTrend(score, score - 5)} // Mock previous value
+                        trendDirection={score >= 70 ? 'up' : 'down'}
+                        status={status}
+                        subtitle={getStatusSubtitle(status)}
+                      />
+                    );
+                  })()}
 
                   {/* Escalation Risk */}
-                  <Card className="bg-gradient-to-br from-orange-50 to-orange-100 border-orange-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-orange-600 rounded-lg">
-                          <AlertTriangle className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-orange-900 capitalize">
-                            {eciAnalysis ? getECIEscalationRisk(eciAnalysis) : 'Low'}
-                          </div>
-                          <div className="text-sm text-orange-700">Escalation Risk</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {(() => {
+                    const risk = eciAnalysis ? getECIEscalationRisk(eciAnalysis) : 'Low';
+                    const { status, subtitle } = getEscalationStatus(risk as 'low' | 'medium' | 'high');
+
+                    return (
+                      <HeroMetricCard
+                        icon={AlertTriangle}
+                        label="Escalation Risk"
+                        value={risk}
+                        status={status}
+                        subtitle={subtitle}
+                      />
+                    );
+                  })()}
 
                   {/* Resolution Efficiency */}
-                  <Card className="bg-gradient-to-br from-green-50 to-green-100 border-green-200">
-                    <CardContent className="p-4">
-                      <div className="flex items-center gap-3">
-                        <div className="p-2 bg-green-600 rounded-lg">
-                          <CheckCircle className="w-5 h-5 text-white" />
-                        </div>
-                        <div>
-                          <div className="text-2xl font-bold text-green-900">
-                            {Math.round((performanceMetrics.duration / 60) / (performanceMetrics.wordsPerMinute / 150))}m
-                          </div>
-                          <div className="text-sm text-green-700">Avg Resolution</div>
-                        </div>
-                      </div>
-                    </CardContent>
-                  </Card>
+                  {(() => {
+                    const resolutionTime = calculateResolutionTime(performanceMetrics.duration, performanceMetrics.wordsPerMinute);
+                    const minutes = parseInt(resolutionTime);
+                    const status = minutes <= 10 ? 'excellent' : minutes <= 20 ? 'good' : 'warning';
+
+                    return (
+                      <HeroMetricCard
+                        icon={CheckCircle}
+                        label="Avg Resolution Time"
+                        value={resolutionTime}
+                        status={status}
+                        subtitle={minutes <= 10 ? 'Quick response' : minutes <= 20 ? 'Standard time' : 'Could improve'}
+                      />
+                    );
+                  })()}
                 </div>
               </section>
 
@@ -1043,11 +1092,25 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                   <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-purple-600">{performanceMetrics.sentimentScore}%</div>
-                    <div className="text-sm text-muted-foreground">Satisfaction Score</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      {stats.positiveMoments}P / {stats.negativeMoments}N
-                    </div>
+                    {showScores ? (
+                      <>
+                        <div className="text-2xl font-bold text-purple-600">{performanceMetrics.sentimentScore}%</div>
+                        <div className="text-sm text-muted-foreground">Satisfaction Score</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          {stats.positiveMoments}P / {stats.negativeMoments}N
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-xl font-bold text-purple-600">
+                          {performanceMetrics.sentimentScore >= 80 ? 'High' : performanceMetrics.sentimentScore >= 60 ? 'Moderate' : 'Low'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Satisfaction Level</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Based on sentiment
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
@@ -1059,23 +1122,667 @@ export default function AnalyticsPanel({ recording }: AnalyticsPanelProps) {
                   </div>
 
                   <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-cyan-600">{performanceMetrics.engagementScore}%</div>
-                    <div className="text-sm text-muted-foreground">Engagement Level</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      Customer participation
-                    </div>
+                    {showScores ? (
+                      <>
+                        <div className="text-2xl font-bold text-cyan-600">{performanceMetrics.engagementScore}%</div>
+                        <div className="text-sm text-muted-foreground">Engagement Level</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Customer participation
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-xl font-bold text-cyan-600">
+                          {performanceMetrics.engagementScore >= 80 ? 'Active' : performanceMetrics.engagementScore >= 60 ? 'Moderate' : 'Passive'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Engagement Level</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Customer participation
+                        </div>
+                      </>
+                    )}
                   </div>
 
                   <div className="bg-white border border-gray-200 rounded-lg p-4 text-center">
-                    <div className="text-2xl font-bold text-teal-600">{performanceMetrics.talkRatio}%</div>
-                    <div className="text-sm text-muted-foreground">Agent Talk Time</div>
-                    <div className="text-xs text-muted-foreground mt-1">
-                      vs Customer: {100 - performanceMetrics.talkRatio}%
-                    </div>
+                    {showScores ? (
+                      <>
+                        <div className="text-2xl font-bold text-teal-600">{performanceMetrics.talkRatio}%</div>
+                        <div className="text-sm text-muted-foreground">Agent Talk Time</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          vs Customer: {100 - performanceMetrics.talkRatio}%
+                        </div>
+                      </>
+                    ) : (
+                      <>
+                        <div className="text-xl font-bold text-teal-600">
+                          {performanceMetrics.talkRatio >= 60 ? 'Agent-Led' : performanceMetrics.talkRatio >= 40 ? 'Balanced' : 'Customer-Led'}
+                        </div>
+                        <div className="text-sm text-muted-foreground">Talk Balance</div>
+                        <div className="text-xs text-muted-foreground mt-1">
+                          Conversation style
+                        </div>
+                      </>
+                    )}
                   </div>
                 </div>
               </section>
-            </>
+              </TabsContent>
+
+              {/* Tab 2: ECI Details */}
+              <TabsContent value="eci-details" className="space-y-6">
+              {/* ECI Performance Breakdown */}
+              {eciAnalysis && (
+                <section className="space-y-4">
+                  <div className="flex items-center justify-between mb-4">
+                    <div className="flex items-center gap-2">
+                      <BarChart2 className="w-5 h-5 text-blue-600" />
+                      <h3 className="text-lg font-semibold text-foreground">ECI Quality Framework Breakdown</h3>
+                      <Badge variant="outline" className="text-xs bg-blue-50 text-blue-700 border-blue-200">
+                        Detailed Analysis
+                      </Badge>
+                    </div>
+                  </div>
+
+                  <Card className="border-blue-100 bg-gradient-to-br from-blue-50/50 to-white">
+                    <CardHeader className="pb-4">
+                      <CardTitle className="text-base flex items-center gap-2">
+                        <Shield className="w-4 h-4 text-blue-600" />
+                        Performance by Framework Section
+                      </CardTitle>
+                    </CardHeader>
+                    <CardContent>
+                      <HorizontalBarChart
+                        data={[
+                          {
+                            label: 'Care for Customer',
+                            score: calculateSectionScore(eciAnalysis.careForCustomer),
+                            icon: Heart,
+                            subtitle: '6 behaviors evaluated'
+                          },
+                          {
+                            label: 'Call Resolution',
+                            score: calculateSectionScore(eciAnalysis.callResolution),
+                            icon: CheckCircle,
+                            subtitle: '2 behaviors evaluated'
+                          },
+                          {
+                            label: 'Call Flow',
+                            score: calculateSectionScore(eciAnalysis.callFlow),
+                            icon: Clock,
+                            subtitle: '4 behaviors evaluated'
+                          }
+                        ]}
+                        showScores={showScores}
+                      />
+
+                      {/* Expandable Behavior Details */}
+                      <div className="mt-6">
+                        <Accordion type="single" collapsible className="w-full">
+                          {/* Care for Customer */}
+                          <AccordionItem value="care-for-customer" className="border-blue-100">
+                            <AccordionTrigger className="hover:no-underline hover:bg-blue-50/50 px-4 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <Heart className="w-4 h-4 text-rose-500" />
+                                <span className="font-semibold text-gray-900">Care for Customer</span>
+                                <Badge variant="outline" className="ml-2 text-xs">
+                                  {showScores ?
+                                    `${calculateSectionScore(eciAnalysis.careForCustomer)}%` :
+                                    calculateSectionScore(eciAnalysis.careForCustomer) >= 80 ? 'Strong' : 'Developing'
+                                  }
+                                </Badge>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pt-4">
+                              <div className="space-y-3">
+                                {Object.entries(eciAnalysis.careForCustomer).map(([key, behavior]) => {
+                                  const behaviorName = key.replace(/([A-Z])/g, ' $1').trim();
+                                  const capitalizedName = behaviorName.charAt(0).toUpperCase() + behaviorName.slice(1);
+
+                                  return (
+                                    <div key={key} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                                      <div className={cn(
+                                        'w-2 h-2 rounded-full mt-1.5 flex-shrink-0',
+                                        behavior.rating === 'YES' && 'bg-green-500',
+                                        behavior.rating === 'NO' && 'bg-red-500',
+                                        behavior.rating === 'UNCERTAIN' && 'bg-yellow-500'
+                                      )} />
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <span className="text-sm font-medium text-gray-900">{capitalizedName}</span>
+                                          {showScores && (
+                                            <Badge
+                                              variant="outline"
+                                              className={cn(
+                                                'text-xs',
+                                                behavior.rating === 'YES' && 'bg-green-50 text-green-700 border-green-200',
+                                                behavior.rating === 'NO' && 'bg-red-50 text-red-700 border-red-200',
+                                                behavior.rating === 'UNCERTAIN' && 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                              )}
+                                            >
+                                              {behavior.rating}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-gray-600 leading-relaxed">{behavior.briefTip}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+
+                          {/* Call Resolution */}
+                          <AccordionItem value="call-resolution" className="border-blue-100">
+                            <AccordionTrigger className="hover:no-underline hover:bg-blue-50/50 px-4 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <CheckCircle className="w-4 h-4 text-green-500" />
+                                <span className="font-semibold text-gray-900">Call Resolution</span>
+                                <Badge variant="outline" className="ml-2 text-xs">
+                                  {showScores ?
+                                    `${calculateSectionScore(eciAnalysis.callResolution)}%` :
+                                    calculateSectionScore(eciAnalysis.callResolution) >= 80 ? 'Strong' : 'Developing'
+                                  }
+                                </Badge>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pt-4">
+                              <div className="space-y-3">
+                                {Object.entries(eciAnalysis.callResolution).map(([key, behavior]) => {
+                                  const behaviorName = key.replace(/([A-Z])/g, ' $1').trim();
+                                  const capitalizedName = behaviorName.charAt(0).toUpperCase() + behaviorName.slice(1);
+
+                                  return (
+                                    <div key={key} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                                      <div className={cn(
+                                        'w-2 h-2 rounded-full mt-1.5 flex-shrink-0',
+                                        behavior.rating === 'YES' && 'bg-green-500',
+                                        behavior.rating === 'NO' && 'bg-red-500',
+                                        behavior.rating === 'UNCERTAIN' && 'bg-yellow-500'
+                                      )} />
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <span className="text-sm font-medium text-gray-900">{capitalizedName}</span>
+                                          {showScores && (
+                                            <Badge
+                                              variant="outline"
+                                              className={cn(
+                                                'text-xs',
+                                                behavior.rating === 'YES' && 'bg-green-50 text-green-700 border-green-200',
+                                                behavior.rating === 'NO' && 'bg-red-50 text-red-700 border-red-200',
+                                                behavior.rating === 'UNCERTAIN' && 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                              )}
+                                            >
+                                              {behavior.rating}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-gray-600 leading-relaxed">{behavior.briefTip}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+
+                          {/* Call Flow */}
+                          <AccordionItem value="call-flow" className="border-blue-100">
+                            <AccordionTrigger className="hover:no-underline hover:bg-blue-50/50 px-4 rounded-lg">
+                              <div className="flex items-center gap-3">
+                                <Clock className="w-4 h-4 text-blue-500" />
+                                <span className="font-semibold text-gray-900">Call Flow</span>
+                                <Badge variant="outline" className="ml-2 text-xs">
+                                  {showScores ?
+                                    `${calculateSectionScore(eciAnalysis.callFlow)}%` :
+                                    calculateSectionScore(eciAnalysis.callFlow) >= 80 ? 'Strong' : 'Developing'
+                                  }
+                                </Badge>
+                              </div>
+                            </AccordionTrigger>
+                            <AccordionContent className="px-4 pt-4">
+                              <div className="space-y-3">
+                                {Object.entries(eciAnalysis.callFlow).map(([key, behavior]) => {
+                                  const behaviorName = key.replace(/([A-Z])/g, ' $1').trim();
+                                  const capitalizedName = behaviorName.charAt(0).toUpperCase() + behaviorName.slice(1);
+
+                                  return (
+                                    <div key={key} className="flex items-start gap-3 p-3 bg-white rounded-lg border border-gray-100">
+                                      <div className={cn(
+                                        'w-2 h-2 rounded-full mt-1.5 flex-shrink-0',
+                                        behavior.rating === 'YES' && 'bg-green-500',
+                                        behavior.rating === 'NO' && 'bg-red-500',
+                                        behavior.rating === 'UNCERTAIN' && 'bg-yellow-500'
+                                      )} />
+                                      <div className="flex-1">
+                                        <div className="flex items-center justify-between mb-1">
+                                          <span className="text-sm font-medium text-gray-900">{capitalizedName}</span>
+                                          {showScores && (
+                                            <Badge
+                                              variant="outline"
+                                              className={cn(
+                                                'text-xs',
+                                                behavior.rating === 'YES' && 'bg-green-50 text-green-700 border-green-200',
+                                                behavior.rating === 'NO' && 'bg-red-50 text-red-700 border-red-200',
+                                                behavior.rating === 'UNCERTAIN' && 'bg-yellow-50 text-yellow-700 border-yellow-200'
+                                              )}
+                                            >
+                                              {behavior.rating}
+                                            </Badge>
+                                          )}
+                                        </div>
+                                        <p className="text-xs text-gray-600 leading-relaxed">{behavior.briefTip}</p>
+                                      </div>
+                                    </div>
+                                  );
+                                })}
+                              </div>
+                            </AccordionContent>
+                          </AccordionItem>
+                        </Accordion>
+                      </div>
+                    </CardContent>
+  </Card>
+                </section>
+              )}
+              </TabsContent>
+
+              {/* Tab 3: AI Insights */}
+              <TabsContent value="insights" className="space-y-6">
+              {/* AI Insights & Coaching */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Brain className="w-5 h-5 text-purple-600" />
+                    <h3 className="text-lg font-semibold text-foreground">AI Insights & Coaching</h3>
+                    <Badge variant="outline" className="text-xs bg-purple-50 text-purple-700 border-purple-200">
+                      Actionable Intelligence
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Key Strengths */}
+                  {eciAnalysis?.summary?.strengths && eciAnalysis.summary.strengths.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                        <Star className="w-4 h-4 text-emerald-600" />
+                        Key Strengths
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {eciAnalysis.summary.strengths.slice(0, 4).map((strength, index) => (
+                          <div key={`strength-${index}`} className="animate-stagger">
+                            <InsightCard
+                              icon={CheckCircle}
+                              title="Performance Excellence"
+                              description={strength}
+                              type="strength"
+                              priority={index === 0 ? 'high' : 'medium'}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Improvement Areas */}
+                  {eciAnalysis?.summary?.improvementAreas && eciAnalysis.summary.improvementAreas.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                        <TrendingUp className="w-4 h-4 text-amber-600" />
+                        Growth Opportunities
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {eciAnalysis.summary.improvementAreas.slice(0, 4).map((improvement, index) => (
+                          <div key={`improvement-${index}`} className="animate-stagger">
+                            <InsightCard
+                              icon={Lightbulb}
+                              title="Coaching Focus"
+                              description={improvement}
+                              type="improvement"
+                              priority="medium"
+                              actionable={true}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Risk Alerts */}
+                  {riskAlerts.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                        <AlertTriangle className="w-4 h-4 text-red-600" />
+                        Risk Factors
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {riskAlerts.slice(0, 4).map((risk, index) => (
+                          <div key={`risk-${index}`} className="animate-stagger">
+                            <InsightCard
+                              icon={AlertTriangle}
+                              title="Attention Required"
+                              description={risk}
+                              type="risk"
+                              priority={index === 0 ? 'high' : 'medium'}
+                              actionable={true}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Opportunities */}
+                  {opportunities.length > 0 && (
+                    <div className="space-y-3">
+                      <h4 className="text-sm font-semibold text-gray-700 flex items-center gap-2">
+                        <Zap className="w-4 h-4 text-blue-600" />
+                        Strategic Opportunities
+                      </h4>
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                        {opportunities.slice(0, 4).map((opportunity, index) => (
+                          <div key={`opportunity-${index}`} className="animate-stagger">
+                            <InsightCard
+                              icon={Zap}
+                              title="Action Item"
+                              description={opportunity}
+                              type="opportunity"
+                              priority="medium"
+                              actionable={true}
+                            />
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Overall Coaching Insight */}
+                  {eciAnalysis?.summary?.briefOverallCoaching && (
+                    <Card className="bg-gradient-to-br from-indigo-50 to-purple-50 border-indigo-200 animate-scale-in">
+                      <CardContent className="p-6">
+                        <div className="flex items-start gap-4">
+                          <div className="p-3 bg-indigo-600 rounded-xl">
+                            <Brain className="w-6 h-6 text-white" />
+                          </div>
+                          <div className="flex-1">
+                            <h4 className="text-base font-semibold text-indigo-900 mb-2">
+                              AI Coaching Summary
+                            </h4>
+                            <p className="text-sm text-indigo-800 leading-relaxed">
+                              {eciAnalysis.summary.briefOverallCoaching}
+                            </p>
+                            {eciAnalysis.summary.managerReviewRequired && (
+                              <Badge variant="outline" className="mt-3 bg-red-50 text-red-700 border-red-200">
+                                Manager Review Required
+                              </Badge>
+                            )}
+                          </div>
+                        </div>
+                      </CardContent>
+                    </Card>
+                  )}
+                </div>
+              </section>
+              </TabsContent>
+
+              {/* Tab 4: Actions */}
+              <TabsContent value="actions" className="space-y-6">
+              {/* Recommended Actions */}
+              <section className="space-y-4">
+                <div className="flex items-center justify-between mb-4">
+                  <div className="flex items-center gap-2">
+                    <Target className="w-5 h-5 text-indigo-600" />
+                    <h3 className="text-lg font-semibold text-foreground">Recommended Actions</h3>
+                    <Badge variant="outline" className="text-xs bg-indigo-50 text-indigo-700 border-indigo-200">
+                      Prioritized
+                    </Badge>
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-1 gap-4">
+                  {/* Immediate Actions */}
+                  {(() => {
+                    const immediateActions = [];
+
+                    // Critical ECI violations
+                    if (eciAnalysis?.nonNegotiables) {
+                      if (eciAnalysis.nonNegotiables.noDocumentation?.violated) {
+                        immediateActions.push({
+                          icon: AlertTriangle,
+                          title: 'Critical: Documentation Missing',
+                          description: 'No call documentation was created. This is a non-negotiable requirement that must be addressed immediately.',
+                          impact: 'high' as const,
+                          estimatedTime: '5 minutes'
+                        });
+                      }
+                      if (eciAnalysis.nonNegotiables.unprofessionalism?.violated) {
+                        immediateActions.push({
+                          icon: Shield,
+                          title: 'Critical: Professionalism Issue',
+                          description: 'Unprofessional behavior was detected. Immediate coaching and corrective action required.',
+                          impact: 'high' as const,
+                          estimatedTime: '30 minutes'
+                        });
+                      }
+                    }
+
+                    // Low scoring sections
+                    if (eciAnalysis) {
+                      const careScore = calculateSectionScore(eciAnalysis.careForCustomer);
+                      if (careScore < 50) {
+                        immediateActions.push({
+                          icon: Heart,
+                          title: 'Improve Customer Care Approach',
+                          description: 'Care for Customer score is below acceptable levels. Focus on empathy, active listening, and customer connection.',
+                          impact: 'high' as const,
+                          estimatedTime: '1-2 days'
+                        });
+                      }
+
+                      const resolutionScore = calculateSectionScore(eciAnalysis.callResolution);
+                      if (resolutionScore < 50) {
+                        immediateActions.push({
+                          icon: CheckCircle,
+                          title: 'Review Resolution Procedures',
+                          description: 'Call resolution effectiveness needs improvement. Review proper procedures and accuracy standards.',
+                          impact: 'high' as const,
+                          estimatedTime: '1 day'
+                        });
+                      }
+                    }
+
+                    // Manager review required
+                    if (eciAnalysis?.summary?.managerReviewRequired) {
+                      immediateActions.push({
+                        icon: UserCheck,
+                        title: 'Schedule Manager Review',
+                        description: 'This call requires manager review and coaching session. Schedule within 24 hours.',
+                        impact: 'high' as const,
+                        estimatedTime: '1 hour'
+                      });
+                    }
+
+                    return immediateActions.length > 0 ? (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-semibold text-red-700 flex items-center gap-2">
+                          <AlertTriangle className="w-4 h-4" />
+                          Immediate Actions Required
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {immediateActions.map((action, index) => (
+                            <div key={`immediate-${index}`} className="animate-stagger">
+                              <ActionCard
+                                icon={action.icon}
+                                title={action.title}
+                                description={action.description}
+                                category="immediate"
+                                impact={action.impact}
+                                estimatedTime={action.estimatedTime}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  {/* Short-term Actions */}
+                  {(() => {
+                    const shortTermActions = [];
+
+                    // Improvement areas
+                    if (eciAnalysis?.summary?.improvementAreas && eciAnalysis.summary.improvementAreas.length > 0) {
+                      eciAnalysis.summary.improvementAreas.slice(0, 2).forEach((area, index) => {
+                        shortTermActions.push({
+                          icon: TrendingUp,
+                          title: `Focus Area ${index + 1}`,
+                          description: area,
+                          impact: 'medium' as const,
+                          estimatedTime: '1 week'
+                        });
+                      });
+                    }
+
+                    // Specific behavior improvements
+                    if (eciAnalysis) {
+                      let noBehaviors: { name: string; tip: string; section: string }[] = [];
+
+                      // Collect NO ratings
+                      Object.entries(eciAnalysis.careForCustomer).forEach(([key, behavior]) => {
+                        if (behavior.rating === 'NO') {
+                          const behaviorName = key.replace(/([A-Z])/g, ' $1').trim();
+                          noBehaviors.push({
+                            name: behaviorName.charAt(0).toUpperCase() + behaviorName.slice(1),
+                            tip: behavior.briefTip,
+                            section: 'Care for Customer'
+                          });
+                        }
+                      });
+
+                      Object.entries(eciAnalysis.callFlow).forEach(([key, behavior]) => {
+                        if (behavior.rating === 'NO') {
+                          const behaviorName = key.replace(/([A-Z])/g, ' $1').trim();
+                          noBehaviors.push({
+                            name: behaviorName.charAt(0).toUpperCase() + behaviorName.slice(1),
+                            tip: behavior.briefTip,
+                            section: 'Call Flow'
+                          });
+                        }
+                      });
+
+                      // Add top 2 NO behaviors as actions
+                      noBehaviors.slice(0, 2).forEach((behavior) => {
+                        shortTermActions.push({
+                          icon: Lightbulb,
+                          title: `Improve: ${behavior.name}`,
+                          description: `${behavior.section} - ${behavior.tip}`,
+                          impact: 'medium' as const,
+                          estimatedTime: '3-5 days'
+                        });
+                      });
+                    }
+
+                    return shortTermActions.length > 0 ? (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-semibold text-amber-700 flex items-center gap-2">
+                          <Timer className="w-4 h-4" />
+                          This Week's Focus
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {shortTermActions.slice(0, 4).map((action, index) => (
+                            <div key={`short-term-${index}`} className="animate-stagger">
+                              <ActionCard
+                                icon={action.icon}
+                                title={action.title}
+                                description={action.description}
+                                category="short-term"
+                                impact={action.impact}
+                                estimatedTime={action.estimatedTime}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+
+                  {/* Long-term Development */}
+                  {(() => {
+                    const longTermActions = [];
+
+                    // Build on strengths
+                    if (eciAnalysis?.summary?.strengths && eciAnalysis.summary.strengths.length > 0) {
+                      const topStrength = eciAnalysis.summary.strengths[0];
+                      longTermActions.push({
+                        icon: Star,
+                        title: 'Leverage Key Strength',
+                        description: `Build on this success: ${topStrength}. Use as foundation for peer mentoring and skill development.`,
+                        impact: 'medium' as const,
+                        estimatedTime: '1 month'
+                      });
+                    }
+
+                    // Overall development based on score
+                    if (eciAnalysis) {
+                      const overallScore = getECIOverallScore(eciAnalysis);
+                      if (overallScore >= 70 && overallScore < 85) {
+                        longTermActions.push({
+                          icon: TrendingUp,
+                          title: 'Progress to Excellence',
+                          description: 'Strong foundation established. Focus on consistency and mastering advanced customer service techniques.',
+                          impact: 'medium' as const,
+                          estimatedTime: '2-3 months'
+                        });
+                      } else if (overallScore < 70) {
+                        longTermActions.push({
+                          icon: Brain,
+                          title: 'Comprehensive Skill Development',
+                          description: 'Enroll in customer service training program. Focus on foundational skills and consistent execution.',
+                          impact: 'high' as const,
+                          estimatedTime: '3-6 months'
+                        });
+                      }
+                    }
+
+                    // Career development
+                    if (performanceMetrics.sentimentScore >= 75) {
+                      longTermActions.push({
+                        icon: Zap,
+                        title: 'Advanced Training Opportunity',
+                        description: 'High customer satisfaction scores indicate readiness for advanced service techniques or leadership development.',
+                        impact: 'low' as const,
+                        estimatedTime: '6 months+'
+                      });
+                    }
+
+                    return longTermActions.length > 0 ? (
+                      <div className="space-y-3">
+                        <h4 className="text-sm font-semibold text-blue-700 flex items-center gap-2">
+                          <Target className="w-4 h-4" />
+                          Long-term Development
+                        </h4>
+                        <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                          {longTermActions.map((action, index) => (
+                            <div key={`long-term-${index}`} className="animate-stagger">
+                              <ActionCard
+                                icon={action.icon}
+                                title={action.title}
+                                description={action.description}
+                                category="long-term"
+                                impact={action.impact}
+                                estimatedTime={action.estimatedTime}
+                              />
+                            </div>
+                          ))}
+                        </div>
+                      </div>
+                    ) : null;
+                  })()}
+                </div>
+              </section>
+              </TabsContent>
+            </Tabs>
           )}
 
           {/* Sales Mode Analytics Sections */}

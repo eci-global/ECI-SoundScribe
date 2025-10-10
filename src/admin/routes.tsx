@@ -28,12 +28,12 @@ import FileManager from '@/pages/admin/FileManager';
 import StorageAnalytics from '@/pages/admin/StorageAnalytics';
 import OrgOverview from '@/pages/admin/OrgOverview';
 import UserAccessManagement from '@/pages/admin/UserAccessManagement';
+import RolesAccess from '@/pages/admin/RolesAccess';
 // Legacy components (deprecated - replaced by UserAccessManagement)
 import UserManagement from '@/pages/admin/UserManagement';
 import AclSettings from '@/pages/admin/AclSettings';
 import AdminTools from '@/pages/admin/AdminTools';
 import AuditLogViewer from '@/pages/admin/AuditLogViewer';
-import TargetRules from '@/pages/admin/TargetRules';
 import AutomationBuilder from '@/pages/admin/AutomationBuilder';
 import IntegrationStatus from '@/pages/admin/IntegrationStatus';
 import PrivacySettings from '@/pages/admin/PrivacySettings';
@@ -49,6 +49,8 @@ import AIScoringRubrics from '@/pages/admin/AIScoringRubrics';
 import AIExperiments from '@/pages/admin/AIExperiments';
 import EmployeeManagement from '@/components/employee/EmployeeManagement';
 import FeedbackAnalytics from '@/pages/admin/FeedbackAnalytics';
+import SupportSettings from '@/pages/admin/SupportSettings';
+import SSOManagement from '@/pages/admin/SSOManagement';
 
 export interface AdminNavItem {
   title: string;
@@ -74,6 +76,9 @@ export const adminNav: AdminNavItem[] = [
     children: [
       { title: 'Overview', path: '/admin/org' },
       { title: 'User & Access Management', path: '/admin/users-access' },
+      { title: 'Roles & Access', path: '/admin/roles-access' },
+      { title: 'SSO Management', path: '/admin/sso-management' },
+      { title: 'Support Settings', path: '/admin/support-settings' },
     ],
   },
   { title: 'Tools', icon: Settings, path: '/admin/tools' },
@@ -85,8 +90,7 @@ export const adminNav: AdminNavItem[] = [
       { title: 'Manager recordings', path: '/admin/all-recordings' }
     ]
   },
-  { title: 'Targeting', icon: Target, path: '/admin/targeting' },
-  { title: 'Workflow automations', icon: Workflow, path: '/admin/automations' },
+    { title: 'Workflow automations', icon: Workflow, path: '/admin/automations' },
   { title: 'Integrations', icon: Plug, path: '/admin/integrations' },
   { title: 'Organization outreach', icon: Target, path: '/admin/organization-outreach' },
   {
@@ -127,12 +131,12 @@ export const adminRouteMap: Record<string, React.ComponentType<any>> = {
   '/admin/org': OrgOverview,
   // Unified User & Access Management
   '/admin/users-access': UserAccessManagement,
+  '/admin/roles-access': RolesAccess,
   // Legacy routes (backwards compatibility) - redirect to unified page
   '/admin/org/users': UserAccessManagement,
   '/admin/access': UserAccessManagement,
   '/admin/tools': AdminTools,
   '/admin/audit': AuditLogViewer,
-  '/admin/targeting': TargetRules,
   '/admin/automations': AutomationBuilder,
   '/admin/integrations': IntegrationStatus,
   '/admin/organization-outreach': OrganizationOutreachSettings,
@@ -147,10 +151,13 @@ export const adminRouteMap: Record<string, React.ComponentType<any>> = {
   '/admin/ai-scoring': AIScoringRubrics,
   '/admin/ai-experiments': AIExperiments,
   '/employees': EmployeeManagement,
+  '/admin/support-settings': SupportSettings,
+  '/admin/sso-management': SSOManagement,
 };
 
 export function resolveAdminComponent(pathname: string): React.ReactElement {
   const Component = adminRouteMap[pathname] || AdminHome;
   return <Component />;
 }
+
 

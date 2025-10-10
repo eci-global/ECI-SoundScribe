@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useSupportMode } from '@/contexts/SupportContext';
 
 export interface RecordingFilters {
   search?: string;
@@ -30,9 +31,23 @@ export interface RecordingListItem {
 
 export function useRecordings(filters: RecordingFilters = {}) {
   const { user } = useAuth();
+  const { currentMode } = useSupportMode();
+
+  // Map app mode to recording content types
+  const modeContentTypes = (() => {
+    switch (currentMode) {
+      case 'support':
+        return ['customer_support', 'support_call'];
+      case 'ux':
+        return ['user_experience'];
+      case 'sales':
+      default:
+        return ['sales_call'];
+    }
+  })();
 
   return useQuery({
-    queryKey: ['recordings', user?.id, filters],
+    queryKey: ['recordings', user?.id, currentMode, filters],
     queryFn: async (): Promise<RecordingListItem[]> => {
       console.log('useRecordings: Starting query', { userId: user?.id, filters });
       
@@ -61,9 +76,10 @@ export function useRecordings(filters: RecordingFilters = {}) {
             enable_coaching
           `)
           .eq('user_id', user.id)
+          .in('content_type', modeContentTypes)
           .order('created_at', { ascending: false });
 
-        console.log('useRecordings: Query built for user:', user.id);
+        console.log('useRecordings: Query built for user:', user.id, 'mode:', currentMode, 'types:', modeContentTypes);
 
         // Apply filters
         if (filters.search) {

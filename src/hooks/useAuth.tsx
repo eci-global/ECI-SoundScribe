@@ -2,6 +2,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
+import { useSupabaseSSO } from './useSupabaseSSO';
 
 interface AuthContextType {
   user: User | null;
@@ -10,6 +11,9 @@ interface AuthContextType {
   signUp: (email: string, password: string, fullName: string) => Promise<{ error: any }>;
   signIn: (email: string, password: string) => Promise<{ error: any }>;
   signOut: () => Promise<void>;
+  signInWithSSO: (email: string) => Promise<void>;
+  checkSsoRequired: (email: string) => Promise<{ required: boolean; message?: string }>;
+  isSSOEnabled: boolean;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -18,6 +22,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
+  const { signInWithSSO: supabaseSSOSignIn, checkSSORequired: checkSupabaseSSO, isSSOEnabled } = useSupabaseSSO();
 
   useEffect(() => {
     // Set up auth state listener first
@@ -116,6 +121,25 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const signInWithSSO = async (email: string) => {
+    try {
+      await supabaseSSOSignIn(email);
+    } catch (error) {
+      console.error('SSO sign in error:', error);
+      throw error;
+    }
+  };
+
+  const checkSsoRequired = async (email: string): Promise<{ required: boolean; message?: string }> => {
+    try {
+      const result = await checkSupabaseSSO(email);
+      return result;
+    } catch (error) {
+      console.error('Error checking SSO requirement:', error);
+      return { required: false };
+    }
+  };
+
   return (
     <AuthContext.Provider value={{
       user,
@@ -123,7 +147,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       loading,
       signUp,
       signIn,
-      signOut
+      signOut,
+      signInWithSSO,
+      checkSsoRequired,
+      isSSOEnabled
     }}>
       {children}
     </AuthContext.Provider>

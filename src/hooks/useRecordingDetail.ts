@@ -303,7 +303,8 @@ export function useRecordingDetail(recordingId: string) {
           ai_insights: recording.ai_insights || undefined,
           ai_moments: transformedAIMoments.length > 0 ? transformedAIMoments : null,
           ai_next_steps: recording.ai_next_steps || undefined,
-          ai_speaker_analysis: null, // This field doesn't exist in current schema
+          // Pass through stored speaker analysis so SpeakerTimeline can render
+          ai_speaker_analysis: (dbRecording as any)?.ai_speaker_analysis ?? (recording as any)?.ai_speaker_analysis ?? undefined,
           coaching_evaluation: recording.coaching_evaluation || undefined,
           content_type: recording.content_type || undefined,
           thumbnail_url: recording.thumbnail_url || undefined,

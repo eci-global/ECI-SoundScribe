@@ -1,5 +1,5 @@
 
-import React, { useMemo, useState } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePlayback } from './hooks/usePlayback';
 import { formatTime } from './utils/timeFmt';
 import { MemoizedSpeakerResolver } from '@/utils/memoizedSpeakerResolution';
@@ -7,6 +7,8 @@ import { ChevronDown, ChevronUp, Users, Clock, Mic, Volume2, Settings, BarChart3
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface EnhancedSpeakerSegment {
   speaker_name: string;
@@ -307,6 +309,9 @@ export default function SpeakerTimeline({
   className = '' 
 }: SpeakerTimelineProps) {
   const { currentTime, duration, seek } = usePlayback();
+  const queryClient = useQueryClient();
+  const [enhancing, setEnhancing] = useState(false);
+  const invokedRef = useRef<string | null>(null);
   const [showMore, setShowMore] = useState(false);
   const [showAnalytics, setShowAnalytics] = useState(false);
 
@@ -497,6 +502,41 @@ export default function SpeakerTimeline({
     };
   }, [recording?.ai_speaker_analysis, recording?.whisper_segments, recording?.speaker_segments, recording?.duration, recording?.id, duration]);
 
+  // Auto-trigger enhanced speaker analysis if recording is complete (or has transcript)
+  // but no ai_speaker_analysis is present yet.
+  useEffect(() => {
+    const id = recordingId || recording?.id;
+    if (!id) return;
+    const completedOrHasTranscript = (recording?.status === 'completed') || !!recording?.transcript;
+    const needsAnalysis = !recording?.ai_speaker_analysis;
+    if (!completedOrHasTranscript || !needsAnalysis) return;
+    if (invokedRef.current === id) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        setEnhancing(true);
+        invokedRef.current = id;
+        const { error } = await supabase.functions.invoke('enhance-whisper-analysis', {
+          body: { recording_id: id }
+        });
+        if (error) {
+          // allow retry later
+          invokedRef.current = null;
+          return;
+        }
+        if (!cancelled) {
+          queryClient.invalidateQueries({ queryKey: ['recording-detail', id] });
+          queryClient.invalidateQueries({ queryKey: ['recordings'] });
+        }
+      } finally {
+        if (!cancelled) setEnhancing(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [recordingId, recording?.id, recording?.status, recording?.transcript, recording?.ai_speaker_analysis, queryClient]);
+
   const handleSegmentClick = (startTime: number) => {
     console.log('🎯 Enhanced SpeakerTimeline: Seeking to time:', startTime);
     seek(startTime);
@@ -514,9 +554,11 @@ export default function SpeakerTimeline({
     return (
       <div className={`py-4 ${className}`}>
         <div className="text-sm text-muted-foreground">
-          {recording.status === 'completed' 
-            ? 'No speakers detected in this recording' 
-            : 'Speaker analysis in progress...'}
+          {enhancing ? 'Generating speaker analysis…' : (
+            recording.status === 'completed' 
+              ? 'No speakers detected in this recording'
+              : 'Speaker analysis in progress...'
+          )}
         </div>
       </div>
     );

@@ -1,7 +1,9 @@
-import React, { useMemo } from 'react';
+import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { usePlayback } from './hooks/usePlayback';
 import { useSpotlight } from '@/contexts/SpotlightContext';
 import { useTopicSegments } from '@/hooks/useTopicSegments';
+import { supabase } from '@/integrations/supabase/client';
+import { useQueryClient } from '@tanstack/react-query';
 
 interface TopicTracksProps {
   recordingId?: string;
@@ -9,6 +11,9 @@ interface TopicTracksProps {
 
 export default function TopicTracks({ recordingId }: TopicTracksProps) {
   const { seek } = usePlayback();
+  const queryClient = useQueryClient();
+  const [generating, setGenerating] = useState(false);
+  const invokedRef = useRef<string | null>(null);
   
   // Get recording ID from props or SpotlightContext
   const { recording } = useSpotlight();
@@ -56,6 +61,49 @@ export default function TopicTracks({ recordingId }: TopicTracksProps) {
       .sort((a, b) => b.confidence - a.confidence);
   }, [topicSegments]);
 
+  // Auto-trigger topic analysis once when recording is completed and no topics exist
+  useEffect(() => {
+    const canGenerate = (
+      !!actualRecordingId &&
+      !isLoading &&
+      !error &&
+      (topics.length === 0) &&
+      (recording?.status === 'completed' || !!recording?.transcript)
+    );
+
+    if (!canGenerate) return;
+
+    // Prevent repeated invocations for the same recording
+    if (invokedRef.current === actualRecordingId) return;
+
+    let cancelled = false;
+    (async () => {
+      try {
+        setGenerating(true);
+        invokedRef.current = actualRecordingId!;
+        const payload: any = { recording_id: actualRecordingId };
+        if (recording?.transcript) payload.transcript = recording.transcript;
+
+        const { error: fnError } = await supabase.functions.invoke('analyze-speakers-topics', {
+          body: payload,
+        });
+        if (fnError) {
+          // Allow retry on next render
+          invokedRef.current = null;
+          return;
+        }
+        // Invalidate topic segments to refetch
+        if (!cancelled) {
+          queryClient.invalidateQueries({ queryKey: ['topic-segments', actualRecordingId] });
+        }
+      } finally {
+        if (!cancelled) setGenerating(false);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [actualRecordingId, isLoading, error, topics.length, recording?.status, recording?.transcript, queryClient]);
+
   const handleTopicClick = (firstTime: number) => {
     seek(firstTime);
   };
@@ -90,10 +138,12 @@ export default function TopicTracks({ recordingId }: TopicTracksProps) {
   if (topics.length === 0) {
     return (
       <div className="p-4 text-center text-gray-500">
-        <div className="mb-2">No topic data available</div>
-        <div className="text-sm">
-          Topic analysis will begin once transcript processing is complete
-        </div>
+        <div className="mb-2">{generating ? 'Generating topics…' : 'No topic data available'}</div>
+        {!generating && (
+          <div className="text-sm">
+            Topic analysis will begin once transcript processing is complete
+          </div>
+        )}
       </div>
     );
   }

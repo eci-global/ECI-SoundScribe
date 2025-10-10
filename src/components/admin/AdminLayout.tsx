@@ -6,6 +6,8 @@ import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { useAuth } from '@/hooks/useAuth';
 import { adminNav, AdminNavItem } from '@/admin/routes';
+import { getRoutePermissions } from '@/admin/permissions';
+import { usePermissions } from '@/hooks/usePermissions';
 
 interface AdminLayoutProps {
   children: React.ReactNode;
@@ -19,6 +21,7 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
   const navigate = useNavigate();
   const location = useLocation();
   const { user, signOut } = useAuth();
+  const { hasPermission } = usePermissions();
   const [breadcrumbs, setBreadcrumbs] = useState<Array<{ label: string; path?: string }>>([]);
 
   const toggleSection = (sectionTitle: string) => {
@@ -55,6 +58,14 @@ export default function AdminLayout({ children }: AdminLayoutProps) {
     const hasChildren = item.children && item.children.length > 0;
     const isOpen = openSections.includes(item.title);
     const active = item.path && isActive(item.path);
+
+    // Permission check: hide items user cannot view
+    if (item.path) {
+      const req = getRoutePermissions(item.path);
+      if (req.length > 0 && !req.every(hasPermission)) {
+        return null;
+      }
+    }
 
     if (hasChildren) {
       return (

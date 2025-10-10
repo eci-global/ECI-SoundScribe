@@ -1,41 +1,83 @@
-import React from 'react';
+import React, { useEffect, useMemo, useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
-import { Users, Building, Shield, UserPlus, Settings, ExternalLink } from 'lucide-react';
-import { useOkta } from '@/hooks/useOkta';
+import { Users, Building, Shield, Settings, ExternalLink, BarChart3 } from 'lucide-react';
+import { supabase } from '@/integrations/supabase/client';
+
+interface OrgStats {
+  totalUsers: number;
+  admins: number;
+  salesCalls: number;
+  supportCalls: number;
+  otherCalls: number;
+}
 
 export default function OrgOverview() {
-  const { orgData, loading } = useOkta();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [stats, setStats] = useState<OrgStats>({ totalUsers: 0, admins: 0, salesCalls: 0, supportCalls: 0, otherCalls: 0 });
+  const [orgName, setOrgName] = useState<string>('Your Organization');
+  const [orgDomain, setOrgDomain] = useState<string>('');
+  const [createdAt, setCreatedAt] = useState<string | null>(null);
 
-  const mockOrgData = {
-    organization: {
-      name: 'ECI Software Solutions',
-      domain: 'ecisolutions.com',
-      plan: 'Enterprise',
-      created: '2023-01-15',
-      status: 'active'
-    },
-    stats: {
-      totalUsers: 245,
-      activeUsers: 218,
-      groups: 12,
-      applications: 8,
-      licenses: {
-        total: 300,
-        used: 245,
-        available: 55
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      try {
+        setLoading(true);
+        // Profiles count (users)
+        const { count: userCount } = await supabase
+          .from('profiles')
+          .select('id', { count: 'exact', head: true });
+
+        // Admin roles count
+        const { count: adminCount } = await supabase
+          .from('user_roles')
+          .select('id', { count: 'exact', head: true })
+          .eq('role', 'admin');
+
+        // Recordings counts by content_type
+        const { data: recAgg } = await supabase
+          .from('recordings')
+          .select('content_type');
+        const salesCalls = recAgg?.filter(r => r.content_type === 'sales_call').length || 0;
+        const supportCalls = recAgg?.filter(r => r.content_type === 'customer_support' || r.content_type === 'support_call').length || 0;
+        const otherCalls = (recAgg?.length || 0) - salesCalls - supportCalls;
+
+        // Try to infer org name/domain from first profile (if available)
+        const { data: firstProfile } = await supabase
+          .from('profiles')
+          .select('email, created_at')
+          .order('created_at', { ascending: true })
+          .limit(1)
+          .single();
+        if (firstProfile?.email) {
+          const domain = String(firstProfile.email).split('@')[1] || '';
+          if (isMounted) setOrgDomain(domain);
+        }
+        if (firstProfile?.created_at && isMounted) setCreatedAt(firstProfile.created_at);
+
+        if (isMounted) {
+          setStats({
+            totalUsers: userCount || 0,
+            admins: adminCount || 0,
+            salesCalls,
+            supportCalls,
+            otherCalls,
+          });
+        }
+      } finally {
+        if (isMounted) setLoading(false);
       }
-    },
-    groups: [
-      { id: '1', name: 'Sales Team', members: 85, description: 'All sales representatives' },
-      { id: '2', name: 'Customer Success', members: 42, description: 'CS managers and support' },
-      { id: '3', name: 'Engineering', members: 38, description: 'Development teams' },
-      { id: '4', name: 'Administrators', members: 5, description: 'System administrators' }
-    ]
-  };
+    })();
+    return () => {
+      isMounted = false;
+    };
+  }, []);
 
-  const data = orgData || mockOrgData;
+  const createdLabel = useMemo(() => (createdAt ? new Date(createdAt).toLocaleDateString() : '—'), [createdAt]);
 
   return (
     
@@ -43,7 +85,7 @@ export default function OrgOverview() {
         <div className="max-w-7xl mx-auto p-8">
           <div className="mb-8">
             <h1 className="text-display text-eci-gray-900 mb-2">Organization Overview</h1>
-            <p className="text-body text-eci-gray-600">Manage organization settings and user groups</p>
+            <p className="text-body text-eci-gray-600">Manage organization users, roles, and integrations</p>
           </div>
 
           {/* Organization Info */}
@@ -53,14 +95,14 @@ export default function OrgOverview() {
                 <div className="flex items-center gap-3 mb-4">
                   <Building className="h-8 w-8 text-eci-gray-400" />
                   <div>
-                    <h2 className="text-title font-semibold text-eci-gray-900">{data.organization.name}</h2>
-                    <p className="text-body-small text-eci-gray-600">{data.organization.domain}</p>
+                    <h2 className="text-title font-semibold text-eci-gray-900">{orgName}</h2>
+                    <p className="text-body-small text-eci-gray-600">{orgDomain || 'domain not set'}</p>
                   </div>
                 </div>
                 <div className="grid grid-cols-3 gap-6">
                   <div>
                     <p className="text-caption text-eci-gray-600 mb-1">Plan</p>
-                    <Badge className="bg-purple-100 text-purple-800">{data.organization.plan}</Badge>
+                    <Badge className="bg-purple-100 text-purple-800">Standard</Badge>
                   </div>
                   <div>
                     <p className="text-caption text-eci-gray-600 mb-1">Status</p>
@@ -68,14 +110,20 @@ export default function OrgOverview() {
                   </div>
                   <div>
                     <p className="text-caption text-eci-gray-600 mb-1">Created</p>
-                    <p className="text-body text-eci-gray-900">{new Date(data.organization.created).toLocaleDateString()}</p>
+                    <p className="text-body text-eci-gray-900">{createdLabel}</p>
                   </div>
                 </div>
               </div>
-              <Button variant="outline" className="flex items-center gap-2">
-                <Settings className="h-4 w-4" />
-                Settings
-              </Button>
+              <div className="flex gap-2">
+                <Button variant="outline" className="flex items-center gap-2" onClick={() => navigate('/admin/users-access')}>
+                  <Users className="h-4 w-4" />
+                  Users & Access
+                </Button>
+                <Button variant="outline" className="flex items-center gap-2" onClick={() => navigate('/admin/organization-outreach')}>
+                  <ExternalLink className="h-4 w-4" />
+                  Outreach
+                </Button>
+              </div>
             </div>
           </Card>
 
@@ -84,79 +132,55 @@ export default function OrgOverview() {
             <Card className="bg-white shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <Users className="h-8 w-8 text-blue-500" />
-                <span className="text-caption text-green-600">89% active</span>
+                <span className="text-caption text-green-600">Admins: {stats.admins}</span>
               </div>
               <p className="text-caption text-eci-gray-600 mb-1">Total Users</p>
-              <p className="text-title-large font-semibold text-eci-gray-900">{data.stats.totalUsers}</p>
+              <p className="text-title-large font-semibold text-eci-gray-900">{stats.totalUsers}</p>
             </Card>
 
             <Card className="bg-white shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <Shield className="h-8 w-8 text-green-500" />
-                <span className="text-caption text-eci-gray-600">{data.stats.licenses.available} left</span>
+                <span className="text-caption text-eci-gray-600">Roles</span>
               </div>
-              <p className="text-caption text-eci-gray-600 mb-1">Licenses</p>
-              <p className="text-title-large font-semibold text-eci-gray-900">
-                {data.stats.licenses.used}/{data.stats.licenses.total}
-              </p>
+              <p className="text-caption text-eci-gray-600 mb-1">Administrators</p>
+              <p className="text-title-large font-semibold text-eci-gray-900">{stats.admins}</p>
             </Card>
 
             <Card className="bg-white shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
-                <Users className="h-8 w-8 text-purple-500" />
+                <BarChart3 className="h-8 w-8 text-purple-500" />
               </div>
-              <p className="text-caption text-eci-gray-600 mb-1">Groups</p>
-              <p className="text-title-large font-semibold text-eci-gray-900">{data.stats.groups}</p>
+              <p className="text-caption text-eci-gray-600 mb-1">Sales Calls</p>
+              <p className="text-title-large font-semibold text-eci-gray-900">{stats.salesCalls}</p>
             </Card>
 
             <Card className="bg-white shadow-sm p-6">
               <div className="flex items-center justify-between mb-4">
                 <ExternalLink className="h-8 w-8 text-orange-500" />
               </div>
-              <p className="text-caption text-eci-gray-600 mb-1">Applications</p>
-              <p className="text-title-large font-semibold text-eci-gray-900">{data.stats.applications}</p>
+              <p className="text-caption text-eci-gray-600 mb-1">Support Calls</p>
+              <p className="text-title-large font-semibold text-eci-gray-900">{stats.supportCalls}</p>
             </Card>
           </div>
-
-          {/* Groups Table */}
+          {/* Call Mix Summary */}
           <Card className="bg-white shadow-sm p-6">
             <div className="flex justify-between items-center mb-6">
-              <h2 className="text-title font-semibold text-eci-gray-900">User Groups</h2>
-              <Button className="flex items-center gap-2">
-                <UserPlus className="h-4 w-4" />
-                Create Group
-              </Button>
+              <h2 className="text-title font-semibold text-eci-gray-900">Call Mix</h2>
             </div>
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-eci-gray-200">
-                    <th className="text-left py-3 px-4 text-caption font-medium text-eci-gray-600">Group Name</th>
-                    <th className="text-left py-3 px-4 text-caption font-medium text-eci-gray-600">Description</th>
-                    <th className="text-left py-3 px-4 text-caption font-medium text-eci-gray-600">Members</th>
-                    <th className="text-right py-3 px-4 text-caption font-medium text-eci-gray-600">Actions</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {data.groups.map((group) => (
-                    <tr key={group.id} className="border-b border-eci-gray-100 hover:bg-eci-gray-50">
-                      <td className="py-3 px-4">
-                        <div className="flex items-center gap-2">
-                          <Users className="h-4 w-4 text-eci-gray-400" />
-                          <span className="text-body font-medium text-eci-gray-900">{group.name}</span>
-                        </div>
-                      </td>
-                      <td className="py-3 px-4 text-body text-eci-gray-600">{group.description}</td>
-                      <td className="py-3 px-4">
-                        <Badge variant="secondary">{group.members} users</Badge>
-                      </td>
-                      <td className="py-3 px-4 text-right">
-                        <Button variant="ghost" size="sm">Manage</Button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
+            <div className="grid grid-cols-3 gap-6 text-center">
+              <div>
+                <p className="text-caption text-eci-gray-600 mb-1">Sales</p>
+                <p className="text-title font-semibold text-eci-gray-900">{stats.salesCalls}</p>
+              </div>
+              <div>
+                <p className="text-caption text-eci-gray-600 mb-1">Support</p>
+                <p className="text-title font-semibold text-eci-gray-900">{stats.supportCalls}</p>
+              </div>
+              <div>
+                <p className="text-caption text-eci-gray-600 mb-1">Other</p>
+                <p className="text-title font-semibold text-eci-gray-900">{stats.otherCalls}</p>
+              </div>
             </div>
           </Card>
         </div>

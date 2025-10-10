@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from '@/hooks/useAuth';
+import { useSupportMode } from '@/contexts/SupportContext';
 
 export interface DashboardStats {
   totalRecordings: number;
@@ -23,6 +24,7 @@ interface CoachingEvaluation {
 
 export const useDashboard = () => {
   const { user } = useAuth();
+  const { currentMode } = useSupportMode();
   const [stats, setStats] = useState<DashboardStats>({
     totalRecordings: 0,
     totalDuration: 0,
@@ -41,11 +43,25 @@ export const useDashboard = () => {
     try {
       setError('');
       
-      // Fetch user's recordings
+      // Fetch user's recordings filtered by current mode
+      const modeContentTypes = (() => {
+        switch (currentMode) {
+          case 'support':
+            return ['customer_support', 'support_call'];
+          case 'ux':
+            return ['user_experience'];
+          case 'sales':
+          default:
+            return ['sales_call'];
+        }
+      })();
+
       const { data: recordings, error: recordingsError } = await supabase
         .from('recordings')
         .select('*')
-        .eq('user_id', user.id);
+        .eq('user_id', user.id)
+        .in('content_type', modeContentTypes)
+        .order('created_at', { ascending: false });
 
       if (recordingsError) {
         throw recordingsError;
@@ -139,3 +155,4 @@ export const useDashboard = () => {
     refetch: fetchDashboardData
   };
 };
+

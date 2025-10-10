@@ -2,6 +2,7 @@
 import { useQuery } from '@tanstack/react-query';
 import { supabase } from '@/integrations/supabase/client';
 import { useAuth } from './useAuth';
+import { useUserRole } from './useUserRole';
 
 export interface TopicSegment {
   id: string;
@@ -15,6 +16,7 @@ export interface TopicSegment {
 
 export function useTopicSegments(recordingId?: string) {
   const { user } = useAuth();
+  const { isAdmin } = useUserRole();
 
   return useQuery({
     queryKey: ['topic-segments', recordingId],
@@ -26,20 +28,23 @@ export function useTopicSegments(recordingId?: string) {
       console.log('useTopicSegments: Fetching segments for recording:', recordingId);
 
       try {
-        // First verify the recording belongs to the current user
-        const { data: recording, error: recordingError } = await supabase
-          .from('recordings')
-          .select('id, user_id')
-          .eq('id', recordingId)
-          .eq('user_id', user.id)
-          .single();
+        // Admins can bypass ownership check
+        if (!isAdmin) {
+          // Verify the recording belongs to the current user
+          const { data: recording, error: recordingError } = await supabase
+            .from('recordings')
+            .select('id, user_id')
+            .eq('id', recordingId)
+            .eq('user_id', user.id)
+            .single();
 
-        if (recordingError || !recording) {
-          console.warn('Recording not found or access denied:', recordingError);
-          return [];
+          if (recordingError || !recording) {
+            console.warn('Recording not found or access denied:', recordingError);
+            return [];
+          }
         }
 
-        // Fetch topic segments for this recording
+        // Fetch topic segments for this recording (admin or owner)
         const { data: segments, error } = await supabase
           .from('topic_segments')
           .select('*')
