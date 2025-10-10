@@ -30,6 +30,21 @@ export const AuthCallback = () => {
 
         if (session) {
           console.log('AuthCallback: Session found, user authenticated:', session.user.email);
+
+          // Initialize new user (creates profile and assigns default role)
+          try {
+            const { error: initError } = await supabase.rpc('initialize_new_user');
+            if (initError) {
+              console.error('AuthCallback: Error initializing user:', initError);
+              // Continue anyway - user might already be initialized
+            } else {
+              console.log('AuthCallback: User initialized successfully');
+            }
+          } catch (initErr) {
+            console.error('AuthCallback: Exception initializing user:', initErr);
+            // Continue anyway
+          }
+
           // Success! Redirect to dashboard
           navigate('/recordings', { replace: true });
         } else {
