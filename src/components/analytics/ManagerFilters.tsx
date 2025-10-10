@@ -1,9 +1,9 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Calendar, Filter, Search, X, Users, Target } from 'lucide-react';
+import { Calendar, Filter, Search, X, Users, Target, ChevronDown, ChevronUp } from 'lucide-react';
 import { ManagerFilterState } from '@/utils/managerAnalytics';
 
 export interface EmployeeOption {
@@ -29,6 +29,8 @@ export function ManagerFilters({
   teams,
   callTypes
 }: ManagerFiltersProps) {
+  const [isExpanded, setIsExpanded] = useState(false);
+
   const updateFilters = (updates: Partial<ManagerFilterState>) => {
     onChange({ ...filters, ...updates });
   };
@@ -63,7 +65,7 @@ export function ManagerFilters({
 
   return (
     <Card className="border border-gray-200 bg-white shadow-sm">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 cursor-pointer" onClick={() => setIsExpanded(!isExpanded)}>
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Filter className="h-4 w-4 text-gray-600" />
@@ -76,19 +78,36 @@ export function ManagerFilters({
               </Badge>
             )}
           </div>
-          {activeFiltersCount > 0 && (
+          <div className="flex items-center gap-2">
+            {activeFiltersCount > 0 && (
+              <Button
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  onReset();
+                }}
+                className="text-gray-600 hover:text-gray-900 h-7 px-2 text-xs"
+              >
+                Clear all
+              </Button>
+            )}
             <Button
-              variant="outline"
+              variant="ghost"
               size="sm"
-              onClick={onReset}
-              className="text-gray-600 hover:text-gray-900 h-7 px-2 text-xs"
+              className="h-7 w-7 p-0"
             >
-              Clear all
+              {isExpanded ? (
+                <ChevronUp className="h-4 w-4 text-gray-600" />
+              ) : (
+                <ChevronDown className="h-4 w-4 text-gray-600" />
+              )}
             </Button>
-          )}
+          </div>
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
+      {isExpanded && (
+        <CardContent className="space-y-3">
         {/* Search */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Search</label>
@@ -221,6 +240,7 @@ export function ManagerFilters({
           />
         </div>
       </CardContent>
+      )}
     </Card>
   );
 }
