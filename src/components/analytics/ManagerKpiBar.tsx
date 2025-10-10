@@ -57,29 +57,29 @@ export function ManagerKpiBar({ kpis }: ManagerKpiBarProps) {
   ];
 
   return (
-    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
+    <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
       {kpiCards.map((kpi) => {
         const Icon = kpi.icon;
         return (
           <Card key={kpi.key} className="border border-gray-200 bg-white shadow-sm">
-            <CardContent className="p-6">
+            <CardContent className="p-4">
               <div className="flex items-center justify-between">
                 <div className="flex-1">
-                  <p className="text-sm font-medium text-gray-600">{kpi.label}</p>
+                  <p className="text-xs font-medium text-gray-600">{kpi.label}</p>
                   <div className="flex items-baseline gap-1">
-                    <p className="text-2xl font-semibold text-gray-900">
+                    <p className="text-xl font-semibold text-gray-900">
                       {kpi.value}
                     </p>
                     {kpi.suffix && (
-                      <span className="text-sm text-gray-500">{kpi.suffix}</span>
+                      <span className="text-xs text-gray-500">{kpi.suffix}</span>
                     )}
                   </div>
                   {kpi.subtitle && (
-                    <p className="text-sm text-gray-500">{kpi.subtitle}</p>
+                    <p className="text-xs text-gray-500">{kpi.subtitle}</p>
                   )}
                 </div>
-                <div className={`rounded-full p-3 ${kpi.bgColor}`}>
-                  <Icon className={`h-6 w-6 ${kpi.color}`} />
+                <div className={`rounded-full p-2 ${kpi.bgColor}`}>
+                  <Icon className={`h-5 w-5 ${kpi.color}`} />
                 </div>
               </div>
             </CardContent>

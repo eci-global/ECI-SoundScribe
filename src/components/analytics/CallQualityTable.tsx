@@ -61,13 +61,13 @@ export function CallQualityTable({ rows, onInspect }: CallQualityTableProps) {
 
   return (
     <Card className="border border-gray-200 bg-white shadow-sm">
-      <CardHeader>
+      <CardHeader className="pb-3">
         <div className="flex items-center justify-between">
-          <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-            <FileText className="h-5 w-5 text-gray-600" />
+          <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+            <FileText className="h-4 w-4 text-gray-600" />
             Call Quality Analysis
           </CardTitle>
-          <Badge variant="secondary" className="text-sm">
+          <Badge variant="secondary" className="text-xs">
             {rows.length} calls
           </Badge>
         </div>
@@ -97,32 +97,32 @@ export function CallQualityTable({ rows, onInspect }: CallQualityTableProps) {
             <tbody className="divide-y divide-gray-200">
               {rows.map((row) => (
                 <tr key={row.id} className="hover:bg-gray-50">
-                  <td className="py-4 pr-4">
+                  <td className="py-3 pr-4">
                     <div>
-                      <h3 className="font-medium text-gray-900 line-clamp-1">
+                      <h3 className="text-sm font-medium text-gray-900 line-clamp-1">
                         {row.title}
                       </h3>
                       {row.description && (
-                        <p className="text-sm text-gray-500 line-clamp-2 mt-1">
+                        <p className="text-xs text-gray-500 line-clamp-2 mt-0.5">
                           {row.description}
                         </p>
                       )}
                     </div>
                   </td>
 
-                  <td className="py-4 pr-4 text-sm text-gray-900">
-                    <div className="space-y-1">
-                      <div className="flex items-center gap-1">
+                  <td className="py-3 pr-4 text-sm text-gray-900">
+                    <div className="space-y-0.5">
+                      <div className="flex items-center gap-1 text-xs">
                         <Clock className="h-3 w-3 text-gray-400" />
                         <span>{formatDate(row.createdAt)}</span>
                       </div>
-                      <div className="text-gray-500">
+                      <div className="text-xs text-gray-500">
                         {formatDuration(row.duration)}
                       </div>
                     </div>
                   </td>
 
-                  <td className="py-4 pr-4">
+                  <td className="py-3 pr-4">
                     <Badge
                       variant="secondary"
                       className={`text-xs ${getContentTypeColor(row.contentType)}`}
@@ -131,7 +131,7 @@ export function CallQualityTable({ rows, onInspect }: CallQualityTableProps) {
                     </Badge>
                   </td>
 
-                  <td className="py-4 pr-4">
+                  <td className="py-3 pr-4">
                     <div className="flex items-center gap-2">
                       <Badge
                         variant="secondary"
@@ -143,7 +143,7 @@ export function CallQualityTable({ rows, onInspect }: CallQualityTableProps) {
                     </div>
                   </td>
 
-                  <td className="py-4 text-center">
+                  <td className="py-3 text-center">
                     <Button
                       variant="ghost"
                       size="sm"
@@ -160,23 +160,23 @@ export function CallQualityTable({ rows, onInspect }: CallQualityTableProps) {
         </div>
 
         {/* Summary Footer */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-3">
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">{rows.length}</p>
-              <p className="text-sm text-gray-500">Total Calls</p>
+              <p className="text-xl font-semibold text-gray-900">{rows.length}</p>
+              <p className="text-xs text-gray-500">Total Calls</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-xl font-semibold text-gray-900">
                 {(rows.reduce((sum, row) => sum + row.score, 0) / rows.length).toFixed(1)}
               </p>
-              <p className="text-sm text-gray-500">Average Score</p>
+              <p className="text-xs text-gray-500">Average Score</p>
             </div>
             <div className="text-center">
-              <p className="text-2xl font-semibold text-gray-900">
+              <p className="text-xl font-semibold text-gray-900">
                 {Math.round(rows.reduce((sum, row) => sum + row.duration, 0) / 60)}m
               </p>
-              <p className="text-sm text-gray-500">Total Duration</p>
+              <p className="text-xs text-gray-500">Total Duration</p>
             </div>
           </div>
         </div>

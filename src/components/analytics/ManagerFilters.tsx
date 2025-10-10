@@ -63,15 +63,15 @@ export function ManagerFilters({
 
   return (
     <Card className="border border-gray-200 bg-white shadow-sm">
-      <CardHeader className="pb-4">
+      <CardHeader className="pb-2">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <Filter className="h-5 w-5 text-gray-600" />
-            <CardTitle className="text-lg font-semibold text-gray-900">
+            <Filter className="h-4 w-4 text-gray-600" />
+            <CardTitle className="text-base font-semibold text-gray-900">
               Filters
             </CardTitle>
             {activeFiltersCount > 0 && (
-              <Badge variant="secondary" className="bg-red-100 text-red-700">
+              <Badge variant="secondary" className="bg-red-100 text-red-700 text-xs">
                 {activeFiltersCount} active
               </Badge>
             )}
@@ -81,14 +81,14 @@ export function ManagerFilters({
               variant="outline"
               size="sm"
               onClick={onReset}
-              className="text-gray-600 hover:text-gray-900"
+              className="text-gray-600 hover:text-gray-900 h-7 px-2 text-xs"
             >
               Clear all
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-6">
+      <CardContent className="space-y-3">
         {/* Search */}
         <div className="space-y-2">
           <label className="text-sm font-medium text-gray-700">Search</label>

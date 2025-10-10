@@ -228,11 +228,11 @@ export default function TrendAnalytics() {
   return (
     <StandardLayout activeSection="analytics">
       <div className="min-h-screen bg-gray-50">
-        <div className="mx-auto max-w-7xl px-6 py-8">
-          <div className="mb-8">
-            <div className="flex items-center gap-4 mb-2">
-              <h1 className="text-display text-eci-gray-800 flex items-center space-x-3">
-                <TrendingUp className={`w-8 h-8 ${
+        <div className="mx-auto max-w-7xl px-6 py-4">
+          <div className="mb-4">
+            <div className="flex items-center gap-3 mb-1">
+              <h1 className="text-2xl font-bold text-eci-gray-800 flex items-center gap-2">
+                <TrendingUp className={`w-6 h-6 ${
                   supportMode.currentMode === 'support' ? 'text-blue-600' :
                   supportMode.currentMode === 'ux' ? 'text-purple-600' :
                   'text-eci-red'
@@ -243,7 +243,7 @@ export default function TrendAnalytics() {
                   'Sales Performance Analytics'
                 }</span>
               </h1>
-              <div className={`px-3 py-1 text-sm rounded-md font-medium ${
+              <div className={`px-2.5 py-0.5 text-xs rounded-md font-medium ${
                 supportMode.currentMode === 'support' ? 'bg-blue-100 text-blue-700' :
                 supportMode.currentMode === 'ux' ? 'bg-purple-100 text-purple-700' :
                 'bg-emerald-100 text-emerald-700'
@@ -253,7 +253,7 @@ export default function TrendAnalytics() {
                  'Sales Mode'}
               </div>
             </div>
-            <p className="text-body-large text-eci-gray-600">
+            <p className="text-sm text-eci-gray-600">
               {supportMode.currentMode === 'support'
                 ? 'Track customer satisfaction scores, resolution times, escalation patterns, and service quality metrics to optimize support operations'
                 : supportMode.currentMode === 'ux'
@@ -263,14 +263,14 @@ export default function TrendAnalytics() {
             </p>
           </div>
 
-          <div className="mb-8">
-            <div className="flex flex-wrap gap-2 bg-gray-100 p-1">
+          <div className="mb-4">
+            <div className="flex flex-wrap gap-2 bg-gray-100 p-1 rounded-lg">
               {analyticsViews.map(view => (
                 <button
                   key={view.id}
                   onClick={() => setActiveView(view.id as 'overview' | 'scorecards' | 'frameworks')}
                   className={cn(
-                    'flex items-center gap-2 rounded-md px-4 py-2 text-sm font-medium transition-colors',
+                    'flex items-center gap-2 rounded-md px-3 py-1.5 text-sm font-medium transition-colors',
                     activeView === view.id ? 'bg-white text-gray-900 shadow-sm' : 'text-gray-600 hover:text-gray-900',
                   )}
                 >
@@ -306,7 +306,7 @@ export default function TrendAnalytics() {
           )}
 
           {!loading && !recordingsLoading && !error && (
-            <div className="space-y-8">
+            <div className="space-y-4">
               {activeView === 'overview' ? (
                 <>
                   <ManagerFilters

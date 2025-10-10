@@ -26,26 +26,26 @@ export function EmployeePerformanceGrid({ employees, onSelectEmployee }: Employe
   }
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-3">
       <div className="flex items-center justify-between">
-        <h2 className="text-lg font-semibold text-gray-900">Employee Performance</h2>
-        <span className="text-sm text-gray-500">{employees.length} employees</span>
+        <h2 className="text-base font-semibold text-gray-900">Employee Performance</h2>
+        <span className="text-xs text-gray-500">{employees.length} employees</span>
       </div>
 
-      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {employees.map((employee) => {
           const trendColor = employee.recentScoreTrend >= 0 ? 'text-green-600' : 'text-red-600';
           const TrendIcon = employee.recentScoreTrend >= 0 ? TrendingUp : TrendingDown;
 
           return (
             <Card key={employee.employeeId} className="border border-gray-200 bg-white shadow-sm hover:shadow-md transition-shadow">
-              <CardHeader className="pb-3">
+              <CardHeader className="pb-2">
                 <div className="flex items-start justify-between">
                   <div className="flex-1">
-                    <CardTitle className="text-base font-semibold text-gray-900 line-clamp-1">
+                    <CardTitle className="text-sm font-semibold text-gray-900 line-clamp-1">
                       {employee.employeeName}
                     </CardTitle>
-                    <Badge variant="secondary" className="mt-1 text-xs">
+                    <Badge variant="secondary" className="mt-0.5 text-xs">
                       {employee.team}
                     </Badge>
                   </div>
@@ -53,31 +53,31 @@ export function EmployeePerformanceGrid({ employees, onSelectEmployee }: Employe
                     variant="ghost"
                     size="sm"
                     onClick={() => onSelectEmployee(employee.employeeId)}
-                    className="text-gray-400 hover:text-gray-600"
+                    className="text-gray-400 hover:text-gray-600 h-7 w-7 p-0"
                   >
-                    <ArrowUpRight className="h-4 w-4" />
+                    <ArrowUpRight className="h-3 w-3" />
                   </Button>
                 </div>
               </CardHeader>
 
-              <CardContent className="pt-0 space-y-4">
+              <CardContent className="pt-0 space-y-3">
                 {/* Key Metrics */}
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-1">
+                <div className="grid grid-cols-2 gap-3">
+                  <div className="space-y-0.5">
                     <div className="flex items-center gap-1">
                       <Phone className="h-3 w-3 text-gray-400" />
                       <span className="text-xs text-gray-500">Calls</span>
                     </div>
-                    <p className="text-lg font-semibold text-gray-900">{employee.totalCalls}</p>
+                    <p className="text-base font-semibold text-gray-900">{employee.totalCalls}</p>
                   </div>
 
-                  <div className="space-y-1">
+                  <div className="space-y-0.5">
                     <div className="flex items-center gap-1">
                       <Target className="h-3 w-3 text-gray-400" />
                       <span className="text-xs text-gray-500">Score</span>
                     </div>
                     <div className="flex items-center gap-1">
-                      <p className="text-lg font-semibold text-gray-900">
+                      <p className="text-base font-semibold text-gray-900">
                         {employee.averageScore.toFixed(1)}
                       </p>
                       <TrendIcon className={`h-3 w-3 ${trendColor}`} />
@@ -87,7 +87,7 @@ export function EmployeePerformanceGrid({ employees, onSelectEmployee }: Employe
 
                 {/* Strengths */}
                 {employee.strengths.length > 0 && (
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                       Top Strengths
                     </h4>
@@ -112,7 +112,7 @@ export function EmployeePerformanceGrid({ employees, onSelectEmployee }: Employe
 
                 {/* Improvements */}
                 {employee.improvements.length > 0 && (
-                  <div className="space-y-2">
+                  <div className="space-y-1">
                     <h4 className="text-xs font-medium text-gray-700 uppercase tracking-wide">
                       Focus Areas
                     </h4>

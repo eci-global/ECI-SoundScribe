@@ -179,14 +179,14 @@ export function InsightHighlights({ kpis, employees }: InsightHighlightsProps) {
 
   return (
     <Card className="border border-gray-200 bg-white shadow-sm">
-      <CardHeader>
-        <CardTitle className="text-lg font-semibold text-gray-900 flex items-center gap-2">
-          <Lightbulb className="h-5 w-5 text-yellow-600" />
+      <CardHeader className="pb-3">
+        <CardTitle className="text-base font-semibold text-gray-900 flex items-center gap-2">
+          <Lightbulb className="h-4 w-4 text-yellow-600" />
           Key Insights & Recommendations
         </CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+        <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
           {insights.map((insight, index) => {
             const styles = getInsightStyles(insight.type);
             const Icon = insight.icon;
@@ -194,15 +194,15 @@ export function InsightHighlights({ kpis, employees }: InsightHighlightsProps) {
             return (
               <div
                 key={index}
-                className={`p-4 rounded-lg border ${styles.border} ${styles.bg}`}
+                className={`p-3 rounded-lg border ${styles.border} ${styles.bg}`}
               >
-                <div className="flex items-start gap-3">
+                <div className="flex items-start gap-2">
                   <div className={`rounded-full p-1 ${styles.iconColor}`}>
-                    <Icon className="h-5 w-5" />
+                    <Icon className="h-4 w-4" />
                   </div>
-                  <div className="flex-1 space-y-2">
+                  <div className="flex-1 space-y-1.5">
                     <div className="flex items-start justify-between">
-                      <h3 className="font-medium text-gray-900">
+                      <h3 className="text-sm font-medium text-gray-900">
                         {insight.title}
                       </h3>
                       <Badge
@@ -212,14 +212,14 @@ export function InsightHighlights({ kpis, employees }: InsightHighlightsProps) {
                         {insight.type}
                       </Badge>
                     </div>
-                    <p className="text-sm text-gray-700">
+                    <p className="text-xs text-gray-700">
                       {insight.description}
                     </p>
-                    <div className="pt-2 border-t border-gray-200">
+                    <div className="pt-1.5 border-t border-gray-200">
                       <p className="text-xs font-medium text-gray-600">
                         💡 Recommended Action:
                       </p>
-                      <p className="text-xs text-gray-600 mt-1">
+                      <p className="text-xs text-gray-600 mt-0.5">
                         {insight.action}
                       </p>
                     </div>
@@ -231,28 +231,28 @@ export function InsightHighlights({ kpis, employees }: InsightHighlightsProps) {
         </div>
 
         {/* Summary Stats */}
-        <div className="mt-6 pt-4 border-t border-gray-200">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-4">
+        <div className="mt-4 pt-3 border-t border-gray-200">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-4">
             <div className="text-center">
-              <p className="text-lg font-semibold text-green-600">
+              <p className="text-base font-semibold text-green-600">
                 {insights.filter(i => i.type === 'success').length}
               </p>
               <p className="text-xs text-gray-500">Strengths</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-semibold text-yellow-600">
+              <p className="text-base font-semibold text-yellow-600">
                 {insights.filter(i => i.type === 'warning').length}
               </p>
               <p className="text-xs text-gray-500">Opportunities</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-semibold text-blue-600">
+              <p className="text-base font-semibold text-blue-600">
                 {insights.filter(i => i.type === 'info').length}
               </p>
               <p className="text-xs text-gray-500">Observations</p>
             </div>
             <div className="text-center">
-              <p className="text-lg font-semibold text-gray-900">
+              <p className="text-base font-semibold text-gray-900">
                 {insights.length}
               </p>
               <p className="text-xs text-gray-500">Total Insights</p>

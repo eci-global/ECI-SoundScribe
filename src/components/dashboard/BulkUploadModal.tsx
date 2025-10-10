@@ -4,13 +4,14 @@ import { Button } from '@/components/ui/button';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
 import { useDragAndDrop } from '@/hooks/useDragAndDrop';
-import { 
-  Upload, 
-  FileAudio, 
-  FileVideo, 
-  X, 
-  CheckCircle, 
-  AlertCircle, 
+import { useSupportMode } from '@/contexts/SupportContext';
+import {
+  Upload,
+  FileAudio,
+  FileVideo,
+  X,
+  CheckCircle,
+  AlertCircle,
   Loader2,
   Trash2,
   FolderOpen
@@ -36,6 +37,16 @@ export default function BulkUploadModal({ open, onClose, onUpload }: BulkUploadM
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
   const { toast } = useToast();
+
+  // Get current application mode from context
+  const { currentMode } = useSupportMode();
+
+  // Helper function to determine default content type based on mode
+  const getDefaultContentType = () => {
+    if (currentMode === 'sales') return 'sales_call';
+    if (currentMode === 'support') return 'customer_support';
+    return 'other';
+  };
 
   const handleFileDrop = useCallback((droppedFiles: File[]) => {
     const newFiles: BulkUploadFile[] = droppedFiles.map(file => ({
@@ -94,7 +105,7 @@ export default function BulkUploadModal({ open, onClose, onUpload }: BulkUploadM
         const batchPromises = batch.map(async (fileItem) => {
           try {
             const fileTitle = fileItem.file.name.replace(/\.[^/.]+$/, "");
-            await onUpload(fileItem.file, fileTitle, '', 'other', true);
+            await onUpload(fileItem.file, fileTitle, '', getDefaultContentType(), true);
             completedFiles++;
             setUploadProgress((completedFiles / totalFiles) * 100);
           } catch (error) {
