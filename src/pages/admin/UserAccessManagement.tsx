@@ -644,7 +644,10 @@ export default function UserAccessManagement() {
               <Users className="h-4 w-4" />
               Users ({filteredUsers.length})
             </TabsTrigger>
-            <TabsTrigger value="policies" className="flex items-center gap-2" disabled><Shield className="h-4 w-4" /> Access Policies (use Roles & Access)</TabsTrigger>
+            <TabsTrigger value="policies" className="flex items-center gap-2">
+              <Shield className="h-4 w-4" />
+              Access Policies (use Roles & Access)
+            </TabsTrigger>
           </TabsList>
 
           {/* Users Tab */}

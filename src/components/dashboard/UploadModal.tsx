@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { ModernFileUpload } from '@/components/ui/modern-file-upload';
 import { Progress } from '@/components/ui/progress';
 import { useToast } from '@/hooks/use-toast';
+import { useSupportMode } from '@/contexts/SupportContext';
 import { CheckCircle, Upload, FileAudio, Loader2, MessageSquare, Phone, Headphones, Users, GraduationCap, BookOpen } from 'lucide-react';
 
 export type ContentType = 'sales_call' | 'customer_support' | 'team_meeting' | 'training_session' | 'bdr_training_data' | 'other';
@@ -53,21 +54,36 @@ interface UploadModalProps {
 type UploadStage = 'idle' | 'uploading' | 'transcribing' | 'summarizing' | 'completed' | 'error';
 
 export default function UploadModal({ open, onClose, onUpload, uploadProgress, isUploading }: UploadModalProps) {
+  // Get current application mode from context
+  const { currentMode } = useSupportMode();
+
+  // Helper function to determine default content type based on mode
+  const getDefaultContentType = (): ContentType => {
+    if (currentMode === 'sales') return 'sales_call';
+    if (currentMode === 'support') return 'customer_support';
+    return 'other';
+  };
+
   const [file, setFile] = useState<File | null>(null);
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
-  const [contentType, setContentType] = useState<ContentType>('other');
+  const [contentType, setContentType] = useState<ContentType>(getDefaultContentType());
   const [enableCoaching, setEnableCoaching] = useState(true);
   const [uploadStage, setUploadStage] = useState<UploadStage>('idle');
   const [progress, setProgress] = useState(0);
   const [statusMessage, setStatusMessage] = useState('');
-  
+
   // BDR Training Data specific fields
   const [callIdentifier, setCallIdentifier] = useState('');
   const [trainingProgramId, setTrainingProgramId] = useState('');
   const [isForTraining, setIsForTraining] = useState(false);
-  
+
   const { toast } = useToast();
+
+  // Update content type when mode changes
+  useEffect(() => {
+    setContentType(getDefaultContentType());
+  }, [currentMode]);
 
   // Use external upload progress if available, otherwise fall back to internal
   const currentProgress = uploadProgress || null;
