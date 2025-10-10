@@ -34,7 +34,7 @@ export const useSupabaseSSO = () => {
     if (domain === 'ecisolutions.com') {
       return {
         required: true,
-        providerId: 'a00d47ee-0539-46cc-adc0-3b9a2ffbc0de',
+        providerId: '4865c1ea-77bb-4182-b8da-6c2f5a8aed32',
         message: 'SSO authentication is required for this account. Please sign in with SSO.',
       };
     }
@@ -95,7 +95,7 @@ export const useSupabaseSSO = () => {
       // First try by domain
       if (domain === 'ecisolutions.com') {
         // Use provider ID directly for ecisolutions.com
-        ssoConfig.providerId = 'a00d47ee-0539-46cc-adc0-3b9a2ffbc0de';
+        ssoConfig.providerId = '4865c1ea-77bb-4182-b8da-6c2f5a8aed32';
       } else {
         // Fall back to domain lookup for other domains
         ssoConfig.domain = domain;
@@ -105,7 +105,7 @@ export const useSupabaseSSO = () => {
       if (domain === 'ecisolutions.com') {
         // Build the Supabase SSO initiate URL manually
         const supabaseProjectRef = 'qinkldgvejheppheykfl';
-        const providerId = 'a00d47ee-0539-46cc-adc0-3b9a2ffbc0de';
+        const providerId = '4865c1ea-77bb-4182-b8da-6c2f5a8aed32';
         const ssoInitiateUrl = `https://${supabaseProjectRef}.supabase.co/auth/v1/sso/saml/initiate?provider_id=${providerId}&redirect_to=${encodeURIComponent(redirectUrl)}&apikey=${SUPABASE_ANON_KEY}`;
 
         console.log('Redirecting to SSO initiate URL:', ssoInitiateUrl);
