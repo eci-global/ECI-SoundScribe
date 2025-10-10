@@ -15,7 +15,8 @@ export type PermissionKey =
   | 'admin.analytics.view'
   | 'admin.bdr.manage'
   | 'admin.roles.manage'
-  | 'admin.support.manage';
+  | 'admin.support.manage'
+  | 'admin.employees.view';
 
 export const ALL_PERMISSIONS: PermissionKey[] = [
   'admin.org.view',
@@ -33,6 +34,7 @@ export const ALL_PERMISSIONS: PermissionKey[] = [
   'admin.bdr.manage',
   'admin.roles.manage',
   'admin.support.manage',
+  'admin.employees.view',
 ];
 
 // Map admin routes to required permissions
@@ -56,6 +58,7 @@ export const ROUTE_PERMISSIONS: Record<string, PermissionKey[]> = {
   '/admin/feedback-analytics': ['admin.bdr.manage'],
   '/admin/roles-access': ['admin.roles.manage'],
   '/admin/support-settings': ['admin.support.manage'],
+  '/employees': ['admin.employees.view'],
 };
 
 export function getRoutePermissions(pathname: string): PermissionKey[] {
