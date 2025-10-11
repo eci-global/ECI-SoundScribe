@@ -1,8 +1,6 @@
-
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { User, Session } from '@supabase/supabase-js';
 import { supabase } from '@/integrations/supabase/client';
-import { useSupabaseSSO } from './useSupabaseSSO';
 
 interface AuthContextType {
   user: User | null;
@@ -22,33 +20,19 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
   const [loading, setLoading] = useState(true);
-  const { signInWithSSO: supabaseSSOSignIn, checkSSORequired: checkSupabaseSSO, isSSOEnabled } = useSupabaseSSO();
+  const isSSOEnabled = false;
 
   useEffect(() => {
-    // Set up auth state listener first
-    const { data: { subscription } } = supabase.auth.onAuthStateChange(
-      (event, session) => {
-        console.log('Auth state changed:', event, {
-          hasSession: !!session,
-          userId: session?.user?.id,
-          email: session?.user?.email
-        });
-        setSession(session);
-        setUser(session?.user ?? null);
-        setLoading(false);
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      setSession(session);
+      setUser(session?.user ?? null);
+      setLoading(false);
+      if (session?.user?.id) {
+        supabase.rpc('initialize_new_user').catch(() => {});
       }
-    );
+    });
 
-    // Then get initial session
-    supabase.auth.getSession().then(({ data: { session }, error }) => {
-      if (error) {
-        console.error('Error getting initial session:', error);
-      }
-      console.log('Initial session loaded:', {
-        hasSession: !!session,
-        userId: session?.user?.id,
-        email: session?.user?.email
-      });
+    supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setUser(session?.user ?? null);
       setLoading(false);
@@ -61,84 +45,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     try {
       setLoading(true);
       const redirectUrl = `${window.location.origin}/`;
-      
       const { error } = await supabase.auth.signUp({
         email,
         password,
-        options: {
-          emailRedirectTo: redirectUrl,
-          data: {
-            full_name: fullName
-          }
-        }
+        options: { emailRedirectTo: redirectUrl, data: { full_name: fullName } }
       });
-      
       return { error };
-    } catch (error) {
-      console.error('Signup error:', error);
-      return { error };
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const signIn = async (email: string, password: string) => {
     try {
       setLoading(true);
-      console.log('Attempting to sign in with:', email);
-      
-      const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password
-      });
-      
-      if (error) {
-        console.error('Sign in error:', error);
-      } else {
-        console.log('Sign in successful:', data);
-      }
-      
+      const { error } = await supabase.auth.signInWithPassword({ email, password });
       return { error };
-    } catch (error) {
-      console.error('Sign in exception:', error);
-      return { error };
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   };
 
   const signOut = async () => {
     try {
       setLoading(true);
-      const { error } = await supabase.auth.signOut();
-      if (error) {
-        console.error('Sign out error:', error);
-      }
-    } catch (error) {
-      console.error('Sign out exception:', error);
-    } finally {
-      setLoading(false);
-    }
+      await supabase.auth.signOut();
+    } finally { setLoading(false); }
   };
 
-  const signInWithSSO = async (email: string) => {
-    try {
-      await supabaseSSOSignIn(email);
-    } catch (error) {
-      console.error('SSO sign in error:', error);
-      throw error;
-    }
-  };
-
-  const checkSsoRequired = async (email: string): Promise<{ required: boolean; message?: string }> => {
-    try {
-      const result = await checkSupabaseSSO(email);
-      return result;
-    } catch (error) {
-      console.error('Error checking SSO requirement:', error);
-      return { required: false };
-    }
-  };
+  const signInWithSSO = async (_email: string) => { throw new Error('SSO disabled'); };
+  const checkSsoRequired = async (_email: string): Promise<{ required: boolean; message?: string }> => ({ required: false });
 
   return (
     <AuthContext.Provider value={{
@@ -164,3 +96,4 @@ export function useAuth() {
   }
   return context;
 }
+

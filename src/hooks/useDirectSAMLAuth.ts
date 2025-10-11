@@ -14,13 +14,12 @@ export const useDirectSAMLAuth = () => {
    * This bypasses Supabase's SSO provider lookup
    */
   const signInWithOktaDirect = (email: string) => {
-    // Your Okta SAML SSO endpoint
-    const oktaSAMLUrl = 'https://ecisolutions.okta.com/app/ecisolutions_ecisoundscribe_1/exkwascjyz0SQ6Vai697/sso/saml';
+    // Okta SAML SSO endpoint (configure via env in production)
+    const oktaSAMLUrl = (import.meta as any)?.env?.VITE_OKTA_SAML_SSO_URL || 'https://example.okta.com/app/your_app_id/sso/saml';
 
     // Supabase callback URL
-    const redirectUrl = window.location.hostname === 'localhost'
-      ? `${window.location.origin}/auth/callback`
-      : 'https://eci-sound-scribe.vercel.app/auth/callback';
+    const publicSite = (import.meta as any)?.env?.VITE_PUBLIC_SITE_URL || window.location.origin;
+    const redirectUrl = `${publicSite}/auth/callback`;
 
     // Build SAML request with RelayState
     const samlRequest = {
@@ -47,9 +46,9 @@ export const useDirectSAMLAuth = () => {
                     ID="${requestID}"
                     Version="2.0"
                     IssueInstant="${timestamp}"
-                    Destination="https://ecisolutions.okta.com/app/ecisolutions_ecisoundscribe_1/exkwascjyz0SQ6Vai697/sso/saml"
-                    AssertionConsumerServiceURL="https://qinkldgvejheppheykfl.supabase.co/auth/v1/sso/saml/acs">
-  <saml:Issuer>https://qinkldgvejheppheykfl.supabase.co/auth/v1/sso/saml/metadata</saml:Issuer>
+                    Destination="${(import.meta as any)?.env?.VITE_OKTA_SAML_SSO_URL || 'https://example.okta.com/app/your_app_id/sso/saml'}"
+                    AssertionConsumerServiceURL="https://${(import.meta as any)?.env?.VITE_SUPABASE_PROJECT_REF || 'your_project_ref'}.supabase.co/auth/v1/sso/saml/acs">
+  <saml:Issuer>https://${(import.meta as any)?.env?.VITE_SUPABASE_PROJECT_REF || 'your_project_ref'}.supabase.co/auth/v1/sso/saml/metadata</saml:Issuer>
 </samlp:AuthnRequest>`;
   };
 
